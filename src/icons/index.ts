@@ -30,6 +30,7 @@ export { default as MenuIcon } from "@mui/icons-material/Menu";
 export { default as MenuBookIcon } from "@mui/icons-material/MenuBook";
 export { default as PeopleIcon } from "@mui/icons-material/People";
 export { default as PersonIcon } from "@mui/icons-material/Person";
+export { default as PhotoCameraIcon } from "@mui/icons-material/PhotoCamera";
 export { default as RadioButtonUncheckedIcon } from "@mui/icons-material/RadioButtonUnchecked";
 export { default as RecommendIcon } from "@mui/icons-material/Recommend";
 export { default as RestaurantIcon } from "@mui/icons-material/Restaurant";

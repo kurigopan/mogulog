@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { ArrowBackIosIcon, HistoryIcon } from "@/icons";
+import { ArrowBackIosIcon, HistoryIcon, DeleteIcon } from "@/icons";
 import ListCard from "@/components/ui/listCard";
-import { Recipe } from "@/types/types";
 import { mockRecipes } from "@/mocks/recipes";
+import { Recipe } from "@/types/types";
 
 export default function RecentViewed() {
   const [recentItems, setRecentItems] = useState<Recipe[]>([]);
@@ -24,7 +25,9 @@ export default function RecentViewed() {
     }, 800);
   }, []);
 
-  const handleClearHistory = () => {
+  const handleClear = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (
       window.confirm("閲覧履歴をすべて削除しますか？この操作は取り消せません。")
     ) {
@@ -54,83 +57,32 @@ export default function RecentViewed() {
     }
   });
 
-  // const formatViewDate = (date: Date) => {
-  //   const now = new Date();
-  //   const diffMs = now.getTime() - date.getTime();
-  //   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  //   const diffDays = Math.floor(diffHours / 24);
-
-  //   if (diffHours < 1) {
-  //     const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  //     return `${diffMinutes}分前`;
-  //   } else if (diffHours < 24) {
-  //     return `${diffHours}時間前`;
-  //   } else if (diffDays === 1) {
-  //     return "昨日";
-  //   } else {
-  //     return `${diffDays}日前`;
-  //   }
-  // };
-
   // ヘッダーコンテンツ
   const content = (
-    <div className="flex items-center space-x-2">
-      {recentItems.length > 0 && (
-        <>
-          {/* フィルター選択 */}
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="text-sm text-stone-600 bg-white border border-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300"
-          >
-            <option value="all">すべて</option>
-            <option value="recipe">レシピ</option>
-            <option value="ingredient">食材</option>
-          </select>
-
-          {/* ソート選択 */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="text-sm text-stone-600 bg-white border border-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300"
-          >
-            <option value="recent">最近見た順</option>
-            <option value="oldest">古い順</option>
-            <option value="name">名前順</option>
-            <option value="subtitle">段階/月齢順</option>
-          </select>
-        </>
-      )}
-    </div>
+    <button
+      onClick={(e) => handleClear(e)}
+      className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+    >
+      <DeleteIcon />
+    </button>
   );
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header icon={<ArrowBackIosIcon />} title="最近見た" content={content} />
+      <Header
+        icon={<ArrowBackIosIcon />}
+        title="最近見たもの"
+        content={content}
+      />
 
       <div className="p-4 space-y-6">
-        {/* 履歴クリアボタン */}
-        {recentItems.length > 0 && (
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-stone-500">
-              {filteredItems.length}件の履歴があります
-            </p>
-            <button
-              onClick={handleClearHistory}
-              className="text-sm text-red-500 hover:text-red-600 transition-colors underline"
-            >
-              履歴をクリア
-            </button>
-          </div>
-        )}
-
         {/* アイテム一覧 */}
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
           </div>
         ) : sortedItems.length > 0 ? (
-          <ListCard listCardItems={sortedItems} pageName="search" />
+          <ListCard listCardItems={sortedItems} pageName="history" />
         ) : recentItems.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">

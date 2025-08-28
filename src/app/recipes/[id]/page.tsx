@@ -15,58 +15,11 @@ import {
 import { Tooltip, IconButton } from "@mui/material";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { mockRecipes } from "@/mocks/recipes";
 
 export default function RecipeDetail() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [memo, setMemo] = useState("");
-
-  // サンプルレシピデータ
-  const recipe = {
-    id: 1,
-    name: "にんじんとかぼちゃの煮物",
-    image: "/soup.jpg",
-    author: "離乳食ママ",
-    isOwn: false, // 自分が作成したレシピかどうか
-    stages: ["中期", "後期"],
-    cookingTime: "15分",
-    servings: "1食分",
-    description:
-      "甘くて栄養満点！赤ちゃんが大好きな定番メニューです。自然の甘みで食べやすく、冷凍保存も可能です。",
-    ingredients: [
-      { name: "にんじん", amount: "30g", note: "皮を厚めに剥く" },
-      { name: "かぼちゃ", amount: "30g", note: "種とワタを取り除く" },
-      { name: "だし汁", amount: "100ml", note: "昆布だしがおすすめ" },
-      { name: "しょうゆ", amount: "小さじ1/4", note: "後期から使用可能" },
-    ],
-    steps: [
-      {
-        step: 1,
-        title: "野菜の下準備",
-        description:
-          "にんじんとかぼちゃを月齢に適した大きさに切る。にんじんは皮を厚めに剥き、かぼちゃは種とワタを取り除きます。",
-        time: "3分",
-        image: "https://placehold.co/600x400/E5E7EB/4B5563?text=Step+1",
-      },
-      {
-        step: 2,
-        title: "だし汁で煮る",
-        description:
-          "小鍋にだし汁を入れ、切った野菜を加えて弱火で煮込みます。野菜が柔らかくなるまで約10分煮込みます。",
-        time: "10分",
-        image: "https://placehold.co/600x400/E5E7EB/4B5563?text=Step+2",
-      },
-      {
-        step: 3,
-        title: "味付けと仕上げ",
-        description:
-          "野菜が柔らかくなったら、後期の場合は少量のしょうゆを加えます。中期までは味付けなしで自然の甘みを楽しみます。",
-        time: "2分",
-        image: "",
-      },
-    ],
-    tags: ["野菜", "煮物", "冷凍OK", "作り置きOK"],
-    savedMemo: "少し多めに作って冷凍保存。解凍後は少し水分を足すと良い。",
-  };
 
   const handleFavoriteClick = () => {
     setIsFavorited((prev) => !prev);
@@ -111,10 +64,10 @@ export default function RecipeDetail() {
           <div className="text-center mb-4">
             {/* 画像があれば表示する */}
             <div className="w-[300px] h-[300px] overflow-hidden mx-auto mb-2">
-              {recipe.image && (
+              {mockRecipes[0].image && (
                 <Image
-                  src={recipe.image}
-                  alt={`${recipe.name}の画像`}
+                  src={mockRecipes[0].image}
+                  alt={`${mockRecipes[0].name}の画像`}
                   width={300}
                   height={300}
                   className="object-contain rounded-2xl"
@@ -123,42 +76,39 @@ export default function RecipeDetail() {
               )}
             </div>
             <h2 className="text-2xl font-bold text-stone-700 mb-2">
-              {recipe.name}
+              {mockRecipes[0].name}
             </h2>
-            <p className="text-sm text-stone-500 mb-3">by {recipe.author}</p>
+            <p className="text-sm text-stone-500 mb-3">
+              by {mockRecipes[0].author}
+            </p>
 
             {/* 離乳食段階タグ */}
             <div className="flex justify-center space-x-2 mb-4">
-              {recipe.stages.map((stage, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium"
-                >
-                  離乳食{stage}
-                </span>
-              ))}
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
+                {mockRecipes[0].startStage}
+              </span>
             </div>
 
             {/* レシピ情報 */}
             <div className="flex justify-center space-x-6 text-sm text-stone-600">
               <div className="flex items-center">
                 <ScheduleIcon />
-                <span className="ml-1">{recipe.cookingTime}</span>
+                <span className="ml-1">{mockRecipes[0].cookingTime}</span>
               </div>
               <div className="flex items-center">
                 <PeopleIcon />
-                <span className="ml-1">{recipe.servings}</span>
+                <span className="ml-1">{mockRecipes[0].servings}</span>
               </div>
             </div>
           </div>
 
           <p className="text-stone-600 text-center leading-relaxed mb-4">
-            {recipe.description}
+            {mockRecipes[0].description}
           </p>
 
           {/* アクションボタン */}
           <div className="flex space-x-3">
-            {recipe.isOwn && (
+            {mockRecipes[0].isOwn && (
               <button className="flex items-center justify-center py-3 px-4 rounded-2xl font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors">
                 <EditIcon />
                 <span className="ml-2">編集</span>
@@ -174,7 +124,7 @@ export default function RecipeDetail() {
           </h3>
           <div className="bg-white rounded-2xl p-4 shadow-sm">
             <div className="space-y-3">
-              {recipe.ingredients.map((ingredient, index) => (
+              {mockRecipes[0].ingredients.map((ingredient, index) => (
                 <div
                   key={index}
                   className="flex justify-between items-center py-2 border-b border-stone-100 last:border-b-0"
@@ -204,7 +154,7 @@ export default function RecipeDetail() {
             作り方
           </h3>
           <div className="space-y-4">
-            {recipe.steps.map((step, index) => (
+            {mockRecipes[0].steps.map((step, index) => (
               <div key={index} className="bg-white rounded-2xl p-5 shadow-sm">
                 <div className="flex items-start mb-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
@@ -239,13 +189,13 @@ export default function RecipeDetail() {
         </section>
 
         {/* タグ */}
-        {recipe.tags.length > 0 && (
+        {mockRecipes[0].tags.length > 0 && (
           <section>
             <h3 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
               タグ
             </h3>
             <div className="flex flex-wrap gap-2">
-              {recipe.tags.map((tag, index) => (
+              {mockRecipes[0].tags.map((tag, index) => (
                 <span
                   key={index}
                   className="text-xs bg-amber-50 text-amber-600 px-3 py-1 rounded-full font-medium"
@@ -292,13 +242,13 @@ export default function RecipeDetail() {
             </Tooltip>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-sm">
-            {recipe.savedMemo && (
+            {mockRecipes[0].savedMemo && (
               <div className="mb-4 p-3 bg-stone-50 rounded-xl">
                 <p className="text-sm text-stone-600 leading-relaxed">
                   <span className="font-medium text-stone-700">
                     前回のメモ:{" "}
                   </span>
-                  {recipe.savedMemo}
+                  {mockRecipes[0].savedMemo}
                 </p>
               </div>
             )}
@@ -312,7 +262,7 @@ export default function RecipeDetail() {
             <div className="flex justify-end mt-3">
               <button
                 onClick={handleMemoSave}
-                className="px-6 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors font-medium"
+                className="px-6 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors font-medium"
               >
                 メモを保存
               </button>

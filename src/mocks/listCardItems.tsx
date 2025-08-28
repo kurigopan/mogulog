@@ -1,6 +1,6 @@
-import { ListCardItem } from "@/types/types";
+import { CardItem } from "@/types/types";
 
-export const mockListCardItems: ListCardItem[] = [
+export const mockListCardItems: CardItem[] = [
   {
     id: 1,
     name: "かぼちゃのペースト",
@@ -10,6 +10,7 @@ export const mockListCardItems: ListCardItem[] = [
     description: "甘くて食べやすい初期離乳食",
     category: "主食",
     isFavorite: false,
+    date: new Date(),
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ export const mockListCardItems: ListCardItem[] = [
     description: "ビタミン豊富で甘い秋野菜",
     category: "野菜",
     isFavorite: false,
+    date: new Date(),
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ export const mockListCardItems: ListCardItem[] = [
     description: "なめらかで栄養満点",
     category: "汁物",
     isFavorite: false,
+    date: new Date(),
   },
   {
     id: 4,
@@ -40,6 +43,7 @@ export const mockListCardItems: ListCardItem[] = [
     description: "自然な甘さで食べやすい",
     category: "果物",
     isFavorite: false,
+    date: new Date(),
   },
   {
     id: 5,
@@ -50,6 +54,7 @@ export const mockListCardItems: ListCardItem[] = [
     description: "自然な甘さの主食",
     category: "主食",
     isFavorite: false,
+    date: new Date(),
   },
   {
     id: 6,
@@ -60,6 +65,7 @@ export const mockListCardItems: ListCardItem[] = [
     description: "色鮮やかで栄養豊富",
     category: "野菜",
     isFavorite: false,
+    date: new Date(),
   },
   {
     id: 7,
@@ -70,5 +76,6 @@ export const mockListCardItems: ListCardItem[] = [
     description: "複数の野菜で栄養バランス◎",
     category: "汁物",
     isFavorite: false,
+    date: new Date(),
   },
 ];

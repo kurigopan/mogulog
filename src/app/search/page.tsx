@@ -6,14 +6,14 @@ import ListCard from "@/components/ui/listCard";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { SearchIcon, ArrowBackIosIcon } from "@/icons";
-import { ListCardItem } from "@/types/types";
+import { CardItem } from "@/types/types";
 import { mockListCardItems } from "@/mocks/listCardItems";
 
 export default function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const [searchQuery, setSearchQuery] = useState(query);
-  const [results, setResults] = useState<ListCardItem[]>([]);
+  const [results, setResults] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all"); // all, recipe, ingredient
   const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age

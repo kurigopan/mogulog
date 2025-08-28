@@ -64,6 +64,7 @@ export const mockIngredients: Ingredient[] = [
       "茹ですぎると栄養が失われるので注意",
       "冷凍保存も可能です",
     ],
+    date: new Date(),
   },
   {
     id: 2,
@@ -124,6 +125,7 @@ export const mockIngredients: Ingredient[] = [
       "冷凍すると便利",
       "甘みが強いので食欲がない時にも◎",
     ],
+    date: new Date(),
   },
   {
     id: 3,
@@ -184,6 +186,7 @@ export const mockIngredients: Ingredient[] = [
       "水分を多めにして与えると食べやすい",
       "冷凍は食感が変わるので注意",
     ],
+    date: new Date(),
   },
   {
     id: 4,
@@ -244,6 +247,7 @@ export const mockIngredients: Ingredient[] = [
       "皮はむいて与える",
       "すりおろしは変色するので早めに食べる",
     ],
+    date: new Date(),
   },
   {
     id: 5,
@@ -304,6 +308,7 @@ export const mockIngredients: Ingredient[] = [
       "冷凍保存は食感が変わるので注意",
       "水切りして使うと良い",
     ],
+    date: new Date(),
   },
   {
     id: 6,
@@ -351,6 +356,7 @@ export const mockIngredients: Ingredient[] = [
       nutrients: ["タンパク質", "ビタミンD", "カルシウム"],
     },
     tips: ["骨と皮は必ず取り除く", "新鮮なものを選ぶ", "冷凍保存可能"],
+    date: new Date(),
   },
   {
     id: 7,
@@ -402,6 +408,7 @@ export const mockIngredients: Ingredient[] = [
       "冷凍保存が可能",
       "すりつぶしてポタージュにも◎",
     ],
+    date: new Date(),
   },
   {
     id: 8,
@@ -462,5 +469,6 @@ export const mockIngredients: Ingredient[] = [
       "冷凍保存が便利",
       "葉先の柔らかい部分から与える",
     ],
+    date: new Date(),
   },
 ];

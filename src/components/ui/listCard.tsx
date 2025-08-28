@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -10,22 +11,21 @@ import {
   EditIcon,
   DeleteIcon,
 } from "@/icons";
-import { ListCardItem, Recipe } from "@/types/types";
-import React from "react";
+import { CardItem } from "@/types/types";
 
 interface ListCardProps {
-  listCardItems: ListCardItem[];
+  listCardItems: CardItem[];
   pageName: pageType;
 }
 
 type pageType = "favorites" | "drafts" | "history" | "created" | "search";
 
 export default function ListCard({ listCardItems, pageName }: ListCardProps) {
-  const [cardItems, setListCardItems] = useState<ListCardItem[]>([]);
+  const [cardItems, setListCardItems] = useState<CardItem[]>([]);
 
   const handleFavoriteClick = (
     e: React.MouseEvent<HTMLElement>,
-    item: ListCardItem
+    item: CardItem
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -37,10 +37,7 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
     setListCardItems(updateCardItems);
   };
 
-  const handleDelete = (
-    e: React.MouseEvent<HTMLElement>,
-    item: ListCardItem
-  ) => {
+  const handleDelete = (e: React.MouseEvent<HTMLElement>, item: CardItem) => {
     e.preventDefault();
     e.stopPropagation();
     if (
@@ -55,9 +52,10 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
     }
   };
 
-  const iconArea = (item: ListCardItem) => {
+  const iconArea = (item: CardItem) => {
     switch (pageName) {
       case "search":
+      case "history":
       case "favorites":
         return (
           <button
@@ -90,16 +88,6 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
               <DeleteIcon />
             </button>
           </div>
-        );
-      case "history":
-        return (
-          <button
-            onClick={(e) => handleDelete(e, item)}
-            className="p-2 text-red-400 hover:bg-red-600 transition-colors"
-            title="削除"
-          >
-            <DeleteIcon />
-          </button>
         );
     }
   };
@@ -155,9 +143,9 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
                 </p>
                 <div className="flex justify-between items-center">
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {item.subtitle && (
+                    {item.startStage && (
                       <span className="inline-flex items-center px-2 py-1 rounded-full bg-amber-50 text-xs text-amber-600">
-                        {item.subtitle}
+                        {item.startStage}
                       </span>
                     )}
                     {item.category && (

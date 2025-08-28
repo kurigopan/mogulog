@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+/* Custom scrollbar for a softer look */
+/* スクロールバー全体に適用 */
+::-webkit-scrollbar {
+  height: 4px; /* 横スクロール時の高さ */
+  width: 4px; /* 縦スクロール時の幅 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+::-webkit-scrollbar-track {
+  background: transparent; /* 背景は透明 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4); /* グレーの半透明 */
+  border-radius: 2px;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6); /* ホバー時に少し濃く */
+}
+
+/* Firefox 用 */
+* {
+  scrollbar-width: thin; /* 細いスクロールバー */
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
 }

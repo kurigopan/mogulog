@@ -180,23 +180,23 @@ export default function Home() {
         {/* 人気のレシピ */}
         <section>
           <h2 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
-            <div className="text-purple-300 mr-2">
+            <div className="text-amber-300 mr-2">
               <StarIcon />
             </div>
             人気のレシピ
           </h2>
-          <Card cardItems={mockRecipes} className="bg-purple-100" />
+          <Card cardItems={mockRecipes} className="bg-amber-100" />
         </section>
 
         {/* 旬の食材 */}
         <section>
           <h2 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
-            <div className="text-amber-300 mr-2">
+            <div className="text-blue-300 mr-2">
               <LocalFloristIcon />
             </div>
             旬の食材
           </h2>
-          <Card cardItems={mockIngredients} className="bg-amber-100" />
+          <Card cardItems={mockIngredients} className="bg-blue-100" />
         </section>
 
         {/* おすすめのレシピ */}

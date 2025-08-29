@@ -36,14 +36,23 @@ export default function Card({ cardItems, className }: CardProps) {
             <h3 className="font-medium text-stone-700 text-sm mb-1 group-hover:text-purple-600 transition-colors">
               {item.name}
             </h3>
-            <div
-              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${
-                className ?? ""
-              } text-stone-600 mb-1 group-hover:bg-purple-100 transition-colors`}
-            >
-              {item.startStage}
+            <div className="flex justify-center gap-4">
+              <div
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${
+                  className ?? ""
+                } text-stone-600 mb-1 group-hover:bg-purple-100 transition-colors`}
+              >
+                {item.startStage}
+              </div>
+              <div
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${
+                  className ?? ""
+                } text-stone-600 mb-1 group-hover:bg-purple-100 transition-colors`}
+              >
+                {item.category}
+              </div>
             </div>
-            <p className="text-xs text-stone-500 group-hover:text-stone-600 transition-colors">
+            <p className="text-xs text-stone-500 group-hover:text-stone-600 transition-colors line-clamp-2">
               {item.description}
             </p>
           </div>

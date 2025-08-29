@@ -1,36 +1,3 @@
-interface ingredientStageInfo {
-  stage: Stage;
-  age: Age;
-  suitable: boolean;
-  amount: string;
-  shape: string;
-  cooking: string;
-  description: string;
-}
-interface ingredientNutrition {
-  calories: string;
-  nutrients: string[];
-}
-
-interface recipeStep {
-  step: number;
-  title: string;
-  description: string;
-  time: string;
-  image?: string;
-}
-
-interface recipeIngredient {
-  name: string;
-  amount: string;
-  note: string;
-}
-
-type Type = "recipe" | "ingredient";
-type Stage = "初期" | "中期" | "後期" | "完了期";
-type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
-type Season = "通年" | "春" | "夏" | "秋" | "冬";
-
 export interface CardItem {
   id: number;
   name: string;
@@ -65,3 +32,35 @@ export interface Recipe extends CardItem {
   isOwn: boolean;
   savedMemo: string;
 }
+interface ingredientStageInfo {
+  stage: Stage;
+  age: Age;
+  suitable: boolean;
+  amount: string;
+  shape: string;
+  cooking: string;
+  description: string;
+}
+interface ingredientNutrition {
+  calories: string;
+  nutrients: string[];
+}
+
+interface recipeStep {
+  step: number;
+  title: string;
+  description: string;
+  time: string;
+  image?: string;
+}
+
+interface recipeIngredient {
+  name: string;
+  amount: string;
+  note: string;
+}
+
+type Type = "recipe" | "ingredient";
+type Stage = "初期" | "中期" | "後期" | "完了期";
+type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
+type Season = "通年" | "春" | "夏" | "秋" | "冬";

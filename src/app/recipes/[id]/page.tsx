@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import {
-  ArrowBackIosIcon,
   ShareIcon,
   EditIcon,
   FavoriteIcon,
@@ -53,11 +52,7 @@ export default function RecipeDetail() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header
-        icon={<ArrowBackIosIcon />}
-        title="レシピ詳細"
-        content={content}
-      />
+      <Header title="レシピ詳細" content={content} />
       <div className="p-4 space-y-6">
         {/* レシピヘッダー */}
         <div className="bg-white rounded-3xl p-6 shadow-sm">

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { ArrowBackIosIcon, CreateIcon } from "@/icons";
+import { CreateIcon } from "@/icons";
 import ListCard from "@/components/ui/listCard";
 import { Recipe } from "@/types/types";
 import { mockRecipes } from "@/mocks/recipes";
@@ -58,11 +58,7 @@ export default function CreatedRecipes() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header
-        icon={<ArrowBackIosIcon />}
-        title="作成したレシピ"
-        content={content}
-      />
+      <Header title="作成したレシピ" content={content} />
 
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}

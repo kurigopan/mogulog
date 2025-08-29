@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { ArrowBackIosIcon, DraftsIcon } from "@/icons";
+import { DraftsIcon } from "@/icons";
 import ListCard from "@/components/ui/listCard";
 import { Recipe } from "@/types/types";
 import { mockRecipes } from "@/mocks/recipes";
@@ -58,11 +58,7 @@ export default function DraftRecipes() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header
-        icon={<ArrowBackIosIcon />}
-        title="下書きレシピ"
-        content={content}
-      />
+      <Header title="下書きレシピ" content={content} />
 
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}

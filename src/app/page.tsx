@@ -14,7 +14,6 @@ import {
   LocalFloristIcon,
   RecommendIcon,
   HistoryIcon,
-  ChildCareIcon,
 } from "@/icons";
 import { mockRecipes } from "@/mocks/recipes";
 import { mockIngredients } from "@/mocks/ingredients";
@@ -112,11 +111,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header
-        icon={<ChildCareIcon />}
-        title="もぐログ"
-        content={<AgeOptionsFilter />}
-      />
+      <Header pageName="home" title="もぐログ" content={<AgeOptionsFilter />} />
       <div className="p-4 space-y-6">
         {/* 統合検索窓 */}
         <div className="space-y-4">

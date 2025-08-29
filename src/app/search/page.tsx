@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import ListCard from "@/components/ui/listCard";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { SearchIcon, ArrowBackIosIcon } from "@/icons";
+import { SearchIcon } from "@/icons";
 import { CardItem } from "@/types/types";
 import { mockListCardItems } from "@/mocks/listCardItems";
 
@@ -57,7 +57,7 @@ export default function SearchResults() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header icon={<ArrowBackIosIcon />} title="検索結果" />
+      <Header title="検索結果" />
       <div className="p-4 space-y-6">
         {/* 検索窓 */}
         <div className="relative">

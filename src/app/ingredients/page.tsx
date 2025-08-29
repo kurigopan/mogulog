@@ -11,7 +11,6 @@ import {
   CheckCircleIcon,
   CancelIcon,
   RadioButtonUncheckedIcon,
-  ArrowBackIosIcon,
   HelpOutlineIcon,
 } from "@/icons";
 import { Tooltip, IconButton } from "@mui/material";
@@ -153,7 +152,7 @@ export default function IngredientsList() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header icon={<ArrowBackIosIcon />} title="食材一覧" />
+      <Header title="食材一覧" />
       <div className="p-4 space-y-6">
         {/* フィルターボックス */}
         <div className="flex items-center justify-end">

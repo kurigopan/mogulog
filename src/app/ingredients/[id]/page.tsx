@@ -6,12 +6,7 @@ import { Tabs, Tab, Box } from "@mui/material";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import Card from "@/components/ui/card";
-import {
-  ArrowBackIosIcon,
-  ShareIcon,
-  CheckCircleIcon,
-  CancelIcon,
-} from "@/icons";
+import { ShareIcon, CheckCircleIcon, CancelIcon } from "@/icons";
 import { mockIngredients } from "@/mocks/ingredients";
 import { mockRecipes } from "@/mocks/recipes";
 
@@ -40,7 +35,7 @@ export default function IngredientDetail() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header icon={<ArrowBackIosIcon />} title="食材詳細" content={content} />;
+      <Header title="食材詳細" content={content} />
       <div className="p-4 space-y-6">
         {/* Ingredient Header */}
         <div className="bg-white rounded-3xl p-6 shadow-sm">

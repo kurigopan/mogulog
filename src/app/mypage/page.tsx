@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import {
-  ArrowBackIosIcon,
   EditIcon,
   ChevronRightIcon,
   FavoriteBorderIcon,
@@ -116,7 +115,7 @@ export default function MyPage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header icon={<ArrowBackIosIcon />} title="マイページ" />
+      <Header title="マイページ" />
       <div className="p-4 space-y-6">
         {/* 親プロフィール */}
         <section>

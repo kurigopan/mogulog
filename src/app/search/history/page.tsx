@@ -5,7 +5,7 @@ import React from "react";
 import Link from "next/link";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { ArrowBackIosIcon, HistoryIcon, DeleteIcon } from "@/icons";
+import { HistoryIcon, DeleteIcon } from "@/icons";
 import ListCard from "@/components/ui/listCard";
 import { mockRecipes } from "@/mocks/recipes";
 import { Recipe } from "@/types/types";
@@ -69,11 +69,7 @@ export default function RecentViewed() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header
-        icon={<ArrowBackIosIcon />}
-        title="最近見たもの"
-        content={content}
-      />
+      <Header title="最近見たもの" content={content} />
 
       <div className="p-4 space-y-6">
         {/* アイテム一覧 */}

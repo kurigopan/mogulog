@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { ArrowBackIosIcon, FavoriteBorderIcon } from "@/icons";
+import { FavoriteBorderIcon } from "@/icons";
 import ListCard from "@/components/ui/listCard";
 import { Recipe } from "@/types/types";
 import { mockRecipes } from "@/mocks/recipes";
@@ -58,11 +58,7 @@ export default function FavoriteRecipes() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header
-        icon={<ArrowBackIosIcon />}
-        title="お気に入りレシピ"
-        content={content}
-      />
+      <Header title="お気に入りレシピ" content={content} />
 
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}

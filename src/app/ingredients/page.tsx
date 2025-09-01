@@ -15,7 +15,7 @@ import {
 } from "@/icons";
 import { Tooltip, IconButton } from "@mui/material";
 import { Ingredient, ingredientStageInfo } from "@/types/types";
-import { getIngredients } from "@/lib/supabase";
+import { getIngredientsWithStatus } from "@/lib/supabase";
 import type { Tables } from "@/types/supabase";
 
 // `getIngredients`の返り値の型を定義
@@ -36,7 +36,10 @@ export default function IngredientsList() {
     const fetchIngredients = async () => {
       try {
         setLoading(true);
-        const data = await getIngredients();
+        const data = await getIngredientsWithStatus(
+          "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+          1
+        );
         if (data) {
           setIngredients(data);
         }

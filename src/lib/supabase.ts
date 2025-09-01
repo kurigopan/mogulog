@@ -1,6 +1,11 @@
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
-import { ingredientsResponseSchema } from '@/types/schemas';
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/types/supabase";
+import { z } from "zod";
+import {
+  // ingredientsResponseSchema,
+  rpcIngredientSchema,
+  ingredientSchema,
+} from "@/types/schemas";
 
 // SupabaseプロジェクトのURLとanonキーを環境変数から取得
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,7 +14,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 // 環境変数が設定されていない場合のエラーハンドリング
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
-    'SupabaseのURLとanonキーが.env.localファイルに設定されていません。'
+    "SupabaseのURLとanonキーが.env.localファイルに設定されていません。"
   );
 }
 
@@ -18,20 +23,25 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 /**
- * ingredientsテーブルからすべてのデータを取得し、Zodスキーマで安全にパースします。
+ * ユーザーと子どものIDに基づいて、食材リストとステータスを取得するカスタム関数を呼び出す
  */
-export const getIngredients = async () => {
-  const { data, error } = await supabase.from('ingredients').select('*');
+export async function getIngredientsWithStatus(
+  userId: string,
+  childId: number
+) {
+  const { data, error } = await supabase.rpc("get_ingredients_with_status", {
+    user_id_param: userId,
+    child_id_param: childId,
+  });
 
   if (error) {
-    console.error('Error fetching ingredients:', error.message);
-    throw error;
+    console.error("Failed to fetch ingredients with status:", error);
+    return [];
   }
 
-  // Zodスキーマでデータをパースします。
-  // これにより、jsonb型も自動的に検証・型付けされます。
-  // .parse()はデータがスキーマに一致しない場合、エラーをスローします。
-  const parsedData = ingredientsResponseSchema.parse(data);
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcIngredientSchema).parse(data);
 
-  return parsedData;
-};
+  // フロントエンドの型に変換
+  return validatedData.map((d) => ingredientSchema.parse(d));
+}

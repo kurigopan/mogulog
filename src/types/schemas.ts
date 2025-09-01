@@ -23,6 +23,7 @@ export const seasonSchema = z.enum(["通年", "春", "夏", "秋", "冬"]);
 export const stageSchema = z.enum(["初期", "中期", "後期", "完了期"]);
 
 // 1. データベースから直接取得するデータのスキーマを定義
+// APIレスポンスに status情報が含まれるため、rpcIngredientSchemaにリネーム
 const dbIngredientSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -39,14 +40,20 @@ const dbIngredientSchema = z.object({
   updated_at: z.string(),
   updated_by: z.string(),
 });
+// カスタム関数が返すデータのZodスキーマを定義
+// is_favorite, eaten, ngがBooleanとして含まれる
+export const rpcIngredientSchema = dbIngredientSchema.extend({
+  is_favorite: z.boolean().nullable(),
+  eaten: z.boolean().nullable(),
+  ng: z.boolean().nullable(),
+});
 
 // 2. dbIngredientSchemaを使い、.transform()でフロントエンドの型に変換
-export const ingredientSchema = dbIngredientSchema.transform((dbData) => {
+export const ingredientSchema = rpcIngredientSchema.transform((dbData) => {
   return {
     // --- プロパティ名のマッピング ---
     image: dbData.image_url,
     startStage: dbData.start_stage,
-    ng: false,
     season: dbData.seasons as Season[],
 
     // --- 値の変換 ---
@@ -54,8 +61,11 @@ export const ingredientSchema = dbIngredientSchema.transform((dbData) => {
 
     // --- 固定値やデフォルト値の追加 ---
     type: "ingredient" as const, // フロントで必要な固定値
-    isFavorite: false, // DBにないがフロントで使うプロパティ
-    eaten: false, // DBにないがフロントで使うプロパティ
+
+    // --- isFavorite, eaten, ngはnullの場合falseに変換 ---
+    isFavorite: dbData.is_favorite ?? false,
+    eaten: dbData.eaten ?? false,
+    ng: dbData.ng ?? false,
 
     // --- そのまま渡すプロパティ ---
     id: dbData.id,
@@ -69,8 +79,7 @@ export const ingredientSchema = dbIngredientSchema.transform((dbData) => {
 });
 
 // ingredientsテーブルからのレスポンス全体（配列）のスキーマ
-// このスキーマが .transform() を含む ingredientSchema を使うようになります
-export const ingredientsResponseSchema = z.array(ingredientSchema);
+export const ingredientsResponseSchema = z.array(dbIngredientSchema);
 
 // スキーマからTypeScriptの型を推論
 export type SupabaseSeason = z.infer<typeof seasonSchema>;

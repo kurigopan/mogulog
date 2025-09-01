@@ -1,8 +1,8 @@
 export interface CardItem {
   id: number;
   name: string;
-  image: string;
-  description: string;
+  image: string | null;
+  description: string | null;
   category: string;
   type: Type;
   startStage: Stage;
@@ -20,17 +20,15 @@ export interface Ingredient extends CardItem {
 }
 
 export interface Recipe extends CardItem {
-  date: Date;
-  isFavorite: boolean;
-  cookingTime: string;
-  servings: string;
+  cookingTime: string | null;
+  servings: string | null;
   ingredients: recipeIngredient[];
   steps: recipeStep[];
   tags: string[];
   isPrivate: boolean;
   author: string;
   isOwn: boolean;
-  savedMemo: string;
+  savedMemo: string | null;
 }
 interface ingredientStageInfo {
   stage: Stage;
@@ -50,17 +48,16 @@ interface recipeStep {
   step: number;
   title: string;
   description: string;
-  time: string;
-  image?: string;
+  image: string | null;
 }
 
 interface recipeIngredient {
   name: string;
   amount: string;
-  note: string;
+  note: string | null;
 }
 
 type Type = "recipe" | "ingredient";
-type Stage = "初期" | "中期" | "後期" | "完了期";
-type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
-type Season = "通年" | "春" | "夏" | "秋" | "冬";
+export type Stage = "初期" | "中期" | "後期" | "完了期";
+export type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
+export type Season = "通年" | "春" | "夏" | "秋" | "冬";

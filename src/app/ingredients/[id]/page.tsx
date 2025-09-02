@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import { Tabs, Tab, Box } from "@mui/material";
@@ -7,13 +8,46 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import Card from "@/components/ui/card";
 import { ShareIcon, CheckCircleIcon, CancelIcon } from "@/icons";
-import { mockIngredients } from "@/mocks/ingredients";
 import { mockRecipes } from "@/mocks/recipes";
+import NotFoundPage from "./notFound";
+import { getIngredientsWithStatus } from "@/lib/supabase";
+import { Ingredient } from "@/types/types";
 
-export default function IngredientDetail() {
+export default function IngredientDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const unwrapParams = use(params);
+  const id = Number(unwrapParams.id);
   const [hasEaten, setHasEaten] = useState(false);
   const [isNG, setIsNG] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchIngredients = async () => {
+    try {
+      const data = await getIngredientsWithStatus(
+        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+        1
+      );
+      if (data) {
+        setIngredients(data);
+      }
+    } catch (err) {
+      setError("データの取得に失敗しました。");
+      console.error(err);
+    } finally {
+    }
+  };
+  fetchIngredients();
+  const displayIngredient = ingredients.find((ing) => ing.id === id);
+
+  // 食材が見つからない場合は404ページを表示
+  if (!displayIngredient) {
+    return <NotFoundPage />;
+  }
 
   const handleEatenClick = () => {
     setHasEaten((prev) => !prev);
@@ -42,10 +76,10 @@ export default function IngredientDetail() {
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <div className="text-center mb-4">
               {/* 画像があれば表示する */}
-              {mockIngredients[0].image && (
+              {displayIngredient.image && (
                 <Image
-                  src={mockIngredients[0].image}
-                  alt={`${mockIngredients[0].name}の画像`}
+                  src={displayIngredient.image}
+                  alt={`${displayIngredient.name}の画像`}
                   width={150}
                   height={150}
                   className="rounded-3xl mb-4 mx-auto"
@@ -53,14 +87,14 @@ export default function IngredientDetail() {
                 />
               )}
               <h2 className="text-2xl font-bold text-stone-700 mb-4">
-                {mockIngredients[0].name}
+                {displayIngredient.name}
               </h2>
               <div className="inline-flex items-center px-3 py-2 rounded-full bg-green-50 text-green-600 text-sm">
-                {mockIngredients[0].season}
+                {displayIngredient.season}
               </div>
             </div>
             <p className="text-stone-600 text-center leading-relaxed">
-              {mockIngredients[0].description}
+              {displayIngredient.description}
             </p>
 
             {/* 食べたNGボタン */}
@@ -121,7 +155,7 @@ export default function IngredientDetail() {
                   },
                 }}
               >
-                {mockIngredients[0].stageInfo.map((info, index) => (
+                {displayIngredient.stageInfo.map((info, index) => (
                   <Tab key={index} label={`${info.stage}`} />
                 ))}
               </Tabs>
@@ -129,7 +163,7 @@ export default function IngredientDetail() {
 
             {/* 離乳食段階別内容 */}
             <div className="p-6">
-              {mockIngredients[0].stageInfo.map((info, index) => (
+              {displayIngredient.stageInfo.map((info, index) => (
                 <div
                   key={index}
                   className={`${selectedTab === index ? "block" : "hidden"}`}
@@ -188,7 +222,7 @@ export default function IngredientDetail() {
             <div className="flex justify-between w-full mb-4">
               <span className="font-medium text-stone-700">カロリー</span>
               <span className="text-stone-600">
-                {mockIngredients[0].nutrition.calories}
+                {displayIngredient.nutrition.calories}
               </span>
             </div>
             <div className="flex justify-between w-full">
@@ -196,7 +230,7 @@ export default function IngredientDetail() {
                 主な栄養素
               </span>
               <div className="flex flex-wrap gap-2 ml-2">
-                {mockIngredients[0].nutrition.nutrients.map(
+                {displayIngredient.nutrition.nutrients.map(
                   (nutrient, index) => (
                     <span
                       key={index}
@@ -216,7 +250,7 @@ export default function IngredientDetail() {
           <h3 className="text-lg font-bold text-stone-700 mb-4">調理のコツ</h3>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <ul className="list-disc list-inside space-y-2 text-stone-600 text-sm">
-              {mockIngredients[0].tips.map((tip, index) => (
+              {displayIngredient.tips.map((tip, index) => (
                 <li key={index} className="flex items-center">
                   ・{tip}
                 </li>

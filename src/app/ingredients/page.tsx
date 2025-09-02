@@ -61,8 +61,6 @@ export default function IngredientsList() {
   if (error) {
     return <div>{error}</div>;
   }
-  //   setIngredients(mockIngredients);
-  // }, []);
 
   const categories = [
     { value: "all", label: "すべて" },

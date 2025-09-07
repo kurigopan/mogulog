@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
 import { DraftsIcon } from "@/icons";
-import ListCard from "@/components/ui/listCard";
+import ListCard from "@/components/ui/ListCard";
 import { Recipe } from "@/types/types";
 import { mockRecipes } from "@/mocks/recipes";
+import { CircularProgress } from "@mui/material";
 
 export default function DraftRecipes() {
   const [draftRecipes, setDraftRecipes] = useState<Recipe[]>([]);
@@ -64,7 +65,7 @@ export default function DraftRecipes() {
         {/* レシピ一覧 */}
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+            <CircularProgress color="secondary" />
           </div>
         ) : sortedRecipes.length > 0 ? (
           <ListCard listCardItems={sortedRecipes} pageName={"drafts"} />

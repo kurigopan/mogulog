@@ -116,35 +116,6 @@ export default function Setup() {
             はじめる
           </button>
         </div>
-
-        {/* Features Preview */}
-        {/* <div className="text-center max-w-sm">
-          <div className="flex justify-center space-x-6 mb-4">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mb-2">
-                <span className="text-lg">🍚</span>
-              </div>
-              <span className="text-xs text-stone-500">月齢別レシピ</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-2">
-                <span className="text-lg">🥕</span>
-              </div>
-              <span className="text-xs text-stone-500">食材管理</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mb-2">
-                <span className="text-lg">📝</span>
-              </div>
-              <span className="text-xs text-stone-500">成長記録</span>
-            </div>
-          </div>
-          <p className="text-xs text-stone-400">
-            月齢に合わせたレシピと食材で
-            <br />
-            安心・安全な離乳食作りをサポート
-          </p>
-        </div> */}
       </div>
 
       {/* Footer */}

@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+import Link from "next/link";
 import {
   EditIcon,
   ChevronRightIcon,
@@ -10,8 +12,8 @@ import {
   FaceIcon,
   ChildCareIcon,
 } from "@/icons";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export default function MyPage() {
   const [isEditingParent, setIsEditingParent] = useState(false);
@@ -36,7 +38,7 @@ export default function MyPage() {
 
   // 統計情報
   const stats = {
-    favoriteRecipes: 23,
+    favorites: 23,
     createdRecipes: 5,
     draftRecipes: 2,
   };
@@ -86,12 +88,12 @@ export default function MyPage() {
   const menuItems = [
     {
       id: "favorites",
-      title: "お気に入りレシピ",
-      stats: `${stats.favoriteRecipes}`,
+      title: "お気に入り",
+      stats: `${stats.favorites}`,
       icon: <FavoriteBorderIcon />,
       color: "text-red-500",
       bgColor: "bg-red-100",
-      action: () => console.log("お気に入りレシピへ"),
+      link: "/mypage/favorites",
     },
     {
       id: "created",
@@ -100,7 +102,7 @@ export default function MyPage() {
       icon: <MenuBookIcon />,
       color: "text-purple-500",
       bgColor: "bg-purple-100",
-      action: () => console.log("作成レシピへ"),
+      link: "/mypage/recipes/created",
     },
     {
       id: "drafts",
@@ -109,7 +111,7 @@ export default function MyPage() {
       icon: <EditNoteIcon />,
       color: "text-amber-500",
       bgColor: "bg-amber-100",
-      action: () => console.log("下書きへ"),
+      link: "/mypage/recipes/drafts",
     },
   ];
 
@@ -312,34 +314,32 @@ export default function MyPage() {
 
         {/* Menu Items */}
         <section>
-          <div className="space-y-3">
+          <div className="space-y-3 ">
             {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={item.action}
-                className="w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className={`${item.color} mr-4`}>{item.icon}</div>
-                    <h4 className="font-bold text-stone-700 mr-4">
-                      {item.title}
-                    </h4>
-                    <p
-                      className={`w-10 text-sm text-stone-500 p-1 rounded-full ${item.bgColor}`}
-                    >
-                      {item.stats}
-                    </p>
-                    {/* <p className="text-sm text-stone-500">{item.subtitle}</p> */}
+              <Link href={item.link} key={item.id}>
+                <button className="w-full mb-4 bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className={`${item.color} mr-4`}>{item.icon}</div>
+                      <h4 className="font-bold text-stone-700 mr-4">
+                        {item.title}
+                      </h4>
+                      <p
+                        className={`w-10 text-sm text-stone-500 p-1 rounded-full ${item.bgColor}`}
+                      >
+                        {item.stats}
+                      </p>
+                      {/* <p className="text-sm text-stone-500">{item.subtitle}</p> */}
+                    </div>
+                    <ChevronRightIcon />
                   </div>
-                  <ChevronRightIcon />
-                </div>
-              </button>
+                </button>
+              </Link>
             ))}
           </div>
         </section>
 
-        {/* Logout Section */}
+        {/* ログアウト */}
         <section>
           <button
             onClick={() => setShowLogoutConfirm(true)}
@@ -354,7 +354,7 @@ export default function MyPage() {
           </button>
         </section>
       </div>
-      {/* Logout Confirmation Modal */}
+      {/* ログアウト確認モーダル */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
@@ -373,12 +373,13 @@ export default function MyPage() {
               >
                 キャンセル
               </button>
-              <button
+              <Link
+                href="/"
                 onClick={handleLogout}
-                className="flex-1 py-3 px-4 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors"
+                className="flex justify-center flex-1 py-3 px-4 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors"
               >
                 ログアウト
-              </button>
+              </Link>
             </div>
           </div>
         </div>

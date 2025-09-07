@@ -26,31 +26,26 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "野菜の下準備",
         description:
           "にんじんとかぼちゃを月齢に適した大きさに切る。にんじんは皮を厚めに剥き、かぼちゃは種とワタを取り除きます。",
-        time: "3分",
         image: "https://placehold.co/600x400/E5E7EB/4B5563?text=Step+1",
       },
       {
         step: 2,
-        title: "だし汁で煮る",
         description:
           "小鍋にだし汁を入れ、切った野菜を加えて弱火で煮込みます。野菜が柔らかくなるまで約10分煮込みます。",
-        time: "10分",
         image: "https://placehold.co/600x400/E5E7EB/4B5563?text=Step+2",
       },
       {
         step: 3,
-        title: "味付けと仕上げ",
         description:
           "野菜が柔らかくなったら、後期の場合は少量のしょうゆを加えます。中期までは味付けなしで自然の甘みを楽しみます。",
-        time: "2分",
         image: "",
       },
     ],
     tags: ["野菜", "煮物", "冷凍OK", "作り置きOK"],
     savedMemo: "少し多めに作って冷凍保存。解凍後は少し水分を足すと良い。",
+    // status: "published",
   },
   {
     id: 2,
@@ -75,28 +70,23 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "さつまいもを蒸す",
         description: "柔らかくなるまで蒸す。",
-        time: "10分",
         image: "",
       },
       {
         step: 2,
-        title: "りんごを加える",
         description: "すりおろしたりんごを加える。",
-        time: "3分",
         image: "",
       },
       {
         step: 3,
-        title: "ペースト状にする",
         description: "ブレンダーで滑らかにする。",
-        time: "2分",
         image: "",
       },
     ],
     tags: ["野菜", "果物", "ペースト", "初期"],
     savedMemo: "冷凍で1週間以内に食べきる。",
+    // status: "published",
   },
   {
     id: 3,
@@ -122,28 +112,23 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "材料を混ぜる",
         description: "ひき肉と野菜、片栗粉を混ぜて丸める。",
-        time: "5分",
         image: "",
       },
       {
         step: 2,
-        title: "茹でる",
         description: "沸騰したお湯で茹でる。",
-        time: "10分",
         image: "",
       },
       {
         step: 3,
-        title: "冷ます",
         description: "食べやすい温度まで冷ます。",
-        time: "5分",
         image: "",
       },
     ],
     tags: ["肉", "ミートボール", "作り置きOK"],
     savedMemo: "冷凍保存可能。レンジで解凍。",
+    // status: "published",
   },
   {
     id: 4,
@@ -168,21 +153,18 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "ほうれん草を下茹で",
         description: "葉先まで柔らかく茹でる。",
-        time: "5分",
         image: "",
       },
       {
         step: 2,
-        title: "豆腐と和える",
         description: "水切りした豆腐とだし汁で和える。",
-        time: "5分",
         image: "",
       },
     ],
     tags: ["野菜", "豆腐", "中期", "後期"],
     savedMemo: "冷蔵で1日以内に食べきる。",
+    // status: "published",
   },
   {
     id: 5,
@@ -208,28 +190,23 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "ささみを煮る",
         description: "細かく切ったささみを煮る。",
-        time: "10分",
         image: "",
       },
       {
         step: 2,
-        title: "かぼちゃを加える",
         description: "小さく切ったかぼちゃを煮る。",
-        time: "10分",
         image: "",
       },
       {
         step: 3,
-        title: "ごはんを混ぜる",
         description: "軟飯と一緒に煮込む。",
-        time: "5分",
         image: "",
       },
     ],
     tags: ["主食", "肉", "煮物", "後期", "完了期"],
     savedMemo: "冷凍保存は1食ずつラップで包む。",
+    // status: "published",
   },
   {
     id: 6,
@@ -254,28 +231,23 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "野菜を切る",
         description: "小さく切る。",
-        time: "3分",
         image: "",
       },
       {
         step: 2,
-        title: "煮る",
         description: "柔らかくなるまで煮る。",
-        time: "10分",
         image: "",
       },
       {
         step: 3,
-        title: "混ぜる",
         description: "ペースト状にする。",
-        time: "2分",
         image: "",
       },
     ],
     tags: ["野菜", "スープ", "作り置きOK"],
     savedMemo: "冷凍保存可能。",
+    // status: "published",
   },
   {
     id: 7,
@@ -300,21 +272,18 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "果物をつぶす",
         description: "すべての果物をつぶす。",
-        time: "3分",
         image: "",
       },
       {
         step: 2,
-        title: "ヨーグルトを和える",
-        description: "混ぜる。",
-        time: "2分",
+        description: "ヨーグルトを和える。",
         image: "",
       },
     ],
     tags: ["果物", "おやつ", "中期", "後期"],
     savedMemo: "冷蔵で1日以内に食べる。",
+    // status: "published",
   },
   {
     id: 8,
@@ -339,21 +308,18 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "ほうれん草を茹でる",
         description: "柔らかく茹でる。",
-        time: "5分",
         image: "",
       },
       {
         step: 2,
-        title: "ツナと混ぜる",
         description: "ツナと和えてペーストにする。",
-        time: "5分",
         image: "",
       },
     ],
     tags: ["野菜", "魚", "後期", "作り置きOK"],
     savedMemo: "冷凍保存可能。",
+    // status: "published",
   },
   {
     id: 9,
@@ -379,20 +345,17 @@ export const mockRecipes: Recipe[] = [
     steps: [
       {
         step: 1,
-        title: "材料を混ぜる",
         description: "ペースト状にして混ぜる。",
-        time: "10分",
         image: "",
       },
       {
         step: 2,
-        title: "型に入れる",
         description: "蒸し器で蒸す。",
-        time: "20分",
         image: "",
       },
     ],
     tags: ["おやつ", "野菜", "後期", "作り置きOK"],
     savedMemo: "冷凍保存可能。",
+    // status: "draft",
   },
 ];

@@ -1,5 +1,7 @@
-import { ExpandMoreIcon } from "@/icons";
+"use client";
+
 import { useState, useEffect, useRef } from "react";
+import { ExpandMoreIcon } from "@/icons";
 
 export default function AgeOptionsFilter() {
   const [childAge, setChildAge] = useState("");

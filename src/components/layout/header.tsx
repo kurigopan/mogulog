@@ -1,11 +1,11 @@
-import {
-  ArrowBackIosIcon,
-  ChildCareIcon,
-  DeleteIcon,
-  ShareIcon,
-} from "@/icons";
 import { ReactNode } from "react";
-import AgeOptionsFilter from "../ageOptionsFilter";
+import {
+  ChildCareIcon,
+  // DeleteIcon,
+  // ShareIcon,
+} from "@/icons";
+import BackButton from "@/components/ui/BackButton";
+import RemoveButton from "@/components/ui/RemoveButton";
 
 type HeaderProps = {
   pageName?: pageType;
@@ -56,12 +56,6 @@ export default function Header({ pageName, title, content }: HeaderProps) {
   //   }
   // };
 
-  const leftSide = (
-    <button className="mr-3 p-2 hover:bg-stone-100 rounded-lg transition-colors">
-      {pageName === "home" ? <ChildCareIcon /> : <ArrowBackIosIcon />}
-    </button>
-  );
-
   // const rightSide = () => {
   //   switch (pageName) {
   //     case "home":
@@ -70,19 +64,8 @@ export default function Header({ pageName, title, content }: HeaderProps) {
   //     case "recipeDetail":
   //       return (
   //         <div className="flex items-center space-x-2">
-  //           <button className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
-  //             <ShareIcon />
-  //           </button>
-  //           <button
-  //             onClick={(e) => handleFavoriteClick(e, item)}
-  //             className={`p-2 rounded-full transition-colors ${
-  //               item.isFavorite
-  //                 ? "text-red-500 hover:bg-red-200"
-  //                 : "hover:bg-stone-100 text-stone-500"
-  //             }`}
-  //           >
-  //             {item.isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-  //           </button>
+  //           <ShareButton />
+  //           <FavoriteButton />
   //         </div>
   //       );
   //     case "favorites":
@@ -106,7 +89,6 @@ export default function Header({ pageName, title, content }: HeaderProps) {
   //       );
   //     case "create":
   //     case "edit":
-  //     case "history":
   //       return (
   //         <button
   //           onClick={(e) => handleDelete(e, item)}
@@ -116,17 +98,23 @@ export default function Header({ pageName, title, content }: HeaderProps) {
   //           <DeleteIcon />
   //         </button>
   //       );
+  //     case "history":
+  // return <RemoveButton />;
   //   }
   // };
 
   return (
     <header className="bg-white border-b border-stone-200 p-4 shadow-sm sticky top-0 z-10">
       <div className="flex items-center justify-between">
+        {/* 左側のコンテンツ */}
         <div className="flex items-center">
-          {leftSide}
+          <div className="mr-3 p-2 hover:bg-stone-100 rounded-lg transition-colors">
+            {pageName === "home" ? <ChildCareIcon /> : <BackButton />}
+          </div>
           <h1 className="text-lg font-bold text-stone-700">{title}</h1>
         </div>
-        {content}
+        {/* 右側のコンテンツ */}
+        <div className="flex items-center">{content}</div>
       </div>
     </header>
   );

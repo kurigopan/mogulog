@@ -1,8 +1,8 @@
 "use client";
 
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import RecipeForm from "@/components/recipeForm";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import RecipeForm from "@/components/RecipeForm";
 
 // レシピ作成ページのコンポーネント
 export default function RecipeCreatePage() {
@@ -11,7 +11,7 @@ export default function RecipeCreatePage() {
       <Header title="レシピ作成" />
       {/* RecipeFormコンポーネントを呼び出し、初期データはnullで渡します */}
       <RecipeForm initialData={null} isEditMode={false} />
-      <Footer />
+      <Footer pageName="create" />
     </div>
   );
 }

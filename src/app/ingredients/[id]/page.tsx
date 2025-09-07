@@ -1,17 +1,17 @@
 "use client";
 
-import { use } from "react";
-import { useState } from "react";
+import { use, useState, useEffect } from "react";
 import Image from "next/image";
 import { Tabs, Tab, Box } from "@mui/material";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import Card from "@/components/ui/card";
-import { ShareIcon, CheckCircleIcon, CancelIcon } from "@/icons";
-import { mockRecipes } from "@/mocks/recipes";
+import { CheckCircleIcon, CancelIcon } from "@/icons";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Card from "@/components/ui/Card";
 import NotFoundPage from "./notFound";
-import { getIngredientsWithStatus } from "@/lib/supabase";
-import { Ingredient } from "@/types/types";
+import { getIngredientsWithStatus, getRecipes } from "@/lib/supabase";
+import { saveRecentlyViewedItem } from "@/lib/localstorage";
+import { Ingredient, Recipe } from "@/types/types";
+import ShareButton from "@/components/ui/ShareButton";
 
 export default function IngredientDetail({
   params,
@@ -20,29 +20,78 @@ export default function IngredientDetail({
 }) {
   const unwrapParams = use(params);
   const id = Number(unwrapParams.id);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [hasEaten, setHasEaten] = useState(false);
   const [isNG, setIsNG] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchIngredients = async () => {
-    try {
-      const data = await getIngredientsWithStatus(
-        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-        1
-      );
-      if (data) {
-        setIngredients(data);
+  // ユーザーIDと子どものIDを仮定。実際は認証情報やプロフィールから取得
+  const userId = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
+  const childId = 1; // getIngredientsWithStatusの引数と同じ値
+  const childAgeStage = "中期"; // 例: プロフィール情報から取得
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      try {
+        const data = await getIngredientsWithStatus(userId, childId);
+        if (data) {
+          setIngredients(data);
+        }
+      } catch (err) {
+        setError("データの取得に失敗しました。");
+        console.error(err);
       }
-    } catch (err) {
-      setError("データの取得に失敗しました。");
-      console.error(err);
-    } finally {
+    };
+    fetchIngredients();
+  }, []);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const data = await getRecipes(userId);
+        if (data) {
+          setRecipes(data);
+        }
+      } catch (err) {
+        setError("データの取得に失敗しました。");
+        console.error(err);
+      }
+    };
+    fetchRecipes();
+  }, []);
+
+  // 食材と全レシピが両方取得されたら、関連レシピをフィルタリング
+  useEffect(() => {
+    if (ingredients.length > 0 && recipes.length > 0) {
+      const displayIngredient = ingredients.find((ing) => ing.id === id);
+      if (displayIngredient) {
+        // 全レシピから、この食材名を含むものを抽出
+        const recipesWithIngredient = recipes.filter((recipe) =>
+          recipe.ingredients.some((ing) => ing.name === displayIngredient.name)
+        );
+        // 子どもの月齢でフィルター
+        const filteredRecipes = recipesWithIngredient.filter(
+          (recipe) => recipe.startStage === childAgeStage
+        );
+        // シャッフルして先頭5件を推薦レシピに設定
+        const shuffled = [...filteredRecipes].sort(() => 0.5 - Math.random());
+
+        setRelatedRecipes(shuffled.slice(0, 5));
+      }
     }
-  };
-  fetchIngredients();
+  }, [ingredients, recipes, id, childAgeStage]);
+
   const displayIngredient = ingredients.find((ing) => ing.id === id);
+
+  // コンポーネントがマウントされた時に、ローカルストレージに保存
+  useEffect(() => {
+    if (displayIngredient) {
+      saveRecentlyViewedItem(displayIngredient);
+    }
+  }, [displayIngredient]); // displayIngredientが取得されたタイミングで実行
 
   // 食材が見つからない場合は404ページを表示
   if (!displayIngredient) {
@@ -61,11 +110,7 @@ export default function IngredientDetail({
     setSelectedTab(newValue);
   };
 
-  const content = (
-    <button className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
-      <ShareIcon />
-    </button>
-  );
+  const content = <ShareButton title={displayIngredient.name} />;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -89,8 +134,18 @@ export default function IngredientDetail({
               <h2 className="text-2xl font-bold text-stone-700 mb-4">
                 {displayIngredient.name}
               </h2>
-              <div className="inline-flex items-center px-3 py-2 rounded-full bg-green-50 text-green-600 text-sm">
-                {displayIngredient.season}
+              {displayIngredient.season.map((s) => {
+                return (
+                  <div
+                    key={s}
+                    className="inline-flex items-center px-3 py-2 rounded-full bg-green-50 text-green-600 text-sm mr-2"
+                  >
+                    {s}
+                  </div>
+                );
+              })}
+              <div className="inline-flex items-center px-3 py-2 rounded-full bg-amber-50 text-amber-600 text-sm">
+                {displayIngredient.category}
               </div>
             </div>
             <p className="text-stone-600 text-center leading-relaxed">
@@ -260,15 +315,14 @@ export default function IngredientDetail({
         </section>
 
         {/* 関連レシピ */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-stone-700">関連レシピ</h3>
-            <button className="text-sm text-purple-400 hover:text-purple-500 transition-colors">
-              すべて見る
-            </button>
-          </div>
-          <Card cardItems={mockRecipes} className="bg-purple-100" />
-        </section>
+        {relatedRecipes.length > 0 && (
+          <section>
+            <h3 className="text-lg font-bold text-stone-700 mb-4">
+              関連レシピ
+            </h3>
+            <Card cardItems={relatedRecipes} className="bg-purple-100" />
+          </section>
+        )}
       </div>
       <Footer />
     </div>

@@ -1,4 +1,4 @@
-import { Ingredient } from "@/types/types";
+import { Ingredient, Category } from "@/types/types";
 
 export const mockIngredients: Ingredient[] = [
   {
@@ -8,7 +8,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/carrot.png",
     description: "ビタミンAが豊富で、甘味があり赤ちゃんに人気の野菜です。",
     season: ["通年"],
-    category: "野菜",
+    category: "野菜・きのこ・海藻",
     startStage: "初期",
     eaten: true,
     ng: false,
@@ -73,7 +73,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/pumpkin.png",
     description: "甘味が強く栄養豊富で、離乳食の初期から安心して使えます。",
     season: ["秋"],
-    category: "野菜",
+    category: "野菜・きのこ・海藻",
     startStage: "初期",
     eaten: true,
     ng: false,
@@ -134,7 +134,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/potato.png",
     description: "消化が良くエネルギー源として使いやすい野菜。",
     season: ["通年"],
-    category: "野菜",
+    category: "野菜・きのこ・海藻",
     startStage: "初期",
     eaten: true,
     ng: false,
@@ -256,7 +256,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/tofu.png",
     description: "良質なたんぱく質源で、消化もしやすい食材です。",
     season: ["通年"],
-    category: "大豆製品",
+    category: "大豆・豆類",
     startStage: "初期",
     eaten: true,
     ng: false,
@@ -317,7 +317,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/fish.png",
     description: "消化が良く、良質なたんぱく質が摂れる食材です。",
     season: ["春", "夏"],
-    category: "魚",
+    category: "肉・魚",
     startStage: "中期",
     eaten: true,
     ng: false,
@@ -365,7 +365,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/broccoli.png",
     description: "ビタミンCや食物繊維が豊富で栄養満点な野菜です。",
     season: ["冬"],
-    category: "野菜",
+    category: "野菜・きのこ・海藻",
     startStage: "中期",
     eaten: true,
     ng: false,
@@ -417,7 +417,7 @@ export const mockIngredients: Ingredient[] = [
     image: "/spinach.png",
     description: "鉄分が豊富で栄養価が高い緑黄色野菜。",
     season: ["冬"],
-    category: "野菜",
+    category: "野菜・きのこ・海藻",
     startStage: "初期",
     eaten: true,
     ng: false,

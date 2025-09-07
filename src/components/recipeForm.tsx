@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Recipe, Stage } from "@/types/types";
+import { FormControlLabel, Switch } from "@mui/material";
 import {
   AddIcon,
   DeleteIcon,
@@ -13,11 +14,12 @@ import {
   ScheduleIcon,
   PeopleIcon,
 } from "@/icons";
-import { FormControlLabel, Switch } from "@mui/material";
+import { createRecipe, updateRecipe } from "@/lib/supabase";
+import { Category, Recipe, Stage } from "@/types/types";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
+const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];
 
-// レシピフォームのコンポーネント
 export default function RecipeForm({
   initialData,
   isEditMode,
@@ -26,7 +28,7 @@ export default function RecipeForm({
   isEditMode: boolean;
 }) {
   // フォームの状態を管理
-  const [formData, setFormData] = useState<Recipe>({
+  const [formData, setFormData] = useState<Omit<Recipe, "id">>({
     name: "",
     image: "",
     startStage: "初期",
@@ -34,7 +36,7 @@ export default function RecipeForm({
     servings: "",
     description: "",
     ingredients: [{ name: "", amount: "", note: "" }],
-    steps: [{ step: 1, title: "", description: "", time: "", image: "" }],
+    steps: [{ step: 1, description: "", image: "" }],
     tags: [],
     isPrivate: false,
     date: new Date(),
@@ -42,9 +44,9 @@ export default function RecipeForm({
     author: "",
     isOwn: true,
     savedMemo: "",
-    category: "",
+    category: "主食",
     type: "recipe",
-    id: 1,
+    // status: "draft",
   });
 
   // フォーム送信ボタンのローディング状態
@@ -53,32 +55,34 @@ export default function RecipeForm({
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const stepImageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  // ルーターフックを初期化
+  const router = useRouter();
+
   // 編集モードの場合、初期データでフォームを初期化
   useEffect(() => {
     if (initialData) {
+      // initialDataにidがある場合は除外してセット
+      const { id, ...rest } = initialData;
       setFormData({
-        name: initialData.name || "",
-        image: initialData.image || "",
-        startStage: initialData.startStage || "初期",
-        cookingTime: initialData.cookingTime || "",
-        servings: initialData.servings || "",
-        description: initialData.description || "",
-        ingredients: initialData.ingredients || [
-          { name: "", amount: "", note: "" },
-        ],
-        steps: initialData.steps || [
-          { title: "", description: "", time: "", image: "" },
-        ],
-        tags: initialData.tags || [],
-        isPrivate: initialData.isPrivate || false,
+        ...rest,
+        name: rest.name || "",
+        image: rest.image || "",
+        startStage: rest.startStage || "初期",
+        cookingTime: rest.cookingTime || "",
+        servings: rest.servings || "",
+        description: rest.description || "",
+        ingredients: rest.ingredients || [{ name: "", amount: "", note: "" }],
+        steps: rest.steps || [{ title: "", description: "", image: "" }],
+        tags: rest.tags || [],
+        isPrivate: rest.isPrivate || false,
         date: new Date(),
-        isFavorite: initialData.isFavorite || false,
-        author: initialData.author || "",
-        isOwn: initialData.isOwn || true,
-        savedMemo: initialData.savedMemo || "",
-        category: initialData.category || "",
-        type: initialData.type || "recipe",
-        id: initialData.id || 1,
+        isFavorite: rest.isFavorite || false,
+        author: rest.author || "",
+        isOwn: rest.isOwn || true,
+        savedMemo: rest.savedMemo || "",
+        category: rest.category || "主食",
+        type: rest.type || "recipe",
+        // status: rest.status || "draft",
       });
     }
   }, [initialData]);
@@ -127,12 +131,21 @@ export default function RecipeForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 離乳食段階のチェックボックス変更をハンドル
+  // 離乳食段階のチェックボックス変更
   const handleStageChange = (stage: Stage) => {
     setFormData((prev) => {
       const newStartStage = prev.startStage == stage ? prev.startStage : stage;
       console.log(newStartStage);
       return { ...prev, startStage: newStartStage };
+    });
+  };
+
+  // カテゴリーのチェックボックス変更
+  const handleCategoryChange = (category: Category) => {
+    setFormData((prev) => {
+      const newCategory = prev.category == category ? prev.category : category;
+      console.log(newCategory);
+      return { ...prev, category: newCategory };
     });
   };
 
@@ -205,10 +218,11 @@ export default function RecipeForm({
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
       e.preventDefault();
-      if (!formData.tags.includes(tagInput.trim())) {
+      const newTag = tagInput.trim();
+      if (!formData.tags.includes(newTag)) {
         setFormData((prev) => ({
           ...prev,
-          tags: [...prev.tags, tagInput.trim()],
+          tags: [...prev.tags, newTag],
         }));
       }
       setTagInput("");
@@ -226,18 +240,35 @@ export default function RecipeForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    // TODO: ここにAPIコールを追加してデータを送信する
-    console.log("フォームデータを保存:", formData);
-    // 成功または失敗に応じてローディング状態をリセット
-    setTimeout(() => {
+    try {
+      // Supabaseにデータを挿入
+      let result;
+      if (isEditMode && initialData?.id) {
+        // 編集モードの場合、IDを使ってレシピを更新
+        result = await updateRecipe(initialData.id, formData);
+      } else {
+        // 新規作成モードの場合、レシピを作成
+        result = await createRecipe(formData);
+      }
+
+      const { data, error } = result;
+      if (error) {
+        throw error;
+      }
+      console.log("レシピを保存しました:", data);
+      router.push("/"); // 成功したらトップページにリダイレクト
+    } catch (error) {
+      console.error("レシピの保存に失敗しました:", error);
+      // alert("レシピの保存に失敗しました。もう一度お試しください。");
+    } finally {
       setIsSaving(false);
-      alert("保存しました！"); // 成功メッセージ
-    }, 1500);
+    }
   };
 
   // 下書き保存処理
   const handleSaveDraft = async () => {
     setIsSaving(true);
+    // TODO: 下書きとして保存するロジック（isPrivateを強制的にtrueにするなど）を実装
     console.log("下書きとして保存:", formData);
     setTimeout(() => {
       setIsSaving(false);
@@ -299,7 +330,7 @@ export default function RecipeForm({
             />
 
             {/* 離乳食段階選択 */}
-            <div className="space-y-2">
+            <div className="space-y-2 mb-6">
               <h2 className="text-sm font-medium text-stone-600 mb-2">
                 離乳食開始時期
               </h2>
@@ -321,13 +352,36 @@ export default function RecipeForm({
               </div>
             </div>
 
+            {/* カテゴリー選択 */}
+            <div className="space-y-2 mb-6">
+              <h2 className="text-sm font-medium text-stone-600 mb-2">
+                カテゴリー
+              </h2>
+              <div className="flex flex-wrap gap-3 justify-center">
+                {categoryValues.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => handleCategoryChange(category)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      formData.category === category
+                        ? "bg-purple-100 text-purple-700 ring-2 ring-purple-300"
+                        : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="flex justify-between">
               <div className="flex items-center">
                 <ScheduleIcon />
                 <input
                   type="text"
                   name="cookingTime"
-                  value={formData.cookingTime}
+                  value={formData.cookingTime || ""}
                   onChange={handleChange}
                   placeholder="15分"
                   className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ml-2"
@@ -338,7 +392,7 @@ export default function RecipeForm({
                 <input
                   type="text"
                   name="servings"
-                  value={formData.servings}
+                  value={formData.servings || ""}
                   onChange={handleChange}
                   placeholder="1食分"
                   className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ml-2"
@@ -348,7 +402,7 @@ export default function RecipeForm({
 
             <textarea
               name="description"
-              value={formData.description}
+              value={formData.description || ""}
               onChange={handleChange}
               placeholder="甘くて栄養満点！赤ちゃんが大好きな定番メニューです。自然の甘みで食べやすく、冷凍保存も可能です。"
               rows={4}
@@ -433,7 +487,7 @@ export default function RecipeForm({
                   <input
                     type="text"
                     name="note"
-                    value={ingredient.note}
+                    value={ingredient.note || ""}
                     onChange={(e) => handleIngredientChange(e, index)}
                     placeholder="皮を厚めに剥く"
                     className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"

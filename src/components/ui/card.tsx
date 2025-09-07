@@ -1,6 +1,7 @@
-import { CardItem } from "@/types/types";
+import Link from "next/link";
 import Image from "next/image";
 import { ImageIcon } from "@/icons";
+import { CardItem } from "@/types/types";
 
 interface CardProps {
   cardItems: CardItem[];
@@ -11,8 +12,9 @@ export default function Card({ cardItems, className }: CardProps) {
   return (
     <div className="flex space-x-3 overflow-x-auto pb-2">
       {cardItems.map((item) => (
-        <div
+        <Link
           key={item.id}
+          href={`/${item.type}s/${item.id}`}
           className="flex-shrink-0 w-40 bg-white rounded-3xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 cursor-pointer group"
         >
           <div className="text-center">
@@ -56,7 +58,7 @@ export default function Card({ cardItems, className }: CardProps) {
               {item.description}
             </p>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

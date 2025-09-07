@@ -1,28 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  ShareIcon,
-  EditIcon,
-  FavoriteIcon,
-  FavoriteBorderIcon,
-  ScheduleIcon,
-  PeopleIcon,
-  InfoOutlineIcon,
-} from "@/icons";
+import { EditIcon, ScheduleIcon, PeopleIcon, InfoOutlineIcon } from "@/icons";
 import { Tooltip, IconButton } from "@mui/material";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import { mockRecipes } from "@/mocks/recipes";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import NotFoundPage from "./notFound";
+import { getRecipes } from "@/lib/supabase";
+import { Recipe } from "@/types/types";
+import { saveRecentlyViewedItem } from "@/lib/localstorage";
+import ShareButton from "@/components/ui/ShareButton";
+import FavoriteButton from "@/components/ui/FavoriteButton";
 
-export default function RecipeDetail() {
-  const [isFavorited, setIsFavorited] = useState(false);
+export default function RecipeDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const unwrapParams = use(params);
+  const id = Number(unwrapParams.id);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
   const [memo, setMemo] = useState("");
 
-  const handleFavoriteClick = () => {
-    setIsFavorited((prev) => !prev);
-  };
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const data = await getRecipes("32836782-4f6d-4dc3-92ea-4faf03ed86a5");
+        if (data) {
+          setRecipes(data);
+        }
+      } catch (err) {
+        setError("データの取得に失敗しました。");
+        console.error(err);
+      }
+    };
+    fetchRecipes();
+  }, []);
+
+  const displayRecipe = recipes.find((rec) => rec.id === id);
+
+  // コンポーネントがマウントされた時に、ローカルストレージに保存
+  useEffect(() => {
+    if (displayRecipe) {
+      saveRecentlyViewedItem(displayRecipe);
+    }
+  }, [displayRecipe]); // displayRecipeが取得されたタイミングで実行
+
+  // レシピが見つからない場合は404ページを表示
+  if (!displayRecipe) {
+    return <NotFoundPage />;
+  }
 
   const handleMemoSave = () => {
     // メモ保存処理
@@ -31,19 +61,8 @@ export default function RecipeDetail() {
 
   const content = (
     <div className="flex items-center space-x-2">
-      <button className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
-        <ShareIcon />
-      </button>
-      <button
-        onClick={handleFavoriteClick}
-        className={`p-2 rounded-lg transition-colors ${
-          isFavorited
-            ? "bg-red-100 text-red-500 hover:bg-red-200"
-            : "hover:bg-stone-100 text-stone-500"
-        }`}
-      >
-        {isFavorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-      </button>
+      <ShareButton title={displayRecipe.name} />
+      <FavoriteButton />
     </div>
   );
 
@@ -59,10 +78,10 @@ export default function RecipeDetail() {
           <div className="text-center mb-4">
             {/* 画像があれば表示する */}
             <div className="w-[300px] h-[300px] overflow-hidden mx-auto mb-2">
-              {mockRecipes[0].image && (
+              {displayRecipe.image && (
                 <Image
-                  src={mockRecipes[0].image}
-                  alt={`${mockRecipes[0].name}の画像`}
+                  src={displayRecipe.image}
+                  alt={`${displayRecipe.name}の画像`}
                   width={300}
                   height={300}
                   className="object-contain rounded-2xl"
@@ -71,16 +90,19 @@ export default function RecipeDetail() {
               )}
             </div>
             <h2 className="text-2xl font-bold text-stone-700 mb-2">
-              {mockRecipes[0].name}
+              {displayRecipe.name}
             </h2>
             <p className="text-sm text-stone-500 mb-3">
-              by {mockRecipes[0].author}
+              by {displayRecipe.author}
             </p>
 
-            {/* 離乳食段階タグ */}
+            {/* 離乳食段階・カテゴリータグ */}
             <div className="flex justify-center space-x-2 mb-4">
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
-                {mockRecipes[0].startStage}
+                {displayRecipe.startStage}
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
+                {displayRecipe.category}
               </span>
             </div>
 
@@ -88,22 +110,22 @@ export default function RecipeDetail() {
             <div className="flex justify-center space-x-6 text-sm text-stone-600">
               <div className="flex items-center">
                 <ScheduleIcon />
-                <span className="ml-1">{mockRecipes[0].cookingTime}</span>
+                <span className="ml-1">{displayRecipe.cookingTime}</span>
               </div>
               <div className="flex items-center">
                 <PeopleIcon />
-                <span className="ml-1">{mockRecipes[0].servings}</span>
+                <span className="ml-1">{displayRecipe.servings}</span>
               </div>
             </div>
           </div>
 
           <p className="text-stone-600 text-center leading-relaxed mb-4">
-            {mockRecipes[0].description}
+            {displayRecipe.description}
           </p>
 
           {/* アクションボタン */}
           <div className="flex space-x-3">
-            {mockRecipes[0].isOwn && (
+            {displayRecipe.isOwn && (
               <button className="flex items-center justify-center py-3 px-4 rounded-2xl font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors">
                 <EditIcon />
                 <span className="ml-2">編集</span>
@@ -119,7 +141,7 @@ export default function RecipeDetail() {
           </h3>
           <div className="bg-white rounded-2xl p-4 shadow-sm">
             <div className="space-y-3">
-              {mockRecipes[0].ingredients.map((ingredient, index) => (
+              {displayRecipe.ingredients.map((ingredient, index) => (
                 <div
                   key={index}
                   className="flex justify-between items-center py-2 border-b border-stone-100 last:border-b-0"
@@ -149,19 +171,13 @@ export default function RecipeDetail() {
             作り方
           </h3>
           <div className="space-y-4">
-            {mockRecipes[0].steps.map((step, index) => (
+            {displayRecipe.steps.map((step, index) => (
               <div key={index} className="bg-white rounded-2xl p-5 shadow-sm">
                 <div className="flex items-start mb-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
                     {step.step}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-stone-700">{step.title}</h4>
-                      <span className="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded-full">
-                        {step.time}
-                      </span>
-                    </div>
                     <p className="text-stone-600 leading-relaxed">
                       {step.description}
                     </p>
@@ -171,7 +187,7 @@ export default function RecipeDetail() {
                 {step.image && (
                   <Image
                     src={step.image}
-                    alt={`${step.title}の画像`}
+                    alt={`${step.step}の画像`}
                     width={400}
                     height={300}
                     className="w-full rounded-2xl shadow-sm"
@@ -184,20 +200,22 @@ export default function RecipeDetail() {
         </section>
 
         {/* タグ */}
-        {mockRecipes[0].tags.length > 0 && (
+        {displayRecipe.tags.length > 0 && (
           <section>
             <h3 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
               タグ
             </h3>
-            <div className="flex flex-wrap gap-2">
-              {mockRecipes[0].tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="text-xs bg-amber-50 text-amber-600 px-3 py-1 rounded-full font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="bg-white rounded-2xl p-5 shadow-sm">
+              <div className="flex flex-wrap gap-2">
+                {displayRecipe.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="text-xs bg-amber-50 text-amber-600 px-3 py-1 rounded-full font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </section>
         )}
@@ -237,13 +255,13 @@ export default function RecipeDetail() {
             </Tooltip>
           </div>
           <div className="bg-white rounded-2xl p-4 shadow-sm">
-            {mockRecipes[0].savedMemo && (
+            {displayRecipe.savedMemo && (
               <div className="mb-4 p-3 bg-stone-50 rounded-xl">
                 <p className="text-sm text-stone-600 leading-relaxed">
                   <span className="font-medium text-stone-700">
                     前回のメモ:{" "}
                   </span>
-                  {mockRecipes[0].savedMemo}
+                  {displayRecipe.savedMemo}
                 </p>
               </div>
             )}

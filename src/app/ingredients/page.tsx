@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import { Tooltip, IconButton, CircularProgress } from "@mui/material";
 import {
   FilterListIcon,
   ExpandMoreIcon,
@@ -13,14 +12,10 @@ import {
   RadioButtonUncheckedIcon,
   HelpOutlineIcon,
 } from "@/icons";
-import { Tooltip, IconButton } from "@mui/material";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { Ingredient, ingredientStageInfo } from "@/types/types";
 import { getIngredientsWithStatus } from "@/lib/supabase";
-import type { Tables } from "@/types/supabase";
-
-// `getIngredients`の返り値の型を定義
-// `Tables`は `npx supabase gen types` で生成した型からインポートします
-// type Ingredient = Tables<"ingredients">;
 
 export default function IngredientsList() {
   const [childAge, setChildAge] = useState("7-8");
@@ -53,14 +48,6 @@ export default function IngredientsList() {
 
     fetchIngredients();
   }, []);
-
-  if (loading) {
-    return <div>読み込み中...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
 
   const categories = [
     { value: "all", label: "すべて" },
@@ -272,8 +259,12 @@ export default function IngredientsList() {
 
         {/* 食材一覧（テーブル表示） */}
         <section>
-          <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-stone-200">
-            {filteredIngredients.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <CircularProgress color="secondary" />
+            </div>
+          ) : filteredIngredients.length > 0 ? (
+            <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-stone-200">
               <div className="overflow-x-auto">
                 {/* テーブルヘッダー */}
                 <div className="border-b-2 border-stone-200">
@@ -404,30 +395,30 @@ export default function IngredientsList() {
                   })}
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center text-3xl">
-                  🤷‍♀️
-                </div>
-                <h3 className="text-lg font-semibold text-stone-700 mb-2">
-                  条件に合う食材が見つかりませんでした
-                </h3>
-                <p className="text-stone-500 mb-4">
-                  フィルター条件を変更して再度お試しください
-                </p>
-                <button
-                  onClick={() => {
-                    setSelectedCategory("all");
-                    setSelectedStageFilter("all");
-                    setSelectedStatusFilter("all");
-                  }}
-                  className="px-6 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
-                >
-                  フィルターをリセット
-                </button>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center text-3xl">
+                🤷‍♀️
               </div>
-            )}
-          </div>
+              <h3 className="text-lg font-semibold text-stone-700 mb-2">
+                条件に合う食材が見つかりませんでした
+              </h3>
+              <p className="text-stone-500 mb-4">
+                フィルター条件を変更して再度お試しください
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCategory("all");
+                  setSelectedStageFilter("all");
+                  setSelectedStatusFilter("all");
+                }}
+                className="px-6 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+              >
+                フィルターをリセット
+              </button>
+            </div>
+          )}
         </section>
       </div>
 

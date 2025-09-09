@@ -14,7 +14,7 @@ import {
   ScheduleIcon,
   PeopleIcon,
 } from "@/icons";
-import { createRecipe, updateRecipe } from "@/lib/supabase";
+import { createRecipe, deleteRecipe, updateRecipe } from "@/lib/supabase";
 import { Category, Recipe, Stage } from "@/types/types";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
@@ -54,6 +54,7 @@ export default function RecipeForm({
   const [tagInput, setTagInput] = useState("");
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const stepImageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // ルーターフックを初期化
   const router = useRouter();
@@ -274,6 +275,26 @@ export default function RecipeForm({
       setIsSaving(false);
       alert("下書きとして保存しました！");
     }, 1000);
+  };
+
+  // レシピ削除処理
+  const handleDelete = async () => {
+    if (!initialData?.id) return;
+    setIsSaving(true);
+    try {
+      const { error } = await deleteRecipe(initialData.id);
+      if (error) {
+        throw error;
+      }
+      console.log("レシピを削除しました");
+      router.push("/"); // 成功したらトップページにリダイレクト
+    } catch (error) {
+      console.error("レシピの削除に失敗しました:", error);
+      // alert("レシピの削除に失敗しました。もう一度お試しください。");
+    } finally {
+      setIsSaving(false);
+      setShowConfirm(false);
+    }
   };
 
   return (
@@ -626,13 +647,25 @@ export default function RecipeForm({
 
         {/* フォーム送信ボタン */}
         <div className="flex justify-center space-x-8 p-4">
+          {/* 編集モードの場合のみ削除ボタンを表示 */}
+          {isEditMode && (
+            <button
+              type="button"
+              onClick={() => setShowConfirm(true)}
+              disabled={isSaving}
+              className="flex items-center px-6 py-3 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+            >
+              削除
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleSaveDraft}
             disabled={isSaving}
             className="px-6 py-3 bg-stone-200 text-stone-700 rounded-full font-medium hover:bg-stone-300 transition-colors disabled:opacity-50"
           >
-            下書き保存
+            下書き
           </button>
           <button
             type="submit"
@@ -642,13 +675,41 @@ export default function RecipeForm({
             {isSaving ? (
               <div className="animate-spin h-5 w-5 mr-3 border-4 border-white border-t-transparent rounded-full"></div>
             ) : isEditMode ? (
-              "レシピを更新"
+              "更新"
             ) : (
-              "レシピを保存"
+              "保存"
             )}
           </button>
         </div>
       </form>
+
+      {/* 削除確認ダイアログ（モーダル） */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-stone-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 shadow-xl w-full max-w-sm text-center">
+            <h3 className="font-bold text-lg mb-2 text-stone-800">
+              このレシピを削除しますか？
+            </h3>
+            <p className="text-sm text-stone-600 mb-6">
+              一度削除すると元に戻せません。
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-6 py-2 rounded-full text-stone-600 border border-stone-300 hover:bg-stone-100 transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-6 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                削除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -20,7 +20,6 @@ type pageType =
   | "favorites"
   | "drafts"
   | "created"
-  | "create"
   | "edit"
   | "history"
   | "search"
@@ -87,7 +86,6 @@ export default function Header({ pageName, title, content }: HeaderProps) {
   //           )}
   //         </>
   //       );
-  //     case "create":
   //     case "edit":
   //       return (
   //         <button

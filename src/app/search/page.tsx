@@ -1,123 +1,112 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { ExpandLessIcon, ExpandMoreIcon, SearchIcon } from "@/icons";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import ListCard from "@/components/ui/ListCard";
 import { CardItem } from "@/types/types";
-import { mockListCardItems } from "@/mocks/listCardItems";
 import CircularProgress from "@mui/material/CircularProgress";
+import { getAllergens, searchRecipesWithAllergens } from "@/lib/supabase";
+
+// アレルゲンデータの型を定義
+interface Allergen {
+  id: number;
+  name: string; // 例えば "egg"
+}
 
 export default function SearchResults() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
+  // const searchParams = useSearchParams();
+  // const query = searchParams.get("q") || "";
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState("all"); // all, recipe, ingredient
+  // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
   const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
+  const [error, setError] = useState<string | null>(null);
   const [showAllergens, setShowAllergens] = useState(false);
-  const [allergenExclusions, setAllergenExclusions] = useState({
-    egg: true,
-    milk: true,
-    wheat: true,
-    shrimp: true,
-    crab: true,
-    soba: true,
-    peanut: true,
-    walnut: true,
-    almond: true,
-    abalone: true,
-    squid: true,
-    ikura: true,
-    orange: true,
-    cashew: true,
-    kiwi: true,
-    beef: true,
-    sesame: true,
-    salmon: true,
-    mackerel: true,
-    soy: true,
-    chicken: true,
-    banana: true,
-    pork: true,
-    macadamia: true,
-    peach: true,
-    yam: true,
-    apple: true,
-    gelatin: true,
-  });
 
-  const toggleAllergen = (allergen: keyof typeof allergenExclusions) => {
+  // Supabaseから取得したアレルゲンを保存する状態
+  const [allergens, setAllergens] = useState<Allergen[]>([]);
+
+  // アレルゲン除外設定の状態を動的に管理
+  const [allergenExclusions, setAllergenExclusions] = useState<
+    Record<string, boolean>
+  >({});
+
+  useEffect(() => {
+    const excludedAllergenIds = Object.keys(allergenExclusions)
+      .filter((id) => allergenExclusions[id] === true)
+      .map(Number);
+    console.log("除外するアレルゲンID:", excludedAllergenIds);
+  }, [allergenExclusions]);
+
+  // const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === "Enter") {
+  //     // 検索窓でのEnterキーでURLを更新
+  //     window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+  //   }
+  // };
+
+  // 検索処理
+  const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const currentQuery = inputRef.current?.value || "";
+
+      if (!currentQuery.trim()) {
+        setResults([]); // 検索結果を空にする
+        setLoading(false); // ローディング状態を解除
+        setSearchQuery("");
+        return; // ここで処理を終了
+      }
+      setLoading(true); // 検索を開始するので「読み込み中」にする
+      setError(null);
+
+      // Enterが押されたタイミングで検索クエリをStateに設定
+      setSearchQuery(currentQuery);
+
+      // 除外するアレルゲンのIDを取得
+      // const excludedAllergenIds = Object.entries(allergenExclusions)
+      //   .filter(([, excluded]) => excluded)
+      //   .map(([id]) => Number(id));
+
+      const excludedAllergenIds = Object.keys(allergenExclusions)
+        .filter((id) => allergenExclusions[id] === true)
+        .map(Number);
+
+      try {
+        const data = await searchRecipesWithAllergens(
+          currentQuery,
+          excludedAllergenIds,
+          "32836782-4f6d-4dc3-92ea-4faf03ed86a5"
+        );
+        if (data) {
+          setResults(data);
+        }
+      } catch (error) {
+        console.error("データの取得に失敗しました。", error);
+        setError("データの取得に失敗しました。");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const toggleAllergen = (allergenId: number) => {
     setAllergenExclusions((prev) => ({
       ...prev,
-      [allergen]: !prev[allergen],
+      [allergenId]: !prev[allergenId],
     }));
   };
 
-  const allergenList = [
-    { key: "egg", label: "卵" },
-    { key: "milk", label: "乳" },
-    { key: "wheat", label: "小麦" },
-    { key: "shrimp", label: "エビ" },
-    { key: "crab", label: "カニ" },
-    { key: "soba", label: "そば" },
-    { key: "peanut", label: "落花生" },
-    { key: "walnut", label: "くるみ" },
-    { key: "almond", label: "アーモンド" },
-    { key: "abalone", label: "あわび" },
-    { key: "squid", label: "いか" },
-    { key: "ikura", label: "いくら" },
-    { key: "orange", label: "オレンジ" },
-    { key: "cashew", label: "カシューナッツ" },
-    { key: "kiwi", label: "キウイフルーツ" },
-    { key: "beef", label: "牛肉" },
-    { key: "sesame", label: "ごま" },
-    { key: "salmon", label: "さけ" },
-    { key: "mackerel", label: "さば" },
-    { key: "soy", label: "大豆" },
-    { key: "chicken", label: "鶏肉" },
-    { key: "banana", label: "バナナ" },
-    { key: "pork", label: "豚肉" },
-    { key: "macadamia", label: "マカダミアナッツ" },
-    { key: "peach", label: "もも" },
-    { key: "yam", label: "やまいも" },
-    { key: "apple", label: "りんご" },
-    { key: "gelatin", label: "ゼラチン" },
-  ];
+  // const filteredResults = results.filter((result) => {
+  //   if (filter === "all") return true;
+  //   return result.type === filter;
+  // });
 
-  useEffect(() => {
-    inputRef.current?.focus();
-    if (query) {
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        const filtered = mockListCardItems.filter(
-          (item) =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
-        );
-        setResults(filtered);
-        setLoading(false);
-      }, 500);
-    }
-  }, [query]);
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
-    }
-  };
-
-  const filteredResults = results.filter((result) => {
-    if (filter === "all") return true;
-    return result.type === filter;
-  });
-
-  const sortedResults = [...filteredResults].sort((a, b) => {
+  const sortedResults = results.sort((a, b) => {
     if (sortBy === "name") {
       return a.name.localeCompare(b.name);
     }
@@ -126,6 +115,37 @@ export default function SearchResults() {
     }
     return 0; // relevance (default order)
   });
+
+  // ページロード時とアレルゲン項目がないときに実行
+  useEffect(() => {
+    inputRef.current?.focus();
+    const fetchAllergens = async () => {
+      if (allergens.length === 0) {
+        try {
+          const data = await getAllergens();
+          if (data) {
+            setAllergens(data);
+            const initialExclusions: Record<number, boolean> = {};
+            data.forEach((allergen) => {
+              initialExclusions[allergen.id] = false;
+            });
+            setAllergenExclusions(initialExclusions);
+          }
+        } catch (err) {
+          setError("データの取得に失敗しました。");
+          console.error(err);
+        }
+      }
+    };
+    fetchAllergens();
+  }, []);
+
+  // 検索クエリ、アレルゲン除外設定が変更されたときに検索を再実行
+  // useEffect(() => {
+  //   if (allergens.length > 0) {
+  //     handleSearch(query);
+  //   }
+  // }, [query, allergens]);
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -140,10 +160,10 @@ export default function SearchResults() {
             <input
               ref={inputRef}
               type="text"
-              placeholder="レシピ・食材を検索（ ひらがな or カタカナ ）"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="レシピ・食材を検索"
+              // value={searchQuery}
+              // onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
               className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300 transition-all shadow-sm"
               autoFocus
             />
@@ -169,27 +189,25 @@ export default function SearchResults() {
             {showAllergens && (
               <div className="px-4 pb-4">
                 <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 pt-2 border-t border-stone-100">
-                  {allergenList.map((allergen) => (
-                    <button
-                      key={allergen.key}
-                      onClick={() =>
-                        toggleAllergen(
-                          allergen.key as keyof typeof allergenExclusions
-                        )
-                      }
-                      className={`h-10 flex items-center justify-center p-1.5 rounded-xl text-xs transition-all hover:scale-105 active:scale-95 ${
-                        allergenExclusions[
-                          allergen.key as keyof typeof allergenExclusions
-                        ]
-                          ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                          : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
-                      }`}
-                    >
-                      <div className="text-xs leading-tight">
-                        {allergen.label}
-                      </div>
-                    </button>
-                  ))}
+                  {allergens.length === 0 && loading ? (
+                    <CircularProgress color="secondary" size={24} />
+                  ) : (
+                    allergens.map((allergen) => (
+                      <button
+                        key={allergen.id}
+                        onClick={() => toggleAllergen(allergen.id)}
+                        className={`h-10 flex items-center justify-center p-1.5 rounded-xl text-xs transition-all hover:scale-105 active:scale-95 ${
+                          allergenExclusions[allergen.id]
+                            ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                            : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
+                        }`}
+                      >
+                        <div className="text-xs leading-tight">
+                          {allergen.name}
+                        </div>
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
             )}
@@ -198,10 +216,11 @@ export default function SearchResults() {
 
         {/* 検索結果ヘッダー */}
         <div className="flex items-center justify-between">
-          {query && (
+          {searchQuery && (
             <p className="text-sm text-stone-500 mt-1">
-              「<span className="font-medium text-stone-700">{query}</span>
-              」の検索結果 {filteredResults.length}件
+              「
+              <span className="font-medium text-stone-700">{searchQuery}</span>
+              」の検索結果 {results.length}件
             </p>
           )}
         </div>
@@ -213,7 +232,7 @@ export default function SearchResults() {
           </div>
         ) : sortedResults.length > 0 ? (
           <ListCard listCardItems={sortedResults} pageName="search" />
-        ) : query ? (
+        ) : searchQuery ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center text-3xl">
               😔
@@ -222,7 +241,7 @@ export default function SearchResults() {
               検索結果が見つかりませんでした
             </h3>
             <p className="text-stone-500 mb-6">
-              「{query}」に一致するレシピや食材が見つかりませんでした。
+              「{searchQuery}」に一致するレシピや食材が見つかりませんでした。
               <br />
               別のキーワードで検索してみてください。
             </p>

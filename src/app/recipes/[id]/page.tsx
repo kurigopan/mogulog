@@ -2,7 +2,13 @@
 
 import { use, useState, useEffect } from "react";
 import Image from "next/image";
-import { EditIcon, ScheduleIcon, PeopleIcon, InfoOutlineIcon } from "@/icons";
+import {
+  EditIcon,
+  ScheduleIcon,
+  PeopleIcon,
+  InfoOutlineIcon,
+  DeleteIcon,
+} from "@/icons";
 import { Tooltip, IconButton } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -123,15 +129,19 @@ export default function RecipeDetail({
             {displayRecipe.description}
           </p>
 
-          {/* アクションボタン */}
-          <div className="flex space-x-3">
-            {displayRecipe.isOwn && (
-              <button className="flex items-center justify-center py-3 px-4 rounded-2xl font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors">
+          {/* アクションボタン(自作レシピの場合のみ表示) */}
+          {displayRecipe.isOwn && (
+            <div className="flex items-center justify-center gap-4">
+              <button className=" py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600-600 hover:bg-purple-200 transition-colors">
                 <EditIcon />
                 <span className="ml-2">編集</span>
               </button>
-            )}
-          </div>
+              <button className="py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600 hover:bg-purple-200 transition-colors">
+                <DeleteIcon />
+                <span className="ml-2">削除</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 材料 */}

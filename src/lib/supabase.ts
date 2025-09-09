@@ -24,44 +24,40 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabaseクライアントのインスタンスを作成
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-/**
- * @param recipeData - 登録するレシピデータ
- */
-export async function createRecipe(recipeData: Omit<Recipe, "id">) {
-  // フロントエンドの型をデータベースの型に変換
-  const formattedData = formatRecipeForSupabase(recipeData);
-  const { data, error } = await supabase
-    .from("recipes")
-    .insert([formattedData])
-    .select();
+// アレルゲン登録データを全て取得する関数
+export async function getAllergens() {
+  const { data, error } = await supabase.from("allergens").select("id, name");
 
   if (error) {
-    console.error("レシピの登録に失敗しました:", error);
-    return { data: null, error };
+    console.error("Failed to fetch allergens:", error);
+    return [];
   }
 
-  // 成功時のデータとエラーを返却
-  return { data, error: null };
+  return data;
 }
 
-/**
- * @param id - 更新するレシピのID
- * @param recipeData - 更新するレシピデータ
- */
-export async function updateRecipe(id: number, recipeData: Omit<Recipe, "id">) {
-  const formattedData = formatRecipeForSupabase(recipeData);
-  const { data, error } = await supabase
-    .from("recipes")
-    .update(formattedData)
-    .eq("id", id)
-    .select();
+// アレルゲンを考慮したレシピ検索
+export async function searchRecipesWithAllergens(
+  searchTerm: string,
+  excludedAllergenIds: number[],
+  userId: string
+) {
+  const { data, error } = await supabase.rpc("search_recipes_with_allergens", {
+    search_term: searchTerm,
+    excluded_allergen_ids: excludedAllergenIds,
+    user_id_param: userId,
+  });
 
   if (error) {
-    console.error("レシピの更新に失敗しました:", error);
-    return { data: null, error };
+    console.error("Failed to fetch recipe:", error);
+    return [];
   }
 
-  return { data, error: null };
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcRecipeSchema).parse(data);
+
+  // フロントエンドの型に変換
+  return validatedData.map((d) => recipeSchema.parse(d));
 }
 
 // ingredientsの型定義に含まれるeaten,ng,isFavoriteを補完するために、
@@ -136,4 +132,58 @@ export async function getFavoriteRecipeLogs() {
   }
 
   return data.map((row) => row.recipe_id);
+}
+
+/**
+ * @param recipeData - 登録するレシピデータ
+ */
+export async function createRecipe(recipeData: Omit<Recipe, "id">) {
+  // フロントエンドの型をデータベースの型に変換
+  const formattedData = formatRecipeForSupabase(recipeData);
+  const { data, error } = await supabase
+    .from("recipes")
+    .insert([formattedData])
+    .select();
+
+  if (error) {
+    console.error("レシピの登録に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  // 成功時のデータとエラーを返却
+  return { data, error: null };
+}
+
+/**
+ * @param id - 更新するレシピのID
+ * @param recipeData - 更新するレシピデータ
+ */
+export async function updateRecipe(id: number, recipeData: Omit<Recipe, "id">) {
+  const formattedData = formatRecipeForSupabase(recipeData);
+  const { data, error } = await supabase
+    .from("recipes")
+    .update(formattedData)
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    console.error("レシピの更新に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+}
+
+/**
+ * @param id - 削除するレシピのID
+ */
+export async function deleteRecipe(id: number) {
+  const { error } = await supabase.from("recipes").delete().eq("id", id);
+
+  if (error) {
+    console.error("レシピの削除に失敗しました:", error);
+    return { error };
+  }
+
+  return { error: null };
 }

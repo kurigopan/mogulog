@@ -349,6 +349,51 @@ export type Database = {
         }
         Relationships: []
       }
+      recipe_allergens: {
+        Row: {
+          allergen_id: number
+          created_at: string
+          created_by: string
+          id: number
+          recipe_id: number
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          allergen_id: number
+          created_at?: string
+          created_by: string
+          id?: number
+          recipe_id: number
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          allergen_id?: number
+          created_at?: string
+          created_by?: string
+          id?: number
+          recipe_id?: number
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_allergens_allergen_id_fkey"
+            columns: ["allergen_id"]
+            isOneToOne: false
+            referencedRelation: "allergens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_allergens_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipes: {
         Row: {
           category: string
@@ -409,6 +454,47 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestion_keywords: {
+        Row: {
+          allergen_id: number
+          created_at: string
+          created_by: string
+          id: number
+          keyword: string
+          message: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          allergen_id: number
+          created_at?: string
+          created_by: string
+          id?: number
+          keyword: string
+          message: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          allergen_id?: number
+          created_at?: string
+          created_by?: string
+          id?: number
+          keyword?: string
+          message?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_keywords_allergen_id_fkey"
+            columns: ["allergen_id"]
+            isOneToOne: false
+            referencedRelation: "allergens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -462,6 +548,34 @@ export type Database = {
       }
       get_recipes: {
         Args: { user_id_param: string }
+        Returns: {
+          category: string
+          cooking_time: string
+          created_at: string
+          created_by: string
+          description: string
+          id: number
+          image_url: string
+          ingredients: Json
+          is_favorite: boolean
+          is_own: boolean
+          is_private: boolean
+          memo: string
+          name: string
+          servings: string
+          start_stage: string
+          steps: Json
+          tags: string[]
+          updated_at: string
+          updated_by: string
+        }[]
+      }
+      search_recipes_with_allergens: {
+        Args: {
+          excluded_allergen_ids: number[]
+          search_term: string
+          user_id_param: string
+        }
         Returns: {
           category: string
           cooking_time: string

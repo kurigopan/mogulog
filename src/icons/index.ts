@@ -5,12 +5,14 @@ export { default as CancelIcon } from "@mui/icons-material/Cancel";
 export { default as CheckCircleIcon } from "@mui/icons-material/CheckCircle";
 export { default as ChevronRightIcon } from "@mui/icons-material/ChevronRight";
 export { default as ChildCareIcon } from "@mui/icons-material/ChildCare"; // 赤ちゃんの顔
+export { default as ClearIcon } from "@mui/icons-material/Clear";
 export { default as CloseIcon } from "@mui/icons-material/Close";
 export { default as CreateIcon } from "@mui/icons-material/Create";
 export { default as DeleteIcon } from "@mui/icons-material/Delete";
 export { default as DraftsIcon } from "@mui/icons-material/Drafts";
 export { default as EditIcon } from "@mui/icons-material/Edit";
 export { default as EditNoteIcon } from "@mui/icons-material/EditNote";
+export { default as ErrorIcon } from "@mui/icons-material/Error";
 export { default as ExpandLessIcon } from "@mui/icons-material/ExpandLess";
 export { default as ExpandMoreIcon } from "@mui/icons-material/ExpandMore";
 export { default as FaceIcon } from "@mui/icons-material/Face";

@@ -35,14 +35,9 @@ export default function IngredientDetail({
 
   useEffect(() => {
     const fetchIngredients = async () => {
-      try {
-        const data = await getIngredientsWithStatus(userId, childId);
-        if (data) {
-          setIngredients(data);
-        }
-      } catch (err) {
-        setError("データの取得に失敗しました。");
-        console.error(err);
+      const data = await getIngredientsWithStatus(userId, childId);
+      if (data) {
+        setIngredients(data);
       }
     };
     fetchIngredients();
@@ -50,14 +45,9 @@ export default function IngredientDetail({
 
   useEffect(() => {
     const fetchRecipes = async () => {
-      try {
-        const data = await getRecipes(userId);
-        if (data) {
-          setRecipes(data);
-        }
-      } catch (err) {
-        setError("データの取得に失敗しました。");
-        console.error(err);
+      const data = await getRecipes(userId);
+      if (data) {
+        setRecipes(data);
       }
     };
     fetchRecipes();

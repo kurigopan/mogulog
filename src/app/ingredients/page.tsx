@@ -25,25 +25,18 @@ export default function IngredientsList() {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchIngredients = async () => {
-      try {
-        setLoading(true);
-        const data = await getIngredientsWithStatus(
-          "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-          1
-        );
-        if (data) {
-          setIngredients(data);
-        }
-      } catch (err) {
-        setError("データの取得に失敗しました。");
-        console.error(err);
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      const data = await getIngredientsWithStatus(
+        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+        1
+      );
+      if (data) {
+        setIngredients(data);
       }
+      setLoading(false);
     };
 
     fetchIngredients();

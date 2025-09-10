@@ -18,11 +18,7 @@ export default function ShareButton({ title }: Props) {
     };
 
     if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.error("共有がキャンセルまたは失敗", err);
-      }
+      await navigator.share(shareData);
     } else {
       try {
         await navigator.clipboard.writeText(shareData.url);
@@ -40,7 +36,6 @@ export default function ShareButton({ title }: Props) {
       className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
     >
       <ShareIcon />
-      {copied ? "コピーしました！" : "シェア"}
     </button>
   );
 }

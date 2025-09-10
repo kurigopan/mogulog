@@ -22,6 +22,7 @@ export type Database = {
           name: string
           updated_at: string
           updated_by: string
+          variants: string[]
         }
         Insert: {
           created_at?: string
@@ -30,6 +31,7 @@ export type Database = {
           name: string
           updated_at?: string
           updated_by: string
+          variants?: string[]
         }
         Update: {
           created_at?: string
@@ -38,6 +40,7 @@ export type Database = {
           name?: string
           updated_at?: string
           updated_by?: string
+          variants?: string[]
         }
         Relationships: []
       }
@@ -223,6 +226,7 @@ export type Database = {
       ingredient_allergens: {
         Row: {
           allergen_id: number
+          allergen_name: string
           created_at: string
           created_by: string
           id: number
@@ -232,6 +236,7 @@ export type Database = {
         }
         Insert: {
           allergen_id: number
+          allergen_name: string
           created_at?: string
           created_by: string
           id?: number
@@ -241,6 +246,7 @@ export type Database = {
         }
         Update: {
           allergen_id?: number
+          allergen_name?: string
           created_at?: string
           created_by?: string
           id?: number
@@ -255,6 +261,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "allergens"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingredient_allergens_allergens_name_fkey"
+            columns: ["allergen_name"]
+            isOneToOne: true
+            referencedRelation: "allergens"
+            referencedColumns: ["name"]
           },
           {
             foreignKeyName: "ingredient_allergens_ingredient_id_fkey"
@@ -454,47 +467,6 @@ export type Database = {
         }
         Relationships: []
       }
-      suggestion_keywords: {
-        Row: {
-          allergen_id: number
-          created_at: string
-          created_by: string
-          id: number
-          keyword: string
-          message: string
-          updated_at: string
-          updated_by: string
-        }
-        Insert: {
-          allergen_id: number
-          created_at?: string
-          created_by: string
-          id?: number
-          keyword: string
-          message: string
-          updated_at?: string
-          updated_by: string
-        }
-        Update: {
-          allergen_id?: number
-          created_at?: string
-          created_by?: string
-          id?: number
-          keyword?: string
-          message?: string
-          updated_at?: string
-          updated_by?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "suggestion_keywords_allergen_id_fkey"
-            columns: ["allergen_id"]
-            isOneToOne: false
-            referencedRelation: "allergens"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -520,6 +492,22 @@ export type Database = {
           tips: string[]
           updated_at: string
           updated_by: string
+        }[]
+      }
+      get_recipe_allergens: {
+        Args: { recipe_id_param: number }
+        Returns: {
+          id: number
+          name: string
+          variants: string[]
+        }[]
+      }
+      get_recipe_allergens_with_names: {
+        Args: { recipe_id_param: number }
+        Returns: {
+          id: number
+          name: string
+          variants: string[]
         }[]
       }
       get_recipe_by_id: {

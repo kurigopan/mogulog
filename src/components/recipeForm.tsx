@@ -3,19 +3,27 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { FormControlLabel, Switch } from "@mui/material";
+import { CircularProgress, FormControlLabel, Switch } from "@mui/material";
 import {
   AddIcon,
-  DeleteIcon,
-  CloseIcon,
   InfoOutlineIcon,
   PhotoCameraIcon,
   ImageIcon,
   ScheduleIcon,
   PeopleIcon,
+  ClearIcon,
+  ErrorIcon,
 } from "@/icons";
-import { createRecipe, deleteRecipe, updateRecipe } from "@/lib/supabase";
-import { Category, Recipe, Stage } from "@/types/types";
+import {
+  createRecipe,
+  createRecipeAllergens,
+  deleteRecipe,
+  deleteRecipeAllergens,
+  getAllergens,
+  getRecipeAllergensById,
+  updateRecipe,
+} from "@/lib/supabase";
+import { Allergen, Category, Recipe, Stage } from "@/types/types";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
 const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];
@@ -27,7 +35,6 @@ export default function RecipeForm({
   initialData: Recipe | null;
   isEditMode: boolean;
 }) {
-  // フォームの状態を管理
   const [formData, setFormData] = useState<Omit<Recipe, "id">>({
     name: "",
     image: "",
@@ -48,45 +55,21 @@ export default function RecipeForm({
     type: "recipe",
     // status: "draft",
   });
-
-  // フォーム送信ボタンのローディング状態
   const [isSaving, setIsSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const stepImageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  // ルーターフックを初期化
+  const [allergenInclusions, setAllergenInclusions] = useState<
+    Record<string, boolean>
+  >({});
+  const [allergens, setAllergens] = useState<Allergen[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  // 編集モードの場合、初期データでフォームを初期化
-  useEffect(() => {
-    if (initialData) {
-      // initialDataにidがある場合は除外してセット
-      const { id, ...rest } = initialData;
-      setFormData({
-        ...rest,
-        name: rest.name || "",
-        image: rest.image || "",
-        startStage: rest.startStage || "初期",
-        cookingTime: rest.cookingTime || "",
-        servings: rest.servings || "",
-        description: rest.description || "",
-        ingredients: rest.ingredients || [{ name: "", amount: "", note: "" }],
-        steps: rest.steps || [{ title: "", description: "", image: "" }],
-        tags: rest.tags || [],
-        isPrivate: rest.isPrivate || false,
-        date: new Date(),
-        isFavorite: rest.isFavorite || false,
-        author: rest.author || "",
-        isOwn: rest.isOwn || true,
-        savedMemo: rest.savedMemo || "",
-        category: rest.category || "主食",
-        type: rest.type || "recipe",
-        // status: rest.status || "draft",
-      });
-    }
-  }, [initialData]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [suggestedAllergenNames, setSuggestedAllergenNames] = useState<
+    string[]
+  >([]);
 
   // 画像ファイル処理（実際の実装ではファイルアップロード処理が必要）
   const handleImageUpload = (file: File, callback: (url: string) => void) => {
@@ -150,21 +133,20 @@ export default function RecipeForm({
     });
   };
 
-  // 材料の追加・削除
+  // 材料の追加・削除・変更
   const handleAddIngredient = () => {
     setFormData((prev) => ({
       ...prev,
       ingredients: [...prev.ingredients, { name: "", amount: "", note: "" }],
     }));
   };
-
   const handleRemoveIngredient = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      ingredients: prev.ingredients.filter((_, i) => i !== index),
-    }));
+    setFormData((prev) => {
+      const newIngredients = prev.ingredients.filter((_, i) => i !== index);
+      checkAndSuggestAllergens(newIngredients);
+      return { ...prev, ingredients: newIngredients };
+    });
   };
-
   const handleIngredientChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number
@@ -173,9 +155,14 @@ export default function RecipeForm({
     const newIngredients = [...formData.ingredients];
     newIngredients[index] = { ...newIngredients[index], [name]: value };
     setFormData((prev) => ({ ...prev, ingredients: newIngredients }));
+    // 材料名が変更された場合のみサジェストを更新
+    if (name === "name") {
+      checkAndSuggestAllergens(newIngredients);
+    }
+    setFormData((prev) => ({ ...prev, ingredients: newIngredients }));
   };
 
-  // 作り方の追加・削除
+  // 作り方の追加・削除・変更
   const handleAddStep = () => {
     setFormData((prev) => {
       const lastStep =
@@ -195,7 +182,6 @@ export default function RecipeForm({
       };
     });
   };
-
   const handleRemoveStep = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -204,7 +190,6 @@ export default function RecipeForm({
         .map((step, i) => ({ ...step, step: i + 1 })),
     }));
   };
-
   const handleStepChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number
@@ -229,7 +214,6 @@ export default function RecipeForm({
       setTagInput("");
     }
   };
-
   const handleRemoveTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -237,30 +221,114 @@ export default function RecipeForm({
     }));
   };
 
+  // アレルゲン名とその同義語のマップ
+  const allergenMap = useRef<Map<string, string>>(new Map());
+
+  // アレルゲン選択
+  const toggleAllergen = (allergenId: number) => {
+    const isCurrentlySelected = allergenInclusions[allergenId];
+
+    // アレルゲン選択状態を更新
+    setAllergenInclusions((prev) => ({
+      ...prev,
+      [allergenId]: !prev[allergenId],
+    }));
+    // サジェストリストから該当のアレルゲンを削除するロジック
+    const clickedAllergen = allergens.find((a) => a.id === allergenId);
+    if (!clickedAllergen) return;
+
+    if (isCurrentlySelected) {
+      // 選択を解除する場合（'ON' -> 'OFF'）
+      // 材料リストを再チェックして、再度サジェストが必要か確認
+      const updatedIngredients = [...formData.ingredients];
+      const allIngredients = updatedIngredients
+        .map((ing) => ing.name)
+        .join(" ");
+
+      // 材料にアレルゲン要素がまだ含まれているか確認
+      let hasAllergenInIngredients = allIngredients.includes(
+        clickedAllergen.name
+      );
+      if (clickedAllergen.variants) {
+        clickedAllergen.variants.forEach((variant) => {
+          if (allIngredients.includes(variant)) {
+            hasAllergenInIngredients = true;
+          }
+        });
+      }
+
+      if (hasAllergenInIngredients) {
+        // 材料に含まれている場合は、サジェストを再表示
+        setSuggestedAllergenNames((prev) => {
+          // 既存のサジェストに重複がないか確認して追加
+          if (!prev.includes(clickedAllergen.name)) {
+            return [...prev, clickedAllergen.name];
+          }
+          return prev;
+        });
+      }
+    } else {
+      // 選択する場合（'OFF' -> 'ON'）
+      // サジェストリストから該当のアレルゲンを削除
+      setSuggestedAllergenNames((prev) =>
+        prev.filter((name) => name !== clickedAllergen.name)
+      );
+    }
+  };
+
+  // 材料名の変更をチェックしてアレルゲンサジェストを更新
+  const checkAndSuggestAllergens = (
+    ingredients: { name: string; amount: string; note?: string | null }[]
+  ) => {
+    const allIngredients = ingredients.map((ing) => ing.name).join(" ");
+    const newSuggestions: string[] = [];
+
+    for (const [synonym, allergenName] of allergenMap.current.entries()) {
+      if (
+        allIngredients.includes(synonym) &&
+        !newSuggestions.includes(allergenName)
+      ) {
+        newSuggestions.push(allergenName);
+      }
+    }
+    setSuggestedAllergenNames(newSuggestions);
+  };
+
   // フォーム送信処理
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      // Supabaseにデータを挿入
-      let result;
+      let recipeId;
+      let newRecipeData; // createRecipeの戻り値を受け取る変数
       if (isEditMode && initialData?.id) {
         // 編集モードの場合、IDを使ってレシピを更新
-        result = await updateRecipe(initialData.id, formData);
+        await updateRecipe(initialData.id, formData);
+        recipeId = initialData.id;
       } else {
         // 新規作成モードの場合、レシピを作成
-        result = await createRecipe(formData);
+        const { data, error } = await createRecipe(formData);
+        if (error || !data) {
+          throw new Error("レシピの作成に失敗しました。");
+        }
+        newRecipeData = data[0];
+        recipeId = newRecipeData.id;
       }
+      // 選択されたアレルゲン情報を抽出
+      const selectedAllergenIds = Object.keys(allergenInclusions)
+        .filter((key) => allergenInclusions[parseInt(key, 10)])
+        .map((key) => parseInt(key, 10));
 
-      const { data, error } = result;
-      if (error) {
-        throw error;
-      }
-      console.log("レシピを保存しました:", data);
-      router.push("/"); // 成功したらトップページにリダイレクト
+      // 既存のアレルゲンデータを削除（編集モードの場合）
+      await deleteRecipeAllergens(recipeId);
+
+      // 新しいアレルゲンデータを登録
+      await createRecipeAllergens(recipeId, selectedAllergenIds);
+
+      console.log("レシピとアレルゲン情報を保存しました:", recipeId);
+      router.push("/");
     } catch (error) {
       console.error("レシピの保存に失敗しました:", error);
-      // alert("レシピの保存に失敗しました。もう一度お試しください。");
     } finally {
       setIsSaving(false);
     }
@@ -297,13 +365,97 @@ export default function RecipeForm({
     }
   };
 
+  // 編集モードの場合、初期データでフォームを初期化
+  useEffect(() => {
+    if (initialData) {
+      // initialDataにidがある場合は除外してセット
+      const { id, ...rest } = initialData;
+      setFormData({
+        ...rest,
+        name: rest.name || "",
+        image: rest.image || "",
+        startStage: rest.startStage || "初期",
+        cookingTime: rest.cookingTime || "",
+        servings: rest.servings || "",
+        description: rest.description || "",
+        ingredients: rest.ingredients || [{ name: "", amount: "", note: "" }],
+        steps: rest.steps || [{ title: "", description: "", image: "" }],
+        tags: rest.tags || [],
+        isPrivate: rest.isPrivate || false,
+        date: new Date(),
+        isFavorite: rest.isFavorite || false,
+        author: rest.author || "",
+        isOwn: rest.isOwn || true,
+        savedMemo: rest.savedMemo || "",
+        category: rest.category || "主食",
+        type: rest.type || "recipe",
+        // status: rest.status || "draft",
+      });
+    }
+  }, [initialData]);
+
+  // ページロード時とアレルゲン項目がないときに実行
+  useEffect(() => {
+    inputRef.current?.focus();
+    const fetchAllergens = async () => {
+      if (allergens.length === 0) {
+        const data = await getAllergens();
+        if (data) {
+          setAllergens(data);
+
+          // マップを作成
+          const newMap = new Map<string, string>();
+          data.forEach((allergen) => {
+            // 同義語をキー、アレルゲン名を値として保存
+            if (allergen.variants) {
+              allergen.variants.forEach((variant) => {
+                newMap.set(variant, allergen.name);
+              });
+            }
+          });
+          allergenMap.current = newMap;
+
+          // レシピIDがすでに存在する場合、そのレシピに紐づくアレルゲンも取得
+          if (isEditMode && initialData?.id) {
+            const selectedAllergenIds = await getRecipeAllergensById(
+              initialData.id
+            );
+            if (selectedAllergenIds) {
+              const initialAllergenState: Record<string, boolean> = {};
+              data.forEach((allergen) => {
+                initialAllergenState[allergen.id] =
+                  selectedAllergenIds.includes(allergen.id);
+              });
+              setAllergenInclusions(initialAllergenState);
+            }
+          } else {
+            // 新規作成モードの場合、全てのアレルゲンをfalseで初期化
+            const initialInclusions: Record<string, boolean> = {};
+            data.forEach((allergen) => {
+              initialInclusions[allergen.id] = false;
+            });
+            setAllergenInclusions(initialInclusions);
+          }
+        }
+      }
+    };
+    fetchAllergens();
+  }, [allergens, isEditMode, initialData]);
+
+  // 材料の変更をチェックしてサジェストを更新するuseEffect
+  useEffect(() => {
+    if (initialData && allergens.length > 0) {
+      checkAndSuggestAllergens(formData.ingredients);
+    }
+  }, [initialData, allergens]);
+
   return (
     <div className="p-4 space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* レシピ基本情報 */}
         <section className="bg-white rounded-3xl p-6 shadow-sm">
-          <div className="flex flex-col items-center space-y-4">
-            {/* 画像プレビュー */}
+          {/* 画像プレビュー */}
+          <div className="flex flex-col items-center">
             <div
               className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer hover:bg-stone-200 transition-colors group relative"
               onClick={() => mainImageInputRef.current?.click()}
@@ -340,6 +492,7 @@ export default function RecipeForm({
           </div>
 
           <div className="space-y-4 mt-6">
+            {/* レシピ名 */}
             <input
               type="text"
               name="name"
@@ -396,6 +549,7 @@ export default function RecipeForm({
               </div>
             </div>
 
+            {/* レシピ情報 */}
             <div className="flex justify-between">
               <div className="flex items-center">
                 <ScheduleIcon />
@@ -421,6 +575,7 @@ export default function RecipeForm({
               </div>
             </div>
 
+            {/* 説明 */}
             <textarea
               name="description"
               value={formData.description || ""}
@@ -430,7 +585,8 @@ export default function RecipeForm({
               className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
             />
 
-            <div className="flex items-center space-x-3">
+            {/* 非公開設定 */}
+            <div className="flex items-center">
               <FormControlLabel
                 control={
                   <Switch
@@ -480,11 +636,11 @@ export default function RecipeForm({
               追加
             </button>
           </div>
-          <div className="bg-white rounded-3xl px-6 py-2 shadow-sm">
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
             {formData.ingredients.map((ingredient, index) => (
               <div
                 key={index}
-                className="flex-col items-center py-4 border-b border-stone-100 last:border-b-0"
+                className="flex-col items-center border-b border-stone-300 last:border-b-0 mb-4"
               >
                 <div className="flex justify-between space-x-2 mb-2">
                   <input
@@ -504,7 +660,7 @@ export default function RecipeForm({
                     className="w-24 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between mb-4">
                   <input
                     type="text"
                     name="note"
@@ -517,10 +673,10 @@ export default function RecipeForm({
                     <button
                       type="button"
                       onClick={() => handleRemoveIngredient(index)}
-                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors ml-2"
                       title="材料を削除"
                     >
-                      <DeleteIcon className="w-5 h-5" />
+                      <ClearIcon className="w-5 h-5" />
                     </button>
                   )}
                 </div>
@@ -559,7 +715,7 @@ export default function RecipeForm({
                       className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                       title="ステップを削除"
                     >
-                      <DeleteIcon className="w-5 h-5" />
+                      <ClearIcon className="w-5 h-5" />
                     </button>
                   )}
                 </div>
@@ -616,32 +772,75 @@ export default function RecipeForm({
         </section>
 
         {/* タグ */}
-        <section className="bg-white rounded-3xl p-6 shadow-sm">
+        <section>
           <h3 className="text-lg font-bold text-stone-700 mb-4">タグ</h3>
-          <input
-            type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleAddTag}
-            placeholder="作り置きOK"
-            className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all mb-4"
-          />
-          <div className="flex flex-wrap gap-2">
-            {formData.tags.map((tag, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-2 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium"
-              >
-                <span>{tag}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className="text-amber-600 hover:text-amber-800 transition-colors"
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleAddTag}
+              placeholder="作り置きOK"
+              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all mb-4"
+            />
+            <div className="flex flex-wrap gap-2">
+              {formData.tags.map((tag, index) => (
+                <div
+                  key={index}
+                  className="flex items-center space-x-2 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium"
                 >
-                  <CloseIcon className="w-4 h-4" />
-                </button>
+                  <span>{tag}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
+                    className="text-amber-600 hover:text-amber-800 transition-colors"
+                  >
+                    <ClearIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* アレルゲン選択 */}
+        <section>
+          <h3 className="text-lg font-bold text-stone-700 mb-4">アレルゲン</h3>
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
+            {allergens.length === 0 && loading ? (
+              <CircularProgress color="secondary" size={24} />
+            ) : (
+              <div>
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2">
+                  {allergens.map((allergen) => (
+                    <button
+                      key={allergen.id}
+                      type="button"
+                      onClick={() => toggleAllergen(allergen.id)}
+                      className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
+                        allergenInclusions[allergen.id]
+                          ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                          : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
+                      }`}
+                    >
+                      <div className="text-xs leading-tight">
+                        {allergen.name}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {/* リアルタイムサジェストメッセージ */}
+                {suggestedAllergenNames.length > 0 && (
+                  <div className="flex items-center p-3 text-red-400 rounded-lg mt-4">
+                    <ErrorIcon />
+                    <p className="text-sm font-medium text-stone-600 ml-2">
+                      「{suggestedAllergenNames.join("」と「")}
+                      」は含まれていませんか？
+                    </p>
+                  </div>
+                )}
               </div>
-            ))}
+            )}
           </div>
         </section>
 

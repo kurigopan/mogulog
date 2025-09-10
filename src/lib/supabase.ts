@@ -24,9 +24,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabaseクライアントのインスタンスを作成
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
+// ハードコードされたユーザーIDを定義
+// TODO: ユーザー認証実装後に、セッションから取得したユーザーIDに置き換えてください
+const HARDCODED_USER_ID = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
+
 // アレルゲン登録データを全て取得する関数
 export async function getAllergens() {
-  const { data, error } = await supabase.from("allergens").select("id, name");
+  const { data, error } = await supabase
+    .from("allergens")
+    .select("id, name, variants");
 
   if (error) {
     console.error("Failed to fetch allergens:", error);
@@ -120,6 +126,35 @@ export async function getRecipeById(userId: string, recipeId: number) {
   return validatedData.map((d) => recipeSchema.parse(d));
 }
 
+// レシピIDに基づいてアレルゲンのIDと名前を取得
+export async function getRecipeAllergens(recipeId: number) {
+  const { data, error } = await supabase.rpc("get_recipe_allergens", {
+    recipe_id_param: recipeId,
+  });
+
+  if (error) {
+    console.error("Failed to fetch recipe allergens:", error);
+    return [];
+  }
+
+  return data;
+}
+
+// レシピIDに基づいてアレルゲンIDを取得
+export async function getRecipeAllergensById(recipeId: number) {
+  const { data, error } = await supabase
+    .from("recipe_allergens")
+    .select("allergen_id")
+    .eq("recipe_id", recipeId);
+
+  if (error) {
+    console.error("Error fetching recipe allergens by ID:", error);
+    return null;
+  }
+  // allergen_idの配列に変換して返す
+  return data.map((item) => item.allergen_id);
+}
+
 // お気に入り登録データを全て取得する関数
 export async function getFavoriteRecipeLogs() {
   const { data, error } = await supabase
@@ -131,7 +166,38 @@ export async function getFavoriteRecipeLogs() {
     return [];
   }
 
-  return data.map((row) => row.recipe_id);
+  return data.map((item) => item.recipe_id);
+}
+
+export async function createRecipeAllergens(
+  recipeId: number,
+  allergenIds: number[]
+) {
+  // 挿入するデータの配列を生成
+  const dataToInsert = allergenIds.map((allergenId) => ({
+    recipe_id: recipeId,
+    allergen_id: allergenId,
+    created_by: HARDCODED_USER_ID,
+    updated_by: HARDCODED_USER_ID,
+  }));
+
+  // データがなければ何もしない
+  if (dataToInsert.length === 0) {
+    return { data: null, error: null };
+  }
+
+  // 複数の行を一度に挿入
+  const { data, error } = await supabase
+    .from("recipe_allergens")
+    .insert(dataToInsert)
+    .select();
+
+  if (error) {
+    console.error("Error creating recipe allergens:", error);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
 }
 
 /**
@@ -172,6 +238,20 @@ export async function updateRecipe(id: number, recipeData: Omit<Recipe, "id">) {
   }
 
   return { data, error: null };
+}
+
+export async function deleteRecipeAllergens(recipeId: number) {
+  const { error } = await supabase
+    .from("recipe_allergens")
+    .delete()
+    .eq("recipe_id", recipeId);
+
+  if (error) {
+    console.error("Error deleting recipe allergens:", error);
+    return { error };
+  }
+
+  return { error: null };
 }
 
 /**

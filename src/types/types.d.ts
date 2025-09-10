@@ -57,6 +57,12 @@ interface recipeIngredient {
   note: string | null;
 }
 
+export interface Allergen {
+  id: number;
+  name: string;
+  variants: string[];
+}
+
 export type Category =
   | "主食"
   | "主菜"

@@ -1,24 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-// import { useSearchParams } from "next/navigation";
 import { ExpandLessIcon, ExpandMoreIcon, SearchIcon } from "@/icons";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import ListCard from "@/components/ui/ListCard";
-import { CardItem } from "@/types/types";
+import { Allergen, CardItem } from "@/types/types";
 import CircularProgress from "@mui/material/CircularProgress";
 import { getAllergens, searchRecipesWithAllergens } from "@/lib/supabase";
 
-// アレルゲンデータの型を定義
-interface Allergen {
-  id: number;
-  name: string; // 例えば "egg"
-}
-
 export default function SearchResults() {
-  // const searchParams = useSearchParams();
-  // const query = searchParams.get("q") || "";
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState<CardItem[]>([]);
@@ -43,13 +34,6 @@ export default function SearchResults() {
     console.log("除外するアレルゲンID:", excludedAllergenIds);
   }, [allergenExclusions]);
 
-  // const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e.key === "Enter") {
-  //     // 検索窓でのEnterキーでURLを更新
-  //     window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
-  //   }
-  // };
-
   // 検索処理
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -66,11 +50,6 @@ export default function SearchResults() {
 
       // Enterが押されたタイミングで検索クエリをStateに設定
       setSearchQuery(currentQuery);
-
-      // 除外するアレルゲンのIDを取得
-      // const excludedAllergenIds = Object.entries(allergenExclusions)
-      //   .filter(([, excluded]) => excluded)
-      //   .map(([id]) => Number(id));
 
       const excludedAllergenIds = Object.keys(allergenExclusions)
         .filter((id) => allergenExclusions[id] === true)
@@ -121,31 +100,19 @@ export default function SearchResults() {
     inputRef.current?.focus();
     const fetchAllergens = async () => {
       if (allergens.length === 0) {
-        try {
-          const data = await getAllergens();
-          if (data) {
-            setAllergens(data);
-            const initialExclusions: Record<number, boolean> = {};
-            data.forEach((allergen) => {
-              initialExclusions[allergen.id] = false;
-            });
-            setAllergenExclusions(initialExclusions);
-          }
-        } catch (err) {
-          setError("データの取得に失敗しました。");
-          console.error(err);
+        const data = await getAllergens();
+        if (data) {
+          setAllergens(data);
+          const initialExclusions: Record<string, boolean> = {};
+          data.forEach((allergen) => {
+            initialExclusions[allergen.id] = false;
+          });
+          setAllergenExclusions(initialExclusions);
         }
       }
     };
     fetchAllergens();
   }, []);
-
-  // 検索クエリ、アレルゲン除外設定が変更されたときに検索を再実行
-  // useEffect(() => {
-  //   if (allergens.length > 0) {
-  //     handleSearch(query);
-  //   }
-  // }, [query, allergens]);
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -161,8 +128,6 @@ export default function SearchResults() {
               ref={inputRef}
               type="text"
               placeholder="レシピ・食材を検索"
-              // value={searchQuery}
-              // onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
               className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300 transition-all shadow-sm"
               autoFocus
@@ -196,7 +161,7 @@ export default function SearchResults() {
                       <button
                         key={allergen.id}
                         onClick={() => toggleAllergen(allergen.id)}
-                        className={`h-10 flex items-center justify-center p-1.5 rounded-xl text-xs transition-all hover:scale-105 active:scale-95 ${
+                        className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
                           allergenExclusions[allergen.id]
                             ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
                             : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"

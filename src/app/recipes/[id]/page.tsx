@@ -13,11 +13,18 @@ import { Tooltip, IconButton } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NotFoundPage from "./notFound";
-import { getRecipes } from "@/lib/supabase";
-import { Recipe } from "@/types/types";
+import {
+  getAllergens,
+  getRecipeAllergens,
+  getRecipeById,
+  getRecipes,
+} from "@/lib/supabase";
+import { Allergen, Recipe } from "@/types/types";
 import { saveRecentlyViewedItem } from "@/lib/localstorage";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
+
+const userId = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
 
 export default function RecipeDetail({
   params,
@@ -26,44 +33,45 @@ export default function RecipeDetail({
 }) {
   const unwrapParams = use(params);
   const id = Number(unwrapParams.id);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
+  const [displayRecipe, setDisplayRecipe] = useState<Recipe | null>(null);
+  const [allergens, setAllergens] = useState<Allergen[]>([]);
   const [memo, setMemo] = useState("");
 
+  // 補足テキスト
+  const infoText = "自分専用なので他の人は見れません";
+
+  // メモ保存処理
+  const handleMemoSave = () => {
+    console.log("メモを保存:", memo);
+  };
+
   useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const data = await getRecipes("32836782-4f6d-4dc3-92ea-4faf03ed86a5");
-        if (data) {
-          setRecipes(data);
-        }
-      } catch (err) {
-        setError("データの取得に失敗しました。");
-        console.error(err);
+    const fetchData = async () => {
+      const [recipeData, allergensData] = await Promise.all([
+        getRecipeById(userId, id),
+        getRecipeAllergens(id),
+      ]);
+
+      const foundRecipe = recipeData.length > 0 ? recipeData[0] : null;
+
+      if (foundRecipe) {
+        setDisplayRecipe(foundRecipe);
+        saveRecentlyViewedItem(foundRecipe);
+      }
+
+      if (allergensData) {
+        setAllergens(allergensData);
+      } else {
+        setAllergens([]);
       }
     };
-    fetchRecipes();
-  }, []);
-
-  const displayRecipe = recipes.find((rec) => rec.id === id);
-
-  // コンポーネントがマウントされた時に、ローカルストレージに保存
-  useEffect(() => {
-    if (displayRecipe) {
-      saveRecentlyViewedItem(displayRecipe);
-    }
-  }, [displayRecipe]); // displayRecipeが取得されたタイミングで実行
+    fetchData();
+  }, [id, userId]);
 
   // レシピが見つからない場合は404ページを表示
   if (!displayRecipe) {
     return <NotFoundPage />;
   }
-
-  const handleMemoSave = () => {
-    // メモ保存処理
-    console.log("メモを保存:", memo);
-  };
 
   const content = (
     <div className="flex items-center space-x-2">
@@ -72,59 +80,55 @@ export default function RecipeDetail({
     </div>
   );
 
-  // 補足テキスト
-  const infoText = "自分専用なので他の人は見れません";
-
   return (
     <div className="min-h-screen bg-stone-50">
       <Header title="レシピ詳細" content={content} />
       <div className="p-4 space-y-6">
-        {/* レシピヘッダー */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm">
-          <div className="text-center mb-4">
-            {/* 画像があれば表示する */}
-            <div className="w-[300px] h-[300px] overflow-hidden mx-auto mb-2">
-              {displayRecipe.image && (
-                <Image
-                  src={displayRecipe.image}
-                  alt={`${displayRecipe.name}の画像`}
-                  width={300}
-                  height={300}
-                  className="object-contain rounded-2xl"
-                  unoptimized // 画像がsvgの場合ブロックされてしまうため設定
-                />
-              )}
-            </div>
-            <h2 className="text-2xl font-bold text-stone-700 mb-2">
-              {displayRecipe.name}
-            </h2>
-            <p className="text-sm text-stone-500 mb-3">
-              by {displayRecipe.author}
-            </p>
+        {/* レシピ基本情報 */}
+        <section className="bg-white rounded-3xl p-6 shadow-sm text-center mb-4">
+          {/* 画像があれば表示する */}
+          <div className="w-[300px] h-[300px] overflow-hidden mx-auto mb-4">
+            {displayRecipe.image && (
+              <Image
+                src={displayRecipe.image}
+                alt={`${displayRecipe.name}の画像`}
+                width={300}
+                height={300}
+                className="object-contain rounded-2xl"
+                unoptimized // 画像がsvgの場合ブロックされてしまうため設定
+              />
+            )}
+          </div>
+          <h2 className="text-2xl font-bold text-stone-700 mb-4">
+            {displayRecipe.name}
+          </h2>
+          <p className="text-sm text-stone-500 mb-4">
+            by {displayRecipe.author}
+          </p>
 
-            {/* 離乳食段階・カテゴリータグ */}
-            <div className="flex justify-center space-x-2 mb-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
-                {displayRecipe.startStage}
-              </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
-                {displayRecipe.category}
-              </span>
-            </div>
+          {/* 離乳食段階・カテゴリータグ */}
+          <div className="flex justify-center space-x-2 mb-4">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
+              {displayRecipe.startStage}
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
+              {displayRecipe.category}
+            </span>
+          </div>
 
-            {/* レシピ情報 */}
-            <div className="flex justify-center space-x-6 text-sm text-stone-600">
-              <div className="flex items-center">
-                <ScheduleIcon />
-                <span className="ml-1">{displayRecipe.cookingTime}</span>
-              </div>
-              <div className="flex items-center">
-                <PeopleIcon />
-                <span className="ml-1">{displayRecipe.servings}</span>
-              </div>
+          {/* レシピ情報 */}
+          <div className="flex justify-center space-x-6 text-sm text-stone-600 mb-4">
+            <div className="flex items-center">
+              <ScheduleIcon />
+              <span className="ml-1">{displayRecipe.cookingTime}</span>
+            </div>
+            <div className="flex items-center">
+              <PeopleIcon />
+              <span className="ml-1">{displayRecipe.servings}</span>
             </div>
           </div>
 
+          {/* レシピ説明 */}
           <p className="text-stone-600 text-center leading-relaxed mb-4">
             {displayRecipe.description}
           </p>
@@ -142,7 +146,7 @@ export default function RecipeDetail({
               </button>
             </div>
           )}
-        </div>
+        </section>
 
         {/* 材料 */}
         <section>
@@ -183,7 +187,7 @@ export default function RecipeDetail({
           <div className="space-y-4">
             {displayRecipe.steps.map((step, index) => (
               <div key={index} className="bg-white rounded-2xl p-5 shadow-sm">
-                <div className="flex items-start mb-4">
+                <div className="flex items-start">
                   <div className="flex-shrink-0 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
                     {step.step}
                   </div>
@@ -223,6 +227,27 @@ export default function RecipeDetail({
                     className="text-xs bg-amber-50 text-amber-600 px-3 py-1 rounded-full font-medium"
                   >
                     {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* アレルゲン */}
+        {allergens.length > 0 && (
+          <section>
+            <h3 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
+              アレルゲン
+            </h3>
+            <div className="bg-white rounded-2xl p-5 shadow-sm">
+              <div className="flex flex-wrap gap-2">
+                {allergens.map((allergen) => (
+                  <span
+                    key={allergen.id}
+                    className="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-medium"
+                  >
+                    {allergen.name}
                   </span>
                 ))}
               </div>

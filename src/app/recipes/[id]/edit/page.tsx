@@ -25,22 +25,17 @@ export default function RecipeEditPage({
   useEffect(() => {
     const fetchRecipe = async () => {
       setIsLoading(true);
-      try {
-        const data = await getRecipeById(
-          "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-          recipeId
-        );
-        if (!data) {
-          console.error("レシピの取得に失敗しました:");
-          // エラー処理（例：ユーザーに通知、トップページへリダイレクト）
-        } else if (data) {
-          setRecipeData(data[0]); // 1つ目が該当のデータのはず
-        }
-      } catch (e) {
-        console.error("レシピの取得中にエラーが発生しました:", e);
-      } finally {
-        setIsLoading(false);
+      const data = await getRecipeById(
+        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+        recipeId
+      );
+      if (!data) {
+        console.error("レシピの取得に失敗しました:");
+        // エラー処理（例：ユーザーに通知、トップページへリダイレクト）
+      } else if (data) {
+        setRecipeData(data[0]); // 1つ目が該当のデータのはず
       }
+      setIsLoading(false);
     };
     fetchRecipe();
   }, [recipeId]);

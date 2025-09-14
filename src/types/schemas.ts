@@ -15,7 +15,7 @@ export const step1Schema = z.object({
   name: z
     .string()
     .min(2, { message: "ユーザー名は２文字以上で設定してください" }),
-  avatar_url: z.string().url().optional(),
+  avatar_url: z.url().nullable(),
 });
 
 export const step2Schema = z.object({

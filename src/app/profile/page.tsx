@@ -103,6 +103,7 @@ export default function ProfilePage() {
 
   const handleNext = () => {
     const result = step1Schema.safeParse(formData);
+    console.log(result);
     if (!result.success) {
       setErrors(result.error.flatten().fieldErrors);
       return;

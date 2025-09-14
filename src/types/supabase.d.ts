@@ -547,6 +547,7 @@ export type Database = {
       get_recipe_by_id: {
         Args: { parent_id_param: string; recipe_id_param: number }
         Returns: {
+          author: string
           category: string
           cooking_time: string
           created_at: string

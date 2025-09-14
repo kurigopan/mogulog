@@ -168,6 +168,7 @@ export const dbRecipeSchema = z.object({
 export const rpcRecipeSchema = dbRecipeSchema.extend({
   is_favorite: z.boolean().nullable(),
   is_own: z.boolean(),
+  author: z.string(),
 });
 
 // 2.rpcRecipeSchemaを使い、.transform()でフロントエンドの型に変換
@@ -178,7 +179,6 @@ export const recipeSchema = rpcRecipeSchema.transform((dbData) => {
     startStage: dbData.start_stage,
     cookingTime: dbData.cooking_time,
     isPrivate: dbData.is_private,
-    author: dbData.created_by,
     savedMemo: dbData.memo,
 
     // --- 値の変換 ---
@@ -190,6 +190,7 @@ export const recipeSchema = rpcRecipeSchema.transform((dbData) => {
     // --- isFavoriteはnullの場合falseに変換 ---
     isFavorite: dbData.is_favorite ?? false,
     isOwn: dbData.is_own ?? false,
+    author: dbData.author,
 
     // --- そのまま渡すプロパティ ---
     id: dbData.id,

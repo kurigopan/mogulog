@@ -6,10 +6,10 @@ import {
   EditIcon,
   ScheduleIcon,
   PeopleIcon,
-  InfoOutlineIcon,
+  // InfoOutlineIcon,
   DeleteIcon,
 } from "@/icons";
-import { Tooltip, IconButton } from "@mui/material";
+// import { Tooltip, IconButton } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NotFoundPage from "./notFound";
@@ -32,18 +32,11 @@ export default function RecipeDetail({
   const [allergens, setAllergens] = useState<Allergen[]>([]);
   const [memo, setMemo] = useState("");
 
-  const infoText = "自分専用なので他の人は見れません";
+  // const infoText = "自分専用なので他の人は見れません";
 
-  const handleMemoSave = () => {
-    console.log("メモを保存:", memo);
-  };
-
-  const content = (
-    <div className="flex items-center space-x-2">
-      <ShareButton title={displayRecipe.name} />
-      <FavoriteButton />
-    </div>
-  );
+  // const handleMemoSave = () => {
+  //   console.log("メモを保存:", memo);
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,6 +65,13 @@ export default function RecipeDetail({
   if (!displayRecipe) {
     return <NotFoundPage />;
   }
+
+  const content = (
+    <div className="flex items-center space-x-2">
+      <ShareButton title={displayRecipe.name} />
+      <FavoriteButton />
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -191,7 +191,7 @@ export default function RecipeDetail({
                   </div>
                 </div>
                 {/* 画像があれば表示する */}
-                {step.image && (
+                {/* {step.image && (
                   <Image
                     src={step.image}
                     alt={`${step.step}の画像`}
@@ -200,7 +200,7 @@ export default function RecipeDetail({
                     className="w-full rounded-2xl shadow-sm"
                     unoptimized // 画像がsvgの場合ブロックされてしまうため設定
                   />
-                )}
+                )} */}
               </div>
             ))}
           </div>
@@ -249,7 +249,7 @@ export default function RecipeDetail({
         )}
 
         {/* メモ */}
-        <section>
+        {/* <section>
           <div className="flex items-center gap-2 mb-4">
             <h3 className="text-lg font-bold text-stone-700">マイメモ</h3>
             <Tooltip
@@ -309,7 +309,7 @@ export default function RecipeDetail({
               </button>
             </div>
           </div>
-        </section>
+        </section> */}
       </div>
       <Footer />
     </div>

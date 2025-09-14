@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CircularProgress, FormControlLabel, Switch } from "@mui/material";
 import {
   AddIcon,
-  InfoOutlineIcon,
+  // InfoOutlineIcon,
   PhotoCameraIcon,
   ImageIcon,
   ScheduleIcon,
@@ -57,8 +57,7 @@ export default function RecipeForm({
   });
   const [isSaving, setIsSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
-  const mainImageInputRef = useRef<HTMLInputElement>(null);
-  const stepImageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [allergenInclusions, setAllergenInclusions] = useState<
     Record<string, boolean>
@@ -70,42 +69,70 @@ export default function RecipeForm({
   const [suggestedAllergenNames, setSuggestedAllergenNames] = useState<
     string[]
   >([]);
+  const [image, setImage] = useState<string | null>(null);
 
-  // 画像ファイル処理（実際の実装ではファイルアップロード処理が必要）
-  const handleImageUpload = (file: File, callback: (url: string) => void) => {
-    // 実際の実装では、ここでファイルをサーバーにアップロードしてURLを取得
-    // 現在はダミーのURL生成
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      callback(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
+  // // 画像ファイル処理（実際の実装ではファイルアップロード処理が必要）
+  // const handleImageUpload = (file: File, callback: (url: string) => void) => {
+  //   // 実際の実装では、ここでファイルをサーバーにアップロードしてURLを取得
+  //   // 現在はダミーのURL生成
+  //   const reader = new FileReader();
+  //   reader.onload = (e) => {
+  //     callback(e.target?.result as string);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
 
-  // メイン画像の変更処理
-  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleImageUpload(file, (url) => {
-        setFormData((prev) => ({ ...prev, image: url }));
-      });
+  // // メイン画像の変更処理
+  // const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     handleImageUpload(file, (url) => {
+  //       setFormData((prev) => ({ ...prev, image: url }));
+  //     });
+  //   }
+  // };
+
+  // // ステップ画像の変更処理
+  // const handleStepImageChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   stepIndex: number
+  // ) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     handleImageUpload(file, (url) => {
+  //       const newSteps = [...formData.steps];
+  //       newSteps[stepIndex] = { ...newSteps[stepIndex], image: url };
+  //       setFormData((prev) => ({ ...prev, steps: newSteps }));
+  //     });
+  //   }
+  // };
+
+  //　画像の取得
+  useEffect(() => {
+    if (formData && formData.image) {
+      setImage(formData.image);
     }
-  };
+  }, [formData]);
 
-  // ステップ画像の変更処理
-  const handleStepImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    stepIndex: number
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleImageUpload(file, (url) => {
-        const newSteps = [...formData.steps];
-        newSteps[stepIndex] = { ...newSteps[stepIndex], image: url };
-        setFormData((prev) => ({ ...prev, steps: newSteps }));
-      });
-    }
-  };
+  // 画像の変更処理
+  const onUpLoadImage = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+
+      // ファイルが選択されていない場合
+      if (!files || files.length === 0) {
+        setFormData((prev) => ({ ...prev, image: null }));
+        return;
+      }
+
+      // 画像URLを生成してformDataにセット
+      const imageUrl = URL.createObjectURL(files[0]);
+      setFormData((prev) => ({ ...prev, image: imageUrl }));
+      // 画像をセット
+      setImage(files[0].name);
+    },
+    []
+  );
 
   // 入力フィールドの変更をハンドル
   const handleChange = (
@@ -457,7 +484,7 @@ export default function RecipeForm({
           <div className="flex flex-col items-center">
             <div
               className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer hover:bg-stone-200 transition-colors group relative"
-              onClick={() => mainImageInputRef.current?.click()}
+              onClick={() => imageInputRef.current?.click()}
             >
               {formData.image ? (
                 <>
@@ -482,10 +509,10 @@ export default function RecipeForm({
               )}
             </div>
             <input
-              ref={mainImageInputRef}
+              ref={imageInputRef}
               type="file"
               accept="image/*"
-              onChange={handleMainImageChange}
+              onChange={onUpLoadImage}
               className="hidden"
             />
           </div>
@@ -585,7 +612,7 @@ export default function RecipeForm({
             />
 
             {/* 非公開設定 */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <FormControlLabel
                 control={
                   <Switch
@@ -618,7 +645,7 @@ export default function RecipeForm({
                   非公開レシピは自分専用なので、他のユーザーは閲覧できません
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </section>
 
@@ -729,7 +756,7 @@ export default function RecipeForm({
                 />
 
                 {/* ステップ画像 */}
-                <div className="flex items-center space-x-4">
+                {/* <div className="flex items-center space-x-4">
                   <div
                     className="w-32 h-24 bg-stone-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-stone-200 transition-colors group relative overflow-hidden"
                     onClick={() => stepImageInputRefs.current[index]?.click()}
@@ -764,7 +791,7 @@ export default function RecipeForm({
                     onChange={(e) => handleStepImageChange(e, index)}
                     className="hidden"
                   />
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

@@ -572,6 +572,7 @@ export type Database = {
       get_recipes: {
         Args: { parent_id_param: string }
         Returns: {
+          author: string
           category: string
           cooking_time: string
           created_at: string
@@ -627,6 +628,7 @@ export type Database = {
           search_term: string
         }
         Returns: {
+          author: string
           category: string
           cooking_time: string
           created_at: string

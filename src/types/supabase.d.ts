@@ -180,29 +180,29 @@ export type Database = {
       }
       favorites_ingredients: {
         Row: {
-          auth_id: string
           created_at: string
           created_by: string
           id: number
           ingredient_id: number
+          parent_id: string
           updated_at: string
           updated_by: string
         }
         Insert: {
-          auth_id: string
           created_at?: string
           created_by: string
           id?: number
           ingredient_id: number
+          parent_id: string
           updated_at?: string
           updated_by: string
         }
         Update: {
-          auth_id?: string
           created_at?: string
           created_by?: string
           id?: number
           ingredient_id?: number
+          parent_id?: string
           updated_at?: string
           updated_by?: string
         }
@@ -214,32 +214,39 @@ export type Database = {
             referencedRelation: "ingredients"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "favorites_ingredients_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       favorites_recipes: {
         Row: {
-          auth_id: string
           created_at: string
           created_by: string
           id: number
+          parent_id: string
           recipe_id: number
           updated_at: string
           updated_by: string
         }
         Insert: {
-          auth_id: string
           created_at?: string
           created_by: string
           id?: number
+          parent_id: string
           recipe_id: number
           updated_at?: string
           updated_by: string
         }
         Update: {
-          auth_id?: string
           created_at?: string
           created_by?: string
           id?: number
+          parent_id?: string
           recipe_id?: number
           updated_at?: string
           updated_by?: string
@@ -250,6 +257,13 @@ export type Database = {
             columns: ["recipe_id"]
             isOneToOne: false
             referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_recipes_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -501,7 +515,7 @@ export type Database = {
     }
     Functions: {
       get_ingredients_with_status: {
-        Args: { child_id_param: number; user_id_param: string }
+        Args: { child_id_param: number; parent_id_param: string }
         Returns: {
           category: string
           created_at: string
@@ -531,7 +545,7 @@ export type Database = {
         }[]
       }
       get_recipe_by_id: {
-        Args: { recipe_id_param: number; user_id_param: string }
+        Args: { parent_id_param: string; recipe_id_param: number }
         Returns: {
           category: string
           cooking_time: string
@@ -555,7 +569,7 @@ export type Database = {
         }[]
       }
       get_recipes: {
-        Args: { user_id_param: string }
+        Args: { parent_id_param: string }
         Returns: {
           category: string
           cooking_time: string
@@ -582,8 +596,8 @@ export type Database = {
         Args: {
           child_id_param: number
           excluded_allergen_ids: number[]
+          parent_id_param: string
           search_term: string
-          user_id_param: string
         }
         Returns: {
           category: string
@@ -608,8 +622,8 @@ export type Database = {
       search_recipes_with_allergens: {
         Args: {
           excluded_allergen_ids: number[]
+          parent_id_param: string
           search_term: string
-          user_id_param: string
         }
         Returns: {
           category: string

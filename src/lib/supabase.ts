@@ -1,6 +1,4 @@
-// import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { z } from "zod";
 import { formatRecipeForSupabase } from "@/lib/utils";
 import { Database } from "@/types/supabase";
@@ -30,29 +28,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabaseクライアントのインスタンスを作成
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-// export async function supabaseCreateServerClient() {
-//   const cookieStore = await cookies();
-
-//   return createServerClient<Database>(supabaseUrl!, supabaseAnonKey!, {
-//     cookies: {
-//       getAll() {
-//         return cookieStore.getAll();
-//       },
-//       setAll(cookiesToSet) {
-//         try {
-//           cookiesToSet.forEach(({ name, value, options }) =>
-//             cookieStore.set(name, value, options as CookieOptions)
-//           );
-//         } catch {
-//           // The `setAll` method was called from a Server Component.
-//           // This can be ignored if you have middleware refreshing
-//           // user sessions.
-//         }
-//       },
-//     },
-//   });
-// }
-
 // アレルゲン登録データを全て取得する関数
 export async function getAllergens() {
   const { data, error } = await supabase
@@ -69,18 +44,18 @@ export async function getAllergens() {
 
 // アレルゲンを考慮した食材検索
 export async function searchIngredientsWithAllergens(
-  search_term: string,
-  excluded_allergen_ids: number[],
-  user_id_param: string,
-  child_id_param: number
+  searchTerm: string,
+  excludedAllergenIds: number[],
+  userId: string,
+  childId: number
 ) {
   const { data, error } = await supabase.rpc(
     "search_ingredients_with_allergens",
     {
-      search_term: search_term,
-      excluded_allergen_ids: excluded_allergen_ids,
-      user_id_param: user_id_param,
-      child_id_param: child_id_param,
+      search_term: searchTerm,
+      excluded_allergen_ids: excludedAllergenIds,
+      parent_id_param: userId,
+      child_id_param: childId,
     }
   );
 
@@ -99,12 +74,12 @@ export async function searchIngredientsWithAllergens(
 export async function searchRecipesWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
-  userId: string
+  parentId: string
 ) {
   const { data, error } = await supabase.rpc("search_recipes_with_allergens", {
     search_term: searchTerm,
     excluded_allergen_ids: excludedAllergenIds,
-    user_id_param: userId,
+    parent_id_param: parentId,
   });
 
   if (error) {
@@ -126,7 +101,7 @@ export async function getIngredientsWithStatus(
   childId: number
 ) {
   const { data, error } = await supabase.rpc("get_ingredients_with_status", {
-    user_id_param: userId,
+    parent_id_param: userId,
     child_id_param: childId,
   });
 
@@ -145,7 +120,7 @@ export async function getIngredientsWithStatus(
 // recipesの型定義に含まれるisFavoriteを補完するために、レシピリストを取得するカスタム関数を呼び出す
 export async function getRecipes(userId: string) {
   const { data, error } = await supabase.rpc("get_recipes", {
-    user_id_param: userId,
+    parent_id_param: userId,
   });
 
   if (error) {
@@ -163,7 +138,7 @@ export async function getRecipes(userId: string) {
 // 単一のレシピを取得する
 export async function getRecipeById(userId: string, recipeId: number) {
   const { data, error } = await supabase.rpc("get_recipe_by_id", {
-    user_id_param: userId,
+    parent_id_param: userId,
     recipe_id_param: recipeId,
   });
 

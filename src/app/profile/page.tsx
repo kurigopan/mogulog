@@ -42,6 +42,7 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [fileMessage, setFileMessage] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
+  const [today, setToday] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -103,7 +104,6 @@ export default function ProfilePage() {
 
   const handleNext = () => {
     const result = step1Schema.safeParse(formData);
-    console.log(result);
     if (!result.success) {
       setErrors(result.error.flatten().fieldErrors);
       return;
@@ -114,6 +114,12 @@ export default function ProfilePage() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 選択されたアレルゲン情報を抽出
+    const selectedAllergenIds = Object.keys(allergenExclusions)
+      .filter((key) => allergenExclusions[parseInt(key, 10)])
+      .map((key) => parseInt(key, 10));
+    setFormData((prev) => ({ ...prev, allergens: selectedAllergenIds }));
 
     const result = step2Schema.safeParse(formData);
     if (!result.success) {
@@ -183,6 +189,12 @@ export default function ProfilePage() {
       }
     };
     fetchAllergens();
+  }, []);
+
+  useEffect(() => {
+    // 今日の日付を YYYY-MM-DD に変換
+    const date = new Date().toISOString().split("T")[0];
+    setToday(date);
   }, []);
 
   //   if (loading || !session) {
@@ -301,6 +313,7 @@ export default function ProfilePage() {
                 </label>
                 <input
                   type="date"
+                  max={today}
                   name="childBirthday"
                   value={formData.childBirthday}
                   onChange={handleChange}

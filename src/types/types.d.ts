@@ -116,10 +116,8 @@ export interface ChildAllergens {
 }
 
 export interface FormData {
-  email: User["email"];
-  password: User["password"];
   name: Profile["name"];
-  avatar_url?: Profile["avatar_url"];
+  avatar_url: Profile["avatar_url"];
   childName: Child["name"];
   childBirthday: Child["birthday"];
   allergens: Child["allergens"];

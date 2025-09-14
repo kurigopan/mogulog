@@ -1,6 +1,5 @@
 import { atom } from "jotai";
 import { Session } from "@supabase/supabase-js";
-import { FormData } from "@/types/types";
 
 // ユーザーセッションを格納するアトム
 // 初期値はnull

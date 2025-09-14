@@ -223,13 +223,13 @@ export async function getFavoriteRecipeLogs() {
 }
 
 export async function createProfile(
-  formData: { name: string; avatar_url?: string },
+  formData: { name: string; avatar_url: string | null },
   userId: string // supabase.auth.signUp 後の user.id
 ) {
   const profileData: Profile = {
     id: userId,
     name: formData.name,
-    avatar_url: formData.avatar_url || null,
+    avatar_url: formData.avatar_url,
     created_by: userId,
     updated_by: userId,
   };

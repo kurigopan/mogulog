@@ -12,7 +12,7 @@ import {
   createProfile,
   getAllergens,
 } from "@/lib/supabase";
-import { Allergen } from "@/types/types";
+import { Allergen, FormData } from "@/types/types";
 import { step1Schema, step2Schema } from "@/types/schemas";
 import { supabase } from "@/lib/supabase";
 
@@ -24,9 +24,9 @@ export default function ProfilePage() {
   const router = useRouter();
   //   const [session, setSession] = useAtom(sessionAtom);
   const [loading, setLoading] = useAtom(loadingAtom);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
-    avatar_url: "",
+    avatar_url: null as string | null,
     childName: "",
     childBirthday: "",
     allergens: [],
@@ -62,9 +62,9 @@ export default function ProfilePage() {
       setFileMessage("");
 
       // ファイルが選択されていない場合
-      if (!files) {
+      if (!files || files.length === 0) {
         setFileMessage("画像をアップロードしてください。");
-        setFormData((prev) => ({ ...prev, avatar_url: "" }));
+        setFormData((prev) => ({ ...prev, avatar_url: null }));
         return;
       }
       const fileSize = files[0]?.size / 1024 / 1024; // size in MB
@@ -73,14 +73,14 @@ export default function ProfilePage() {
       // 画像サイズが ２MBを超える場合
       if (fileSize > 2) {
         setFileMessage("画像サイズが2MB以下にする必要があります。");
-        setFormData((prev) => ({ ...prev, avatar_url: "" }));
+        setFormData((prev) => ({ ...prev, avatar_url: null }));
         return;
       }
 
       // ファイル形式がjpgまたはpngでない場合
       if (fileType !== "image/jpeg" && fileType !== "image/png") {
         setFileMessage("画像はjpgまたはpng形式である必要があります。");
-        setFormData((prev) => ({ ...prev, avatar_url: "" }));
+        setFormData((prev) => ({ ...prev, avatar_url: null }));
         return;
       }
       setFileMessage("");
@@ -263,6 +263,9 @@ export default function ProfilePage() {
                   onChange={onUpLoadImage}
                   className="hidden"
                 />
+                {fileMessage && (
+                  <p className="mt-2 text-sm text-red-500">{fileMessage}</p>
+                )}
               </div>
               <button
                 onClick={handleNext}

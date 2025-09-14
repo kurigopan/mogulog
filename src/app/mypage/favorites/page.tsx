@@ -10,17 +10,9 @@ import { Recipe } from "@/types/types";
 import { CircularProgress } from "@mui/material";
 
 export default function FavoriteRecipes() {
-  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [sortBy, setSortBy] = useState("newest"); // newest, oldest, name, subtitle
-
-  useEffect(() => {
-    // Simulate API call to fetch favorite recipes
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 800);
-  }, []);
 
   const sortedRecipes = [...favoriteRecipes].sort((a, b) => {
     switch (sortBy) {
@@ -54,6 +46,14 @@ export default function FavoriteRecipes() {
       )}
     </>
   );
+
+  useEffect(() => {
+    // Simulate API call to fetch favorite recipes
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 800);
+  }, []);
 
   return (
     <div className="min-h-screen bg-stone-50">

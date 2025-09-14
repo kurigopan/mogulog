@@ -2,6 +2,30 @@ import { z } from "zod";
 import { Season, ingredientNutrition } from "./types";
 import { convertUtcToJst } from "@/utils/date";
 
+export const signupSchema = z.object({
+  email: z
+    .string()
+    .email({ message: "有効なメールアドレスを入力してください" }),
+  password: z
+    .string()
+    .min(6, { message: "パスワードは6文字以上で設定してください" }),
+});
+
+export const step1Schema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "ユーザー名は２文字以上で設定してください" }),
+  avatar_url: z.string().url().optional(),
+});
+
+export const step2Schema = z.object({
+  childName: z
+    .string()
+    .min(2, { message: "お子様の名前は２文字以上で設定してください" }),
+  childBirthday: z.string().min(1, { message: "誕生日を入力してください" }),
+  allergens: z.array(z.string()),
+});
+
 // ユニオン型に対応するスキーマ
 export const seasonSchema = z.enum(["通年", "春", "夏", "秋", "冬"]);
 export const stageSchema = z.enum(["初期", "中期", "後期", "完了期"]);

@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteIcon } from "@/icons";
+import { ClearIcon, DeleteIcon } from "@/icons";
 
 export default function DeleteButton() {
   const handleDelete = (e: React.MouseEvent<HTMLElement>, item: CardItem) => {
@@ -23,7 +23,7 @@ export default function DeleteButton() {
       className="p-2 text-stone-500 hover:text-red-500 transition-colors"
       title="削除"
     >
-      <DeleteIcon />
+      <ClearIcon />
     </button>
   );
 }

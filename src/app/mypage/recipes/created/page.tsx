@@ -11,18 +11,9 @@ import { mockRecipes } from "@/mocks/recipes";
 import { CircularProgress } from "@mui/material";
 
 export default function CreatedRecipes() {
-  const [createdRecipes, setCreatedRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [createdRecipes, setCreatedRecipes] = useState<Recipe[]>([]);
   const [sortBy, setSortBy] = useState("newest"); // newest, oldest, name, subtitle
-
-  useEffect(() => {
-    // Simulate API call to fetch created recipes
-    setLoading(true);
-    setTimeout(() => {
-      setCreatedRecipes(mockRecipes);
-      setLoading(false);
-    }, 800);
-  }, []);
 
   const sortedRecipes = [...createdRecipes].sort((a, b) => {
     switch (sortBy) {
@@ -56,6 +47,15 @@ export default function CreatedRecipes() {
       )}
     </>
   );
+
+  useEffect(() => {
+    // Simulate API call to fetch created recipes
+    setLoading(true);
+    setTimeout(() => {
+      setCreatedRecipes(mockRecipes);
+      setLoading(false);
+    }, 800);
+  }, []);
 
   return (
     <div className="min-h-screen bg-stone-50">

@@ -7,7 +7,11 @@ import Header from "@/components/layout/Header";
 import ListCard from "@/components/ui/ListCard";
 import { Allergen, CardItem } from "@/types/types";
 import CircularProgress from "@mui/material/CircularProgress";
-import { getAllergens, searchRecipesWithAllergens } from "@/lib/supabase";
+import {
+  getAllergens,
+  searchIngredientsWithAllergens,
+  searchRecipesWithAllergens,
+} from "@/lib/supabase";
 
 export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,23 +20,11 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(false);
   // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
   const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
-  const [error, setError] = useState<string | null>(null);
   const [showAllergens, setShowAllergens] = useState(false);
-
-  // Supabaseから取得したアレルゲンを保存する状態
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-
-  // アレルゲン除外設定の状態を動的に管理
   const [allergenExclusions, setAllergenExclusions] = useState<
     Record<string, boolean>
   >({});
-
-  useEffect(() => {
-    const excludedAllergenIds = Object.keys(allergenExclusions)
-      .filter((id) => allergenExclusions[id] === true)
-      .map(Number);
-    console.log("除外するアレルゲンID:", excludedAllergenIds);
-  }, [allergenExclusions]);
 
   // 検索処理
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -40,13 +32,12 @@ export default function SearchResults() {
       const currentQuery = inputRef.current?.value || "";
 
       if (!currentQuery.trim()) {
-        setResults([]); // 検索結果を空にする
-        setLoading(false); // ローディング状態を解除
+        setResults([]);
+        setLoading(false);
         setSearchQuery("");
-        return; // ここで処理を終了
+        return;
       }
-      setLoading(true); // 検索を開始するので「読み込み中」にする
-      setError(null);
+      setLoading(true);
 
       // Enterが押されたタイミングで検索クエリをStateに設定
       setSearchQuery(currentQuery);
@@ -55,21 +46,31 @@ export default function SearchResults() {
         .filter((id) => allergenExclusions[id] === true)
         .map(Number);
 
-      try {
-        const data = await searchRecipesWithAllergens(
+      // Promise.allを使ってレシピと食材の検索を同時に実行
+      const [ingredientsData, recipesData] = await Promise.all([
+        searchIngredientsWithAllergens(
+          currentQuery,
+          excludedAllergenIds,
+          "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+          1
+        ),
+        searchRecipesWithAllergens(
           currentQuery,
           excludedAllergenIds,
           "32836782-4f6d-4dc3-92ea-4faf03ed86a5"
-        );
-        if (data) {
-          setResults(data);
-        }
-      } catch (error) {
-        console.error("データの取得に失敗しました。", error);
-        setError("データの取得に失敗しました。");
-      } finally {
-        setLoading(false);
+        ),
+      ]);
+
+      // 結果を結合し、食材を上に、レシピを下に配置
+      const combinedResults: CardItem[] = [];
+      if (ingredientsData) {
+        combinedResults.push(...ingredientsData);
       }
+      if (recipesData) {
+        combinedResults.push(...recipesData);
+      }
+      setResults(combinedResults);
+      setLoading(false);
     }
   };
 
@@ -127,7 +128,7 @@ export default function SearchResults() {
             <input
               ref={inputRef}
               type="text"
-              placeholder="レシピ・食材を検索"
+              placeholder="食材・レシピを検索"
               onKeyDown={handleSearch}
               className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300 transition-all shadow-sm"
               autoFocus

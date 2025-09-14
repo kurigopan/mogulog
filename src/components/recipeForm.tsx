@@ -355,10 +355,9 @@ export default function RecipeForm({
         throw error;
       }
       console.log("レシピを削除しました");
-      router.push("/"); // 成功したらトップページにリダイレクト
+      router.push("/");
     } catch (error) {
       console.error("レシピの削除に失敗しました:", error);
-      // alert("レシピの削除に失敗しました。もう一度お試しください。");
     } finally {
       setIsSaving(false);
       setShowConfirm(false);

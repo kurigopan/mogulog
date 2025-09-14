@@ -23,7 +23,6 @@ export default function IngredientDetail({
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [hasEaten, setHasEaten] = useState(false);
   const [isNG, setIsNG] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
@@ -32,6 +31,20 @@ export default function IngredientDetail({
   const userId = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
   const childId = 1; // getIngredientsWithStatusの引数と同じ値
   const childAgeStage = "中期"; // 例: プロフィール情報から取得
+
+  const displayIngredient = ingredients.find((ing) => ing.id === id);
+
+  const handleEatenClick = () => {
+    setHasEaten((prev) => !prev);
+  };
+
+  const handleNGClick = () => {
+    setIsNG((prev) => !prev);
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+  };
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -74,8 +87,6 @@ export default function IngredientDetail({
     }
   }, [ingredients, recipes, id, childAgeStage]);
 
-  const displayIngredient = ingredients.find((ing) => ing.id === id);
-
   // コンポーネントがマウントされた時に、ローカルストレージに保存
   useEffect(() => {
     if (displayIngredient) {
@@ -87,18 +98,6 @@ export default function IngredientDetail({
   if (!displayIngredient) {
     return <NotFoundPage />;
   }
-
-  const handleEatenClick = () => {
-    setHasEaten((prev) => !prev);
-  };
-
-  const handleNGClick = () => {
-    setIsNG((prev) => !prev);
-  };
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-  };
 
   const content = <ShareButton title={displayIngredient.name} />;
 

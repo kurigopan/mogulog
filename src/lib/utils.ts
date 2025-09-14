@@ -26,7 +26,7 @@ export function formatRecipeForSupabase(recipe: Omit<Recipe, "id">) {
     steps: recipe.steps.map((step) => JSON.parse(JSON.stringify(step))),
     // created_byとupdated_byはSupabaseのAuthから取得するか、データベースのトリガーで自動設定されることが一般的です
     // 今回は例としてハードコードしておきます。
-    created_by: "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-    updated_by: "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+    created_by: "HARDCODED_USER_ID",
+    updated_by: "HARDCODED_USER_ID",
   };
 }

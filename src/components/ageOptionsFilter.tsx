@@ -15,6 +15,13 @@ export default function AgeOptionsFilter() {
     { label: "12-18ヶ月", value: "12-18" },
   ];
 
+  const handleAgeChange = (newAge) => {
+    setChildAge(newAge);
+    setIsDropdownOpen(false);
+    // In a real application, you would trigger a data fetch or state update here
+    // to filter the content based on the new age.
+  };
+
   useEffect(() => {
     // localStorage is not supported in this environment, using mock data
     setChildAge("7-8");
@@ -34,13 +41,6 @@ export default function AgeOptionsFilter() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
-
-  const handleAgeChange = (newAge) => {
-    setChildAge(newAge);
-    setIsDropdownOpen(false);
-    // In a real application, you would trigger a data fetch or state update here
-    // to filter the content based on the new age.
-  };
 
   return (
     <div className="relative" ref={dropdownRef}>

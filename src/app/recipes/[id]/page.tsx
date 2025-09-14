@@ -13,12 +13,7 @@ import { Tooltip, IconButton } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NotFoundPage from "./notFound";
-import {
-  getAllergens,
-  getRecipeAllergens,
-  getRecipeById,
-  getRecipes,
-} from "@/lib/supabase";
+import { getRecipeAllergens, getRecipeById } from "@/lib/supabase";
 import { Allergen, Recipe } from "@/types/types";
 import { saveRecentlyViewedItem } from "@/lib/localstorage";
 import ShareButton from "@/components/ui/ShareButton";
@@ -37,13 +32,18 @@ export default function RecipeDetail({
   const [allergens, setAllergens] = useState<Allergen[]>([]);
   const [memo, setMemo] = useState("");
 
-  // 補足テキスト
   const infoText = "自分専用なので他の人は見れません";
 
-  // メモ保存処理
   const handleMemoSave = () => {
     console.log("メモを保存:", memo);
   };
+
+  const content = (
+    <div className="flex items-center space-x-2">
+      <ShareButton title={displayRecipe.name} />
+      <FavoriteButton />
+    </div>
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,13 +72,6 @@ export default function RecipeDetail({
   if (!displayRecipe) {
     return <NotFoundPage />;
   }
-
-  const content = (
-    <div className="flex items-center space-x-2">
-      <ShareButton title={displayRecipe.name} />
-      <FavoriteButton />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-stone-50">

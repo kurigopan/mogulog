@@ -26,22 +26,6 @@ export default function IngredientsList() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchIngredients = async () => {
-      setLoading(true);
-      const data = await getIngredientsWithStatus(
-        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-        1
-      );
-      if (data) {
-        setIngredients(data);
-      }
-      setLoading(false);
-    };
-
-    fetchIngredients();
-  }, []);
-
   const categories = [
     { value: "all", label: "すべて" },
     { value: "穀類", label: "穀類" },
@@ -162,6 +146,22 @@ export default function IngredientsList() {
   // ヘルプテキスト
   const helpText =
     "初：初期（5-6ヶ月）、中：中期（7-8ヶ月）、後：後期（9-11ヶ月）、完：完了期（12-18ヶ月）";
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      setLoading(true);
+      const data = await getIngredientsWithStatus(
+        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
+        1
+      );
+      if (data) {
+        setIngredients(data);
+      }
+      setLoading(false);
+    };
+
+    fetchIngredients();
+  }, []);
 
   return (
     <div className="min-h-screen bg-stone-50">

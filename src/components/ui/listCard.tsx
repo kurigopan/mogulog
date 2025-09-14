@@ -10,6 +10,7 @@ import {
   ImageIcon,
   EditIcon,
   DeleteIcon,
+  ClearIcon,
 } from "@/icons";
 import { CardItem } from "@/types/types";
 
@@ -85,7 +86,7 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
               className="p-2 text-stone-500 hover:text-red-500 transition-colors"
               title="削除"
             >
-              <DeleteIcon />
+              <ClearIcon />
             </button>
           </div>
         );

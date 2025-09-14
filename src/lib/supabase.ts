@@ -1,4 +1,6 @@
+// import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { z } from "zod";
 import { formatRecipeForSupabase } from "@/lib/utils";
 import { Database } from "@/types/supabase";
@@ -8,7 +10,11 @@ import {
   rpcRecipeSchema,
   recipeSchema,
 } from "@/types/schemas";
-import { Recipe } from "@/types/types";
+import { Child, ChildAllergens, Profile, Recipe } from "@/types/types";
+
+// ハードコードされたユーザーIDを定義
+// TODO: ユーザー認証実装後に、セッションから取得したユーザーIDに置き換えてください
+const HARDCODED_USER_ID = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
 
 // SupabaseプロジェクトのURLとanonキーを環境変数から取得
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -24,9 +30,28 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabaseクライアントのインスタンスを作成
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-// ハードコードされたユーザーIDを定義
-// TODO: ユーザー認証実装後に、セッションから取得したユーザーIDに置き換えてください
-const HARDCODED_USER_ID = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
+// export async function supabaseCreateServerClient() {
+//   const cookieStore = await cookies();
+
+//   return createServerClient<Database>(supabaseUrl!, supabaseAnonKey!, {
+//     cookies: {
+//       getAll() {
+//         return cookieStore.getAll();
+//       },
+//       setAll(cookiesToSet) {
+//         try {
+//           cookiesToSet.forEach(({ name, value, options }) =>
+//             cookieStore.set(name, value, options as CookieOptions)
+//           );
+//         } catch {
+//           // The `setAll` method was called from a Server Component.
+//           // This can be ignored if you have middleware refreshing
+//           // user sessions.
+//         }
+//       },
+//     },
+//   });
+// }
 
 // アレルゲン登録データを全て取得する関数
 export async function getAllergens() {
@@ -42,6 +67,34 @@ export async function getAllergens() {
   return data;
 }
 
+// アレルゲンを考慮した食材検索
+export async function searchIngredientsWithAllergens(
+  search_term: string,
+  excluded_allergen_ids: number[],
+  user_id_param: string,
+  child_id_param: number
+) {
+  const { data, error } = await supabase.rpc(
+    "search_ingredients_with_allergens",
+    {
+      search_term: search_term,
+      excluded_allergen_ids: excluded_allergen_ids,
+      user_id_param: user_id_param,
+      child_id_param: child_id_param,
+    }
+  );
+
+  if (error) {
+    console.error("Error fetching ingredients:", error);
+    return null;
+  }
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcIngredientSchema).parse(data);
+
+  // フロントエンドの型に変換
+  return validatedData.map((d) => ingredientSchema.parse(d));
+}
+
 // アレルゲンを考慮したレシピ検索
 export async function searchRecipesWithAllergens(
   searchTerm: string,
@@ -55,7 +108,7 @@ export async function searchRecipesWithAllergens(
   });
 
   if (error) {
-    console.error("Failed to fetch recipe:", error);
+    console.error("Failed to fetch recipes:", error);
     return [];
   }
 
@@ -169,6 +222,83 @@ export async function getFavoriteRecipeLogs() {
   return data.map((item) => item.recipe_id);
 }
 
+export async function createProfile(
+  formData: { name: string; avatar_url?: string },
+  userId: string // supabase.auth.signUp 後の user.id
+) {
+  const profileData: Profile = {
+    id: userId,
+    name: formData.name,
+    avatar_url: formData.avatar_url || null,
+    created_by: userId,
+    updated_by: userId,
+  };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .insert(profileData)
+    .select();
+
+  if (error) {
+    console.error("プロフィールの登録に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+}
+
+export async function createChild(
+  formData: { childName: string; childBirthday: string },
+  userId: string // supabase.auth.signUp 後の user.id
+) {
+  const childData: Omit<Child, "id"> = {
+    parent_id: userId,
+    name: formData.childName,
+    birthday: formData.childBirthday,
+    created_by: userId,
+    updated_by: userId,
+  };
+
+  const { data, error } = await supabase
+    .from("children")
+    .insert(childData)
+    .select();
+
+  if (error) {
+    console.error("子どもの登録に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  return { data: data[0].id, error: null };
+}
+
+export async function createChildAllergens(
+  formData: { allergens: number[] },
+  childId: number,
+  userId: string // supabase.auth.signUp 後の user.id
+) {
+  const allergenData: Omit<ChildAllergens, "id">[] = formData.allergens.map(
+    (allergenId) => ({
+      child_id: childId,
+      allergen_id: allergenId,
+      created_by: userId,
+      updated_by: userId,
+    })
+  );
+
+  const { data, error } = await supabase
+    .from("child_allergens")
+    .insert(allergenData)
+    .select();
+
+  if (error) {
+    console.error("アレルゲンの登録に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+}
+
 export async function createRecipeAllergens(
   recipeId: number,
   allergenIds: number[]
@@ -204,7 +334,6 @@ export async function createRecipeAllergens(
  * @param recipeData - 登録するレシピデータ
  */
 export async function createRecipe(recipeData: Omit<Recipe, "id">) {
-  // フロントエンドの型をデータベースの型に変換
   const formattedData = formatRecipeForSupabase(recipeData);
   const { data, error } = await supabase
     .from("recipes")
@@ -216,7 +345,6 @@ export async function createRecipe(recipeData: Omit<Recipe, "id">) {
     return { data: null, error };
   }
 
-  // 成功時のデータとエラーを返却
   return { data, error: null };
 }
 

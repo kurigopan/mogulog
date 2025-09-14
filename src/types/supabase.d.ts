@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      child_allergens: {
+        Row: {
+          allergen_id: number
+          child_id: number
+          created_at: string
+          created_by: string | null
+          id: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allergen_id: number
+          child_id: number
+          created_at?: string
+          created_by?: string | null
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allergen_id?: number
+          child_id?: number
+          created_at?: string
+          created_by?: string | null
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_allergens_allergen_id_fkey"
+            columns: ["allergen_id"]
+            isOneToOne: false
+            referencedRelation: "allergens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_allergens_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       child_ingredient_logs: {
         Row: {
           child_id: number
@@ -99,7 +144,7 @@ export type Database = {
           created_by: string
           id: number
           name: string
-          profile_id: string
+          parent_id: string
           updated_at: string
           updated_by: string
         }
@@ -109,7 +154,7 @@ export type Database = {
           created_by: string
           id?: number
           name: string
-          profile_id: string
+          parent_id: string
           updated_at?: string
           updated_by: string
         }
@@ -119,14 +164,14 @@ export type Database = {
           created_by?: string
           id?: number
           name?: string
-          profile_id?: string
+          parent_id?: string
           updated_at?: string
           updated_by?: string
         }
         Relationships: [
           {
-            foreignKeyName: "children_profile_id_fkey"
-            columns: ["profile_id"]
+            foreignKeyName: "children_auth_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -135,31 +180,31 @@ export type Database = {
       }
       favorites_ingredients: {
         Row: {
+          auth_id: string
           created_at: string
           created_by: string
           id: number
           ingredient_id: number
           updated_at: string
           updated_by: string
-          user_id: string
         }
         Insert: {
+          auth_id: string
           created_at?: string
           created_by: string
           id?: number
           ingredient_id: number
           updated_at?: string
           updated_by: string
-          user_id: string
         }
         Update: {
+          auth_id?: string
           created_at?: string
           created_by?: string
           id?: number
           ingredient_id?: number
           updated_at?: string
           updated_by?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -169,42 +214,35 @@ export type Database = {
             referencedRelation: "ingredients"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "favorites_ingredients_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       favorites_recipes: {
         Row: {
+          auth_id: string
           created_at: string
           created_by: string
           id: number
           recipe_id: number
           updated_at: string
           updated_by: string
-          user_id: string
         }
         Insert: {
+          auth_id: string
           created_at?: string
           created_by: string
           id?: number
           recipe_id: number
           updated_at?: string
           updated_by: string
-          user_id: string
         }
         Update: {
+          auth_id?: string
           created_at?: string
           created_by?: string
           id?: number
           recipe_id?: number
           updated_at?: string
           updated_by?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -212,13 +250,6 @@ export type Database = {
             columns: ["recipe_id"]
             isOneToOne: false
             referencedRelation: "recipes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -331,34 +362,31 @@ export type Database = {
       }
       profiles: {
         Row: {
-          auth_id: string | null
           avatar_url: string | null
           created_at: string
           created_by: string
           id: string
+          name: string
           updated_at: string
           updated_by: string
-          username: string
         }
         Insert: {
-          auth_id?: string | null
           avatar_url?: string | null
           created_at?: string
           created_by: string
-          id?: string
+          id: string
+          name: string
           updated_at?: string
           updated_by: string
-          username: string
         }
         Update: {
-          auth_id?: string | null
           avatar_url?: string | null
           created_at?: string
           created_by?: string
           id?: string
+          name?: string
           updated_at?: string
           updated_by?: string
-          username?: string
         }
         Relationships: []
       }
@@ -502,14 +530,6 @@ export type Database = {
           variants: string[]
         }[]
       }
-      get_recipe_allergens_with_names: {
-        Args: { recipe_id_param: number }
-        Returns: {
-          id: number
-          name: string
-          variants: string[]
-        }[]
-      }
       get_recipe_by_id: {
         Args: { recipe_id_param: number; user_id_param: string }
         Returns: {
@@ -554,6 +574,33 @@ export type Database = {
           start_stage: string
           steps: Json
           tags: string[]
+          updated_at: string
+          updated_by: string
+        }[]
+      }
+      search_ingredients_with_allergens: {
+        Args: {
+          child_id_param: number
+          excluded_allergen_ids: number[]
+          search_term: string
+          user_id_param: string
+        }
+        Returns: {
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          eaten: boolean
+          id: number
+          image_url: string
+          is_favorite: boolean
+          name: string
+          ng: boolean
+          nutrition: Json
+          seasons: string[]
+          stage_info: Json
+          start_stage: string
+          tips: string[]
           updated_at: string
           updated_by: string
         }[]

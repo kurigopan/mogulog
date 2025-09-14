@@ -15,13 +15,9 @@ export default function RecipeEditPage({
 }) {
   const unwrapParams = use(params);
   const recipeId = Number(unwrapParams.id);
-
-  // 取得したレシピデータを保持するstate
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
-  // ローディング状態を管理するstate
   const [isLoading, setIsLoading] = useState(true);
 
-  // コンポーネントがマウントされた時にレシピデータをフェッチ
   useEffect(() => {
     const fetchRecipe = async () => {
       setIsLoading(true);

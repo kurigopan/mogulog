@@ -81,3 +81,46 @@ export type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
 export type Season = "通年" | "春" | "夏" | "秋" | "冬";
 // export type Status = "draft" | "published";
 type Type = "recipe" | "ingredient";
+
+export interface User {
+  id?: string;
+  email: string;
+  password: string;
+}
+
+// `profiles` テーブルに対応する型
+export interface Profile {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  created_by: string;
+  updated_by: string;
+}
+
+// `children` テーブルに対応する型
+export interface Child {
+  id?: number;
+  parent_id: string;
+  name: string;
+  birthday: string;
+  created_by: string;
+  updated_by: string;
+}
+
+export interface ChildAllergens {
+  id?: number;
+  child_id: number;
+  allergen_id: number;
+  created_by: string;
+  updated_by: string;
+}
+
+export interface FormData {
+  email: User["email"];
+  password: User["password"];
+  name: Profile["name"];
+  avatar_url?: Profile["avatar_url"];
+  childName: Child["name"];
+  childBirthday: Child["birthday"];
+  allergens: Child["allergens"];
+}

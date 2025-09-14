@@ -114,12 +114,10 @@ export default function ProfilePage() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-
     // 選択されたアレルゲン情報を抽出
     const selectedAllergenIds = Object.keys(allergenExclusions)
       .filter((key) => allergenExclusions[parseInt(key, 10)])
       .map((key) => parseInt(key, 10));
-    setFormData((prev) => ({ ...prev, allergens: selectedAllergenIds }));
 
     const result = step2Schema.safeParse(formData);
     if (!result.success) {
@@ -127,7 +125,6 @@ export default function ProfilePage() {
       return;
     }
     setErrors(null);
-
     setLoading(true);
 
     const {
@@ -147,15 +144,24 @@ export default function ProfilePage() {
         formData,
         user.id
       );
+      // ここにログを追加
+      console.log("認証ユーザーID (user.id):", user.id);
+      console.log("アプリケーションが挿入しようとしているchildId:", childId);
+
       if (childId) {
         const { error: allergenError } = await createChildAllergens(
-          formData,
+          { ...formData, allergens: selectedAllergenIds },
           childId,
           user.id
         );
 
         if (allergenError) {
-          setErrors({ general: ["プロフィール情報の登録に失敗しました。"] });
+          console.error("アレルゲン挿入エラー:", allergenError);
+          // 念のためエラーの詳細をコンソールに出力
+          console.error("エラーメッセージ:", allergenError.message);
+          console.error("エラー詳細:", allergenError.details);
+
+          setErrors({ general: ["アレルゲン情報の登録に失敗しました。"] });
           setLoading(false);
           return;
         }

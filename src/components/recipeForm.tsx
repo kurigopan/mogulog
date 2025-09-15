@@ -20,7 +20,9 @@ import {
   deleteRecipe,
   deleteRecipeAllergens,
   getAllergens,
+  getCurrentUser,
   getRecipeAllergensById,
+  supabase,
   updateRecipe,
 } from "@/lib/supabase";
 import { Allergen, Category, Recipe, Stage } from "@/types/types";
@@ -328,13 +330,16 @@ export default function RecipeForm({
     try {
       let recipeId;
       let newRecipeData; // createRecipeの戻り値を受け取る変数
+      const user = await getCurrentUser();
+      if (!user) throw new Error("ユーザー情報が取得できません");
+
       if (isEditMode && initialData?.id) {
         // 編集モードの場合、IDを使ってレシピを更新
-        await updateRecipe(initialData.id, formData);
+        await updateRecipe(initialData.id, formData, user.id);
         recipeId = initialData.id;
       } else {
         // 新規作成モードの場合、レシピを作成
-        const { data, error } = await createRecipe(formData);
+        const { data, error } = await createRecipe(formData, user.id);
         if (error || !data) {
           throw new Error("レシピの作成に失敗しました。");
         }
@@ -350,7 +355,7 @@ export default function RecipeForm({
       await deleteRecipeAllergens(recipeId);
 
       // 新しいアレルゲンデータを登録
-      await createRecipeAllergens(recipeId, selectedAllergenIds);
+      await createRecipeAllergens(recipeId, selectedAllergenIds, user.id);
 
       console.log("レシピとアレルゲン情報を保存しました:", recipeId);
       router.push("/");
@@ -362,15 +367,15 @@ export default function RecipeForm({
   };
 
   // 下書き保存処理
-  const handleSaveDraft = async () => {
-    setIsSaving(true);
-    // TODO: 下書きとして保存するロジック（isPrivateを強制的にtrueにするなど）を実装
-    console.log("下書きとして保存:", formData);
-    setTimeout(() => {
-      setIsSaving(false);
-      alert("下書きとして保存しました！");
-    }, 1000);
-  };
+  // const handleSaveDraft = async () => {
+  //   setIsSaving(true);
+  //   // TODO: 下書きとして保存するロジック（isPrivateを強制的にtrueにするなど）を実装
+  //   console.log("下書きとして保存:", formData);
+  //   setTimeout(() => {
+  //     setIsSaving(false);
+  //     alert("下書きとして保存しました！");
+  //   }, 1000);
+  // };
 
   // レシピ削除処理
   const handleDelete = async () => {
@@ -662,49 +667,53 @@ export default function RecipeForm({
               追加
             </button>
           </div>
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
+          <div className="space-y-6">
             {formData.ingredients.map((ingredient, index) => (
-              <div
-                key={index}
-                className="flex-col items-center border-b border-stone-300 last:border-b-0 mb-4"
-              >
-                <div className="flex justify-between space-x-2 mb-2">
-                  <input
-                    type="text"
-                    name="name"
-                    value={ingredient.name}
-                    onChange={(e) => handleIngredientChange(e, index)}
-                    placeholder="にんじん"
-                    className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                  />
-                  <input
-                    type="text"
-                    name="amount"
-                    value={ingredient.amount}
-                    onChange={(e) => handleIngredientChange(e, index)}
-                    placeholder="30g"
-                    className="w-24 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                  />
-                </div>
-                <div className="flex justify-between mb-4">
-                  <input
-                    type="text"
-                    name="note"
-                    value={ingredient.note || ""}
-                    onChange={(e) => handleIngredientChange(e, index)}
-                    placeholder="皮を厚めに剥く"
-                    className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                  />
-                  {formData.ingredients.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveIngredient(index)}
-                      className="p-2 hover:bg-red-50 rounded-lg transition-colors ml-2"
-                      title="材料を削除"
-                    >
-                      <ClearIcon className="w-5 h-5" />
-                    </button>
-                  )}
+              <div key={index} className="bg-white rounded-3xl p-6 shadow-sm">
+                <div className="flex-col items-center space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-stone-700 text-lg">
+                      {index + 1}
+                    </h4>
+                    {formData.ingredients.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveIngredient(index)}
+                        className="p-2 hover:bg-red-50 rounded-lg transition-colors ml-2"
+                        title="材料を削除"
+                      >
+                        <ClearIcon className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex justify-between space-x-2 mb-2">
+                    <input
+                      type="text"
+                      name="name"
+                      value={ingredient.name}
+                      onChange={(e) => handleIngredientChange(e, index)}
+                      placeholder="にんじん"
+                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    />
+                    <input
+                      type="text"
+                      name="amount"
+                      value={ingredient.amount}
+                      onChange={(e) => handleIngredientChange(e, index)}
+                      placeholder="30g"
+                      className="w-24 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    />
+                  </div>
+                  <div className="flex justify-between mb-4">
+                    <input
+                      type="text"
+                      name="note"
+                      value={ingredient.note || ""}
+                      onChange={(e) => handleIngredientChange(e, index)}
+                      placeholder="皮を厚めに剥く"
+                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -884,14 +893,14 @@ export default function RecipeForm({
             </button>
           )}
 
-          <button
+          {/* <button
             type="button"
             onClick={handleSaveDraft}
             disabled={isSaving}
             className="px-6 py-3 bg-stone-200 text-stone-700 rounded-full font-medium hover:bg-stone-300 transition-colors disabled:opacity-50"
           >
             下書き
-          </button>
+          </button> */}
           <button
             type="submit"
             className="flex items-center px-6 py-3 bg-purple-500 text-white rounded-full font-medium hover:bg-purple-600 transition-colors disabled:opacity-50"

@@ -10,9 +10,9 @@ import {
 } from "@/types/schemas";
 import { Child, ChildAllergens, Profile, Recipe } from "@/types/types";
 
-// ハードコードされたユーザーIDを定義
-// TODO: ユーザー認証実装後に、セッションから取得したユーザーIDに置き換えてください
-const HARDCODED_USER_ID = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
+// // ハードコードされたユーザーIDを定義
+// // TODO: ユーザー認証実装後に、セッションから取得したユーザーIDに置き換えてください
+// const HARDCODED_USER_ID = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
 
 // SupabaseプロジェクトのURLとanonキーを環境変数から取得
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -27,6 +27,61 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Supabaseクライアントのインスタンスを作成
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+
+// 現在のユーザーを取得する関数
+export async function getCurrentUser() {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("Failed to fetch current user:", error);
+    return null;
+  }
+
+  return user;
+}
+
+// プロフィールデータを取得する関数
+export async function getProfile(userId: string) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, name")
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Failed to fetch profile:", error);
+    return null;
+  }
+  return data;
+}
+// 子どものデータを取得する関数
+export async function getChild(userId: string) {
+  const { data, error } = await supabase
+    .from("children")
+    .select("id, name, birthday")
+    .eq("parent_id", userId);
+
+  if (error) {
+    console.error("Failed to fetch child:", error);
+    return null;
+  }
+  return data;
+}
+// 子どものアレルゲンデータを取得する関数
+export async function getChildAllergens(userId: string, childId: string) {
+  const { data, error } = await supabase
+    .from("allergens")
+    .select("id, name, birthday")
+    .eq("child_id", childId);
+
+  if (error) {
+    console.error("Failed to fetch child allergens:", error);
+    return null;
+  }
+  return data;
+}
 
 // アレルゲン登録データを全て取得する関数
 export async function getAllergens() {
@@ -276,14 +331,15 @@ export async function createChildAllergens(
 
 export async function createRecipeAllergens(
   recipeId: number,
-  allergenIds: number[]
+  allergenIds: number[],
+  userId: string
 ) {
   // 挿入するデータの配列を生成
   const dataToInsert = allergenIds.map((allergenId) => ({
     recipe_id: recipeId,
     allergen_id: allergenId,
-    created_by: HARDCODED_USER_ID,
-    updated_by: HARDCODED_USER_ID,
+    created_by: userId,
+    updated_by: userId,
   }));
 
   // データがなければ何もしない
@@ -308,8 +364,11 @@ export async function createRecipeAllergens(
 /**
  * @param recipeData - 登録するレシピデータ
  */
-export async function createRecipe(recipeData: Omit<Recipe, "id">) {
-  const formattedData = formatRecipeForSupabase(recipeData);
+export async function createRecipe(
+  recipeData: Omit<Recipe, "id">,
+  userId: string
+) {
+  const formattedData = formatRecipeForSupabase(recipeData, userId);
   const { data, error } = await supabase
     .from("recipes")
     .insert([formattedData])
@@ -327,8 +386,12 @@ export async function createRecipe(recipeData: Omit<Recipe, "id">) {
  * @param id - 更新するレシピのID
  * @param recipeData - 更新するレシピデータ
  */
-export async function updateRecipe(id: number, recipeData: Omit<Recipe, "id">) {
-  const formattedData = formatRecipeForSupabase(recipeData);
+export async function updateRecipe(
+  id: number,
+  recipeData: Omit<Recipe, "id">,
+  userId: string
+) {
+  const formattedData = formatRecipeForSupabase(recipeData, userId);
   const { data, error } = await supabase
     .from("recipes")
     .update(formattedData)

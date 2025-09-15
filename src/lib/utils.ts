@@ -5,7 +5,10 @@ import { Recipe } from "@/types/types";
  * @param recipe - 変換するレシピデータ（IDを除く）
  * @returns Supabaseのrecipesテーブルに挿入可能なデータ
  */
-export function formatRecipeForSupabase(recipe: Omit<Recipe, "id">) {
+export function formatRecipeForSupabase(
+  recipe: Omit<Recipe, "id">,
+  userId: string
+) {
   // フロントエンドのcamelCaseキーをデータベースのsnake_caseキーにマッピング
   // ingredientsとstepsはJSONBカラムなので、JSON.stringifyで文字列に変換
   return {
@@ -24,9 +27,7 @@ export function formatRecipeForSupabase(recipe: Omit<Recipe, "id">) {
       JSON.parse(JSON.stringify(ing))
     ),
     steps: recipe.steps.map((step) => JSON.parse(JSON.stringify(step))),
-    // created_byとupdated_byはSupabaseのAuthから取得するか、データベースのトリガーで自動設定されることが一般的です
-    // 今回は例としてハードコードしておきます。
-    created_by: "HARDCODED_USER_ID",
-    updated_by: "HARDCODED_USER_ID",
+    created_by: userId,
+    updated_by: userId,
   };
 }

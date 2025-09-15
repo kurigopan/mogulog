@@ -144,9 +144,6 @@ export default function ProfilePage() {
         formData,
         user.id
       );
-      // ここにログを追加
-      console.log("認証ユーザーID (user.id):", user.id);
-      console.log("アプリケーションが挿入しようとしているchildId:", childId);
 
       if (childId) {
         const { error: allergenError } = await createChildAllergens(
@@ -156,11 +153,6 @@ export default function ProfilePage() {
         );
 
         if (allergenError) {
-          console.error("アレルゲン挿入エラー:", allergenError);
-          // 念のためエラーの詳細をコンソールに出力
-          console.error("エラーメッセージ:", allergenError.message);
-          console.error("エラー詳細:", allergenError.details);
-
           setErrors({ general: ["アレルゲン情報の登録に失敗しました。"] });
           setLoading(false);
           return;

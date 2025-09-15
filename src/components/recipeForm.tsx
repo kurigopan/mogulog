@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { CircularProgress, FormControlLabel, Switch } from "@mui/material";
+import { FormControlLabel, Switch } from "@mui/material";
 import {
   AddIcon,
   // InfoOutlineIcon,
@@ -26,6 +26,8 @@ import {
   updateRecipe,
 } from "@/lib/supabase";
 import { Allergen, Category, Recipe, Stage } from "@/types/types";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
 const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];
@@ -65,7 +67,7 @@ export default function RecipeForm({
     Record<string, boolean>
   >({});
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-  const [loading, setLoading] = useState(false);
+  const setLoading = useSetAtom(loadingAtom);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [suggestedAllergenNames, setSuggestedAllergenNames] = useState<
@@ -842,38 +844,30 @@ export default function RecipeForm({
         <section>
           <h3 className="text-lg font-bold text-stone-700 mb-4">アレルゲン</h3>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
-            {allergens.length === 0 && loading ? (
-              <CircularProgress color="secondary" size={24} />
-            ) : (
-              <div>
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2">
-                  {allergens.map((allergen) => (
-                    <button
-                      key={allergen.id}
-                      type="button"
-                      onClick={() => toggleAllergen(allergen.id)}
-                      className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
-                        allergenInclusions[allergen.id]
-                          ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                          : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
-                      }`}
-                    >
-                      <div className="text-xs leading-tight">
-                        {allergen.name}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                {/* リアルタイムサジェストメッセージ */}
-                {suggestedAllergenNames.length > 0 && (
-                  <div className="flex items-center p-3 text-red-400 rounded-lg mt-4">
-                    <ErrorIcon />
-                    <p className="text-sm font-medium text-stone-600 ml-2">
-                      「{suggestedAllergenNames.join("」と「")}
-                      」は含まれていませんか？
-                    </p>
-                  </div>
-                )}
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2">
+              {allergens.map((allergen) => (
+                <button
+                  key={allergen.id}
+                  type="button"
+                  onClick={() => toggleAllergen(allergen.id)}
+                  className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
+                    allergenInclusions[allergen.id]
+                      ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                      : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
+                  }`}
+                >
+                  <div className="text-xs leading-tight">{allergen.name}</div>
+                </button>
+              ))}
+            </div>
+            {/* リアルタイムサジェストメッセージ */}
+            {suggestedAllergenNames.length > 0 && (
+              <div className="flex items-center p-3 text-red-400 rounded-lg mt-4">
+                <ErrorIcon />
+                <p className="text-sm font-medium text-stone-600 ml-2">
+                  「{suggestedAllergenNames.join("」と「")}
+                  」は含まれていませんか？
+                </p>
               </div>
             )}
           </div>

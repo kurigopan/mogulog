@@ -10,10 +10,6 @@ import {
 } from "@/types/schemas";
 import { Child, ChildAllergens, Profile, Recipe } from "@/types/types";
 
-// // ハードコードされたユーザーIDを定義
-// // TODO: ユーザー認証実装後に、セッションから取得したユーザーIDに置き換えてください
-// const HARDCODED_USER_ID = "32836782-4f6d-4dc3-92ea-4faf03ed86a5";
-
 // SupabaseプロジェクトのURLとanonキーを環境変数から取得
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -47,7 +43,7 @@ export async function getCurrentUser() {
 export async function getProfile(userId: string) {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name")
+    .select("name")
     .eq("id", userId);
 
   if (error) {
@@ -60,7 +56,7 @@ export async function getProfile(userId: string) {
 export async function getChild(userId: string) {
   const { data, error } = await supabase
     .from("children")
-    .select("id, name, birthday")
+    .select("id,name, birthday")
     .eq("parent_id", userId);
 
   if (error) {
@@ -70,10 +66,10 @@ export async function getChild(userId: string) {
   return data;
 }
 // 子どものアレルゲンデータを取得する関数
-export async function getChildAllergens(userId: string, childId: string) {
+export async function getChildAllergens(childId: string) {
   const { data, error } = await supabase
     .from("allergens")
-    .select("id, name, birthday")
+    .select("allergen_id")
     .eq("child_id", childId);
 
   if (error) {

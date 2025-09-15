@@ -1,12 +1,13 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RecipeForm from "@/components/RecipeForm";
 import { getRecipeById } from "@/lib/supabase";
 import { Recipe } from "@/types/types";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
 export default function RecipeEditPage({
   params,
@@ -16,11 +17,11 @@ export default function RecipeEditPage({
   const unwrapParams = use(params);
   const recipeId = Number(unwrapParams.id);
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const setLoading = useSetAtom(loadingAtom);
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      setIsLoading(true);
+      setLoading(true);
       const data = await getRecipeById(
         "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
         recipeId
@@ -31,7 +32,7 @@ export default function RecipeEditPage({
       } else if (data) {
         setRecipeData(data[0]); // 1つ目が該当のデータのはず
       }
-      setIsLoading(false);
+      setLoading(false);
     };
     fetchRecipe();
   }, [recipeId]);
@@ -40,11 +41,7 @@ export default function RecipeEditPage({
     <div className="min-h-screen bg-stone-50">
       <Header title="レシピ編集" />
       {/* ローディング中はメッセージを表示、データ取得後はフォームを表示 */}
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <CircularProgress color="secondary" />
-        </div>
-      ) : recipeData ? (
+      {recipeData ? (
         <RecipeForm initialData={recipeData} isEditMode={true} />
       ) : (
         <div className="p-8 text-center text-red-500">

@@ -114,60 +114,68 @@ export default function ProfilePage() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
+    const result = step2Schema.safeParse(formData);
+    if (!result.success) {
+      setErrors(result.error.flatten().fieldErrors);
+      setLoading(false);
+      return;
+    }
+    setErrors(null);
+
     // 選択されたアレルゲン情報を抽出
     const selectedAllergenIds = Object.keys(allergenExclusions)
       .filter((key) => allergenExclusions[parseInt(key, 10)])
       .map((key) => parseInt(key, 10));
 
-    const result = step2Schema.safeParse(formData);
-    if (!result.success) {
-      setErrors(result.error.flatten().fieldErrors);
-      return;
-    }
-    setErrors(null);
-    setLoading(true);
+    try {
+      // ユーザー情報を取得
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error("ユーザー情報の取得に失敗しました。");
+      }
 
-    const {
-      data: { user },
-      error: AuthError,
-    } = await supabase.auth.getUser();
-
-    if (AuthError) {
-      setErrors({ general: ["ユーザー情報の取得に失敗しました。"] });
-      setLoading(false);
-      return;
-    }
-
-    if (user) {
+      // プロフィールと子どもの情報を登録
       const { error: profileError } = await createProfile(formData, user.id);
       const { data: childId, error: childError } = await createChild(
         formData,
         user.id
       );
 
+      if (profileError || childError) {
+        throw new Error("プロフィール情報の登録に失敗しました。");
+      }
+
+      // アレルゲン情報を登録
       if (childId) {
         const { error: allergenError } = await createChildAllergens(
           { ...formData, allergens: selectedAllergenIds },
           childId,
           user.id
         );
-
         if (allergenError) {
-          setErrors({ general: ["アレルゲン情報の登録に失敗しました。"] });
-          setLoading(false);
-          return;
+          throw new Error("アレルゲン情報の登録に失敗しました。");
         }
       }
 
-      if (profileError || childError) {
-        setErrors({ general: ["プロフィール情報の登録に失敗しました。"] });
-        setLoading(false);
-        return;
+      // 成功したらホーム画面へ遷移
+      router.push("/");
+    } catch (err) {
+      // いずれかのステップでエラーが発生した場合
+      console.error(err);
+      if (err instanceof Error) {
+        setErrors({ general: [err.message] });
+      } else {
+        setErrors({ general: ["不明なエラーが発生しました。"] });
       }
+    } finally {
+      // 成功・失敗にかかわらずローディングを終了
+      setLoading(false);
     }
-
-    setLoading(false);
-    router.push("/");
   };
 
   // ページロード時とアレルゲン項目がないときに実行

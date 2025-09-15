@@ -63,16 +63,6 @@ export default function SignUp() {
     router.push("/profile");
   };
 
-  // if (loading || session) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="text-purple-500 animate-spin">
-  //         <ChildCareIcon className="text-5xl" />
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-50 flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center p-6">

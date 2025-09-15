@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Tooltip, IconButton, CircularProgress } from "@mui/material";
+import { Tooltip, IconButton } from "@mui/material";
 import {
   FilterListIcon,
   ExpandMoreIcon,
@@ -16,6 +16,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Ingredient, ingredientStageInfo } from "@/types/types";
 import { getIngredientsWithStatus } from "@/lib/supabase";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
 export default function IngredientsList() {
   const [childAge, setChildAge] = useState("7-8");
@@ -24,7 +26,7 @@ export default function IngredientsList() {
   const [selectedStageFilter, setSelectedStageFilter] = useState("all");
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [loading, setLoading] = useState(true);
+  const setLoading = useSetAtom(loadingAtom);
 
   const categories = [
     { value: "all", label: "すべて" },
@@ -158,6 +160,7 @@ export default function IngredientsList() {
         setIngredients(data);
       }
       setLoading(false);
+      console.log();
     };
 
     fetchIngredients();
@@ -252,11 +255,7 @@ export default function IngredientsList() {
 
         {/* 食材一覧（テーブル表示） */}
         <section>
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <CircularProgress color="secondary" />
-            </div>
-          ) : filteredIngredients.length > 0 ? (
+          {filteredIngredients.length > 0 ? (
             <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-stone-200">
               <div className="overflow-x-auto">
                 {/* テーブルヘッダー */}

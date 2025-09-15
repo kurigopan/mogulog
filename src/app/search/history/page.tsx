@@ -1,18 +1,19 @@
 "use client";
 
 import React from "react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { HistoryIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import CircularProgress from "@mui/material/CircularProgress";
 import useRecentItems from "@/hooks/useRecentItems";
 import RemoveButton from "@/components/ui/RemoveButton";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
 export default function RecentViewed() {
-  const [loading, setLoading] = useState(true);
+  const setLoading = useSetAtom(loadingAtom);
   const recentlyViewed = useRecentItems();
 
   useEffect(() => {
@@ -29,11 +30,7 @@ export default function RecentViewed() {
 
       <div className="p-4 space-y-6">
         {/* アイテム一覧 */}
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <CircularProgress color="secondary" />
-          </div>
-        ) : recentlyViewed.length > 0 ? (
+        {recentlyViewed.length > 0 ? (
           <ListCard listCardItems={recentlyViewed} pageName="history" />
         ) : recentlyViewed.length === 0 ? (
           <div className="text-center py-12">

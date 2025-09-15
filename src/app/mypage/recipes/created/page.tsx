@@ -8,10 +8,11 @@ import { CreateIcon } from "@/icons";
 import ListCard from "@/components/ui/ListCard";
 import { Recipe } from "@/types/types";
 import { mockRecipes } from "@/mocks/recipes";
-import { CircularProgress } from "@mui/material";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
 export default function CreatedRecipes() {
-  const [loading, setLoading] = useState(true);
+  const setLoading = useSetAtom(loadingAtom);
   const [createdRecipes, setCreatedRecipes] = useState<Recipe[]>([]);
   const [sortBy, setSortBy] = useState("newest"); // newest, oldest, name, subtitle
 
@@ -63,11 +64,7 @@ export default function CreatedRecipes() {
 
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <CircularProgress color="secondary" />
-          </div>
-        ) : sortedRecipes.length > 0 ? (
+        {sortedRecipes.length > 0 ? (
           <ListCard listCardItems={sortedRecipes} pageName={"created"} />
         ) : (
           <div className="text-center py-12">

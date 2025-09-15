@@ -1,6 +1,9 @@
-import type { Metadata } from "next";
 import "./globals.css";
-// import SupabaseListener from "@/components/supabase/supabaseListener";
+import type { Metadata } from "next";
+import { Provider } from "jotai";
+import SupabaseAuthObserver from "@/components/SupabaseAuthObserver";
+import LoadingOverlay from "@/components/LoadingOverlay";
+import LoadingResetter from "@/components/LoadingResetter";
 
 export const metadata: Metadata = {
   title: "もぐログ",
@@ -14,9 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      {/* <SupabaseListener /> */}
-      <body className="bg-stone-50 text-stone-700 min-h-screen">
-        {children}
+      <body>
+        <Provider>
+          <SupabaseAuthObserver />
+          <LoadingOverlay />
+          <LoadingResetter />
+          <div className="bg-stone-50 text-stone-700 min-h-screen">
+            {children}
+          </div>
+        </Provider>
       </body>
     </html>
   );

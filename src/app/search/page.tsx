@@ -6,18 +6,19 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import ListCard from "@/components/ui/ListCard";
 import { Allergen, CardItem } from "@/types/types";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   getAllergens,
   searchIngredientsWithAllergens,
   searchRecipesWithAllergens,
 } from "@/lib/supabase";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
 export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState<CardItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const setLoading = useSetAtom(loadingAtom);
   // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
   const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
   const [showAllergens, setShowAllergens] = useState(false);
@@ -33,7 +34,6 @@ export default function SearchResults() {
 
       if (!currentQuery.trim()) {
         setResults([]);
-        setLoading(false);
         setSearchQuery("");
         return;
       }
@@ -128,7 +128,7 @@ export default function SearchResults() {
             <input
               ref={inputRef}
               type="text"
-              placeholder="食材・レシピを検索"
+              placeholder="食材レシピを検索"
               onKeyDown={handleSearch}
               className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300 transition-all shadow-sm"
               autoFocus
@@ -155,25 +155,21 @@ export default function SearchResults() {
             {showAllergens && (
               <div className="px-4 pb-4">
                 <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 pt-2 border-t border-stone-100">
-                  {allergens.length === 0 && loading ? (
-                    <CircularProgress color="secondary" size={24} />
-                  ) : (
-                    allergens.map((allergen) => (
-                      <button
-                        key={allergen.id}
-                        onClick={() => toggleAllergen(allergen.id)}
-                        className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
-                          allergenExclusions[allergen.id]
-                            ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                            : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
-                        }`}
-                      >
-                        <div className="text-xs leading-tight">
-                          {allergen.name}
-                        </div>
-                      </button>
-                    ))
-                  )}
+                  {allergens.map((allergen) => (
+                    <button
+                      key={allergen.id}
+                      onClick={() => toggleAllergen(allergen.id)}
+                      className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
+                        allergenExclusions[allergen.id]
+                          ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                          : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
+                      }`}
+                    >
+                      <div className="text-xs leading-tight">
+                        {allergen.name}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -192,11 +188,7 @@ export default function SearchResults() {
         </div>
 
         {/* 検索結果一覧 */}
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <CircularProgress color="secondary" />
-          </div>
-        ) : sortedResults.length > 0 ? (
+        {sortedResults.length > 0 ? (
           <ListCard listCardItems={sortedResults} pageName="search" />
         ) : searchQuery ? (
           <div className="text-center py-12">

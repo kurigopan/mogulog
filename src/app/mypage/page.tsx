@@ -14,11 +14,25 @@ import {
 } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { useAtomValue } from "jotai";
+import { userIdAtom } from "@/lib/atoms";
+import {
+  getChild,
+  getChildAllergens,
+  getCurrentUser,
+  getProfile,
+} from "@/lib/supabase";
 
 export default function MyPage() {
   const [isEditingParent, setIsEditingParent] = useState(false);
   const [isEditingChild, setIsEditingChild] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const userId = useAtomValue(userIdAtom);
+
+  // const userData = getCurrentUser();
+  // const profileData = getProfile(userId);
+  // const childData = getChild(userId);
+  // const allergenData = getChildAllergens(childId);
 
   // 親のサンプルデータ
   const [parentInfo, setParentInfo] = useState({

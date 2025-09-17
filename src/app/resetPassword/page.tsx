@@ -1,0 +1,133 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSetAtom } from "jotai";
+import {
+  VisibilityIcon,
+  VisibilityOffIcon,
+  ChildCareIcon,
+  PasswordIcon,
+} from "@/icons";
+import { supabase } from "@/lib/supabase";
+import { loadingAtom } from "@/lib/atoms";
+
+type ValidationErrors = {
+  [key: string]: string[];
+};
+
+export default function ResetPassword() {
+  const router = useRouter();
+  const setLoading = useSetAtom(loadingAtom);
+  const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newPassword.length < 6) {
+      setErrors({ password: ["パスワードは6文字以上にしてください"] });
+      return;
+    }
+    setErrors(null);
+
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setErrors({ general: [error.message] });
+      return;
+    }
+
+    setIsSuccess(true);
+    // 成功したら数秒後にログインページへリダイレクトなども可能
+    setTimeout(() => {
+      router.push("/login");
+    }, 3000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-50 flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="text-center mb-6">
+          <div className="flex justify-center items-center mb-2">
+            <div className="text-purple-400 text-3xl mr-3">
+              <ChildCareIcon />
+            </div>
+            <h1 className="text-3xl font-bold text-stone-700">もぐログ</h1>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md">
+          <h2 className="text-2xl font-bold text-stone-700 text-center mb-2">
+            パスワード再設定
+          </h2>
+          <div className="flex justify-center mb-4">
+            <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full">
+              <PasswordIcon className="text-purple-500 text-3xl" />
+            </div>
+          </div>
+
+          {errors?.general && (
+            <div className="text-red-500 text-sm text-center mb-4">
+              {errors.general[0]}
+            </div>
+          )}
+
+          {isSuccess ? (
+            <div className="text-center p-6 space-y-4">
+              <h3 className="text-xl font-bold text-stone-700">
+                パスワードを更新しました
+              </h3>
+              <p className="text-stone-600">
+                3秒後にログインページに移動します。
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleUpdatePassword} className="space-y-6">
+              <div className="relative">
+                <label className="block text-sm font-medium text-stone-600 mb-2">
+                  新しいパスワード
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full p-4 rounded-xl border border-stone-300 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-stone-400 hover:text-stone-600"
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </button>
+                {errors?.password && (
+                  <p className="mt-2 text-sm text-red-500">
+                    {errors.password[0]}
+                  </p>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+              >
+                パスワードを更新する
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div className="p-4 text-center">
+          <p className="text-xs text-stone-400">© 2025 もぐログ</p>
+        </div>
+      </div>
+    </div>
+  );
+}

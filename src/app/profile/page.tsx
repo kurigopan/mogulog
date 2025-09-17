@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAtom } from "jotai";
-import { AccountBoxIcon, ChildCareIcon } from "@/icons";
+import { useSetAtom } from "jotai";
+import { AccountBoxIcon } from "@/icons";
 import { sessionAtom, loadingAtom } from "@/lib/atoms";
 import {
   createChild,
@@ -23,7 +23,7 @@ type ValidationErrors = {
 export default function ProfilePage() {
   const router = useRouter();
   //   const [session, setSession] = useAtom(sessionAtom);
-  const [loading, setLoading] = useAtom(loadingAtom);
+  const setLoading = useSetAtom(loadingAtom);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     avatar_url: null as string | null,
@@ -263,9 +263,9 @@ export default function ProfilePage() {
                         className="object-cover w-full h-full"
                         unoptimized
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <AccountBoxIcon className="text-white text-3xl" />
-                      </div>
+                      </div> */}
                     </>
                   ) : (
                     <div className="flex flex-col items-center space-y-2 text-stone-400 group-hover:text-stone-500">

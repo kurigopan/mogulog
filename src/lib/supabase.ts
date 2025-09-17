@@ -7,6 +7,10 @@ import {
   ingredientSchema,
   rpcRecipeSchema,
   recipeSchema,
+  rpcIngredientCardSchema,
+  ingredientCardSchema,
+  recipeCardSchema,
+  rpcRecipeCardSchema,
 } from "@/types/schemas";
 import { Child, ChildAllergens, Profile, Recipe } from "@/types/types";
 
@@ -43,8 +47,9 @@ export async function getCurrentUser() {
 export async function getProfile(userId: string) {
   const { data, error } = await supabase
     .from("profiles")
-    .select("name")
-    .eq("id", userId);
+    .select("*")
+    .eq("id", userId)
+    .single();
 
   if (error) {
     console.error("Failed to fetch profile:", error);
@@ -56,8 +61,9 @@ export async function getProfile(userId: string) {
 export async function getChild(userId: string) {
   const { data, error } = await supabase
     .from("children")
-    .select("id,name, birthday")
-    .eq("parent_id", userId);
+    .select("*")
+    .eq("parent_id", userId)
+    .single();
 
   if (error) {
     console.error("Failed to fetch child:", error);
@@ -65,10 +71,11 @@ export async function getChild(userId: string) {
   }
   return data;
 }
+
 // 子どものアレルゲンデータを取得する関数
-export async function getChildAllergens(childId: string) {
+export async function getChildAllergens(childId: number) {
   const { data, error } = await supabase
-    .from("allergens")
+    .from("child_allergens")
     .select("allergen_id")
     .eq("child_id", childId);
 
@@ -76,7 +83,7 @@ export async function getChildAllergens(childId: string) {
     console.error("Failed to fetch child allergens:", error);
     return null;
   }
-  return data;
+  return data.map((item) => item.allergen_id);
 }
 
 // アレルゲン登録データを全て取得する関数
@@ -248,6 +255,42 @@ export async function getFavoriteRecipeLogs() {
   return data.map((item) => item.recipe_id);
 }
 
+// ユーザーごとの食材お気に入り登録データを取得する関数
+export async function getFavoriteIngredients(userId: string) {
+  const { data, error } = await supabase.rpc("get_favorite_ingredients", {
+    user_id: userId,
+  });
+
+  if (error) {
+    console.error("Failed to fetch favorite ingredients:", error);
+    return [];
+  }
+
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcIngredientCardSchema).parse(data);
+
+  // フロントエンドの型に変換
+  return validatedData.map((d) => ingredientCardSchema.parse(d));
+}
+
+// ユーザーごとのレシピお気に入り登録データを取得する関数
+export async function getFavoriteRecipes(userId: string) {
+  const { data, error } = await supabase.rpc("get_favorite_recipes", {
+    user_id: userId,
+  });
+
+  if (error) {
+    console.error("Failed to fetch favorite recipes:", error);
+    return [];
+  }
+
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
+
+  // フロントエンドの型に変換
+  return validatedData.map((d) => recipeCardSchema.parse(d));
+}
+
 export async function createProfile(
   formData: { name: string; avatar_url: string | null },
   userId: string // supabase.auth.signUp 後の user.id
@@ -270,7 +313,7 @@ export async function createProfile(
     return { data: null, error };
   }
 
-  return { data, error: null };
+  return data;
 }
 
 export async function createChild(
@@ -295,7 +338,7 @@ export async function createChild(
     return { data: null, error };
   }
 
-  return { data: data[0].id, error: null };
+  return { data: data[0].id };
 }
 
 export async function createChildAllergens(
@@ -322,7 +365,7 @@ export async function createChildAllergens(
     return { data: null, error };
   }
 
-  return { data, error: null };
+  return data;
 }
 
 export async function createRecipeAllergens(
@@ -354,7 +397,7 @@ export async function createRecipeAllergens(
     return { data: null, error };
   }
 
-  return { data, error: null };
+  return data;
 }
 
 /**
@@ -375,7 +418,73 @@ export async function createRecipe(
     return { data: null, error };
   }
 
-  return { data, error: null };
+  return data;
+}
+
+export async function updateProfile(
+  userId: string,
+  updates: { name: string; avatar_url: string | null }
+) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("プロフィールの更新に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  return { data, error };
+}
+
+export async function updateChild(
+  childId: number,
+  updates: { name: string; birthday: string }
+) {
+  const { data, error } = await supabase
+    .from("children")
+    .update(updates)
+    .eq("id", childId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("子どものプロフィールの更新に失敗しました:", error);
+    return { data: null, error };
+  }
+
+  return data;
+}
+
+export async function upsertChildAllergens(
+  childId: number,
+  allergenIds: number[]
+) {
+  // 1. 既存のアレルギー情報を削除
+  const { error: deleteError } = await supabase
+    .from("child_allergens")
+    .delete()
+    .eq("child_id", childId);
+
+  if (deleteError) {
+    return { error: deleteError };
+  }
+
+  // 2. 新しいアレルギー情報を作成
+  const newAllergens = allergenIds.map((allergenId) => ({
+    child_id: childId,
+    allergen_id: allergenId,
+  }));
+
+  // 3. 新しい情報を挿入
+  const { error: insertError } = await supabase
+    .from("child_allergens")
+    .insert(newAllergens);
+
+  return { error: insertError };
 }
 
 /**
@@ -399,7 +508,7 @@ export async function updateRecipe(
     return { data: null, error };
   }
 
-  return { data, error: null };
+  return data;
 }
 
 export async function deleteRecipeAllergens(recipeId: number) {
@@ -428,4 +537,32 @@ export async function deleteRecipe(id: number) {
   }
 
   return { error: null };
+}
+
+export async function uploadAvatar(file: File, userId: string) {
+  const bucketName = "avatars";
+  const filePath = `${userId}/${file.name}`;
+
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true, // 同名ファイルがあれば上書き
+    });
+
+  if (error) {
+    console.error("アップロードエラー:", error.message);
+    return null;
+  }
+
+  // 非公開URLを取得したい場合
+  const signedUrlData = await supabase.storage
+    .from(bucketName)
+    .createSignedUrl(filePath, 60);
+
+  if (signedUrlData.error) {
+    console.error("署名付きURL取得エラー:", signedUrlData.error.message);
+    return null;
+  }
+  return signedUrlData.data.signedUrl;
 }

@@ -122,3 +122,18 @@ export interface FormData {
   childBirthday: Child["birthday"];
   allergens: Child["allergens"];
 }
+
+export interface ParentInfo {
+  name: Profile["name"];
+  avatar_url: Profile["avatar_url"];
+  email: User["email"];
+  joinDate: Profile["created_at"];
+}
+
+export interface ChildInfo {
+  id: number;
+  name: Child["name"];
+  birthday: Child["birthday"];
+  age: string;
+  allergens: Child["allergens"];
+}

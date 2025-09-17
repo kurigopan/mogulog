@@ -13,7 +13,6 @@ const LoadingResetter = () => {
   useEffect(() => {
     // ページ遷移が完了した時点でローディングを終了
     setLoading(false);
-    console.log("LoadingResetter: set loading to false");
   }, [pathname, searchParams, setLoading]);
 
   return null;

@@ -1,60 +1,166 @@
 "use client";
 
-import { useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   EditIcon,
   ChevronRightIcon,
   FavoriteBorderIcon,
   MenuBookIcon,
-  EditNoteIcon,
+  // EditNoteIcon,
   LogoutIcon,
   FaceIcon,
   ChildCareIcon,
 } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { useAtomValue } from "jotai";
-import { userIdAtom } from "@/lib/atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { allergensAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
 import {
+  getAllergens,
   getChild,
   getChildAllergens,
   getCurrentUser,
   getProfile,
+  updateChild,
+  updateProfile,
+  uploadAvatar,
+  upsertChildAllergens,
 } from "@/lib/supabase";
+import { ChildInfo, ParentInfo } from "@/types/types";
+import { Avatar } from "@mui/material";
 
 export default function MyPage() {
   const [isEditingParent, setIsEditingParent] = useState(false);
   const [isEditingChild, setIsEditingChild] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const userId = useAtomValue(userIdAtom);
+  const setLoading = useSetAtom(loadingAtom);
+  const [allergens, setAllergens] = useAtom(allergensAtom);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<File | null>(null);
 
-  // const userData = getCurrentUser();
-  // const profileData = getProfile(userId);
-  // const childData = getChild(userId);
-  // const allergenData = getChildAllergens(childId);
-
-  // 親のサンプルデータ
-  const [parentInfo, setParentInfo] = useState({
-    avatar: <FaceIcon style={{ fontSize: 150 }} />,
+  const [parentInfo, setParentInfo] = useState<ParentInfo>({
     name: "親",
-    email: "parent@example.com",
-    joinDate: "2024年1月",
+    avatar_url: null,
+    email: "未設定",
+    joinDate: "不明",
   });
 
-  // 子供の情報
-  const [childInfo, setChildInfo] = useState({
-    avatar: <ChildCareIcon style={{ fontSize: 150 }} />,
-    name: "みーちゃん",
-    age: "8ヶ月",
-    allergies: ["卵", "牛乳"],
-  });
+  const childInitialState: ChildInfo = {
+    id: 0,
+    name: "こども",
+    birthday: "未設定",
+    age: "未設定",
+    allergens: [],
+  };
 
-  // 統計情報
-  const stats = {
-    favorites: 23,
-    createdRecipes: 5,
-    draftRecipes: 2,
+  const [childInfo, setChildInfo] = useState<ChildInfo>(childInitialState);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const [userData, profileData, childData, allergensResponse] =
+          await Promise.all([
+            getCurrentUser(),
+            getProfile(userId),
+            getChild(userId),
+            getAllergens(),
+          ]);
+        if (allergensResponse) {
+          setAllergens(allergensResponse);
+        }
+        if (userData && profileData) {
+          setParentInfo({
+            name: profileData.name || "親",
+            avatar_url: profileData.avatar_url || null,
+            email: userData.email || "未設定",
+            joinDate:
+              (profileData.created_at &&
+                new Date(profileData.created_at).toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "long",
+                })) ||
+              "不明",
+          });
+        }
+        if (childData) {
+          const childAllergenData = await getChildAllergens(childData.id);
+          setChildInfo({
+            id: childData.id || 0,
+            name: childData.name || "こども",
+            birthday: childData.birthday || "未設定",
+            age:
+              (childData.birthday &&
+                calculateAgeInMonths(childData.birthday)) ||
+              "未設定",
+            allergens: childAllergenData || [],
+          });
+        } else {
+          // 子どものデータがnullの場合、childInfoもnullに設定
+          setChildInfo(childInitialState);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(
+            "ユーザー情報の取得中にエラーが発生しました:",
+            error.message
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId, setLoading, setAllergens]);
+  //　アバター画像の取得
+  useEffect(() => {
+    if (parentInfo && parentInfo.avatar_url) {
+      setAvatarUrl(parentInfo.avatar_url);
+    }
+  }, [parentInfo]);
+
+  // アバター画像の変更処理
+  const onUpLoadImage = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+
+      // ファイルが選択されていない場合
+      if (!files || files.length === 0) {
+        setParentInfo((prev) => ({ ...prev, avatar_url: null }));
+        return;
+      }
+
+      // 画像URLを生成してparentInfoにセット
+      const imageUrl = URL.createObjectURL(files[0]);
+      setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
+      // 画像をセット
+      setAvatar(files[0]);
+    },
+    []
+  );
+
+  const calculateAgeInMonths = (birthday: string) => {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    const years = today.getFullYear() - birthDate.getFullYear();
+    const months = today.getMonth() - birthDate.getMonth();
+    const totalMonths = years * 12 + months;
+    return totalMonths >= 0 ? `${totalMonths}ヶ月` : "不明";
+  };
+
+  const getAllergenNameById = (id: number) => {
+    const allergen = allergens.find((a) => a.id === id);
+    return allergen ? allergen.name : "不明";
   };
 
   const handleParentEditToggle = () => {
@@ -65,45 +171,92 @@ export default function MyPage() {
     setIsEditingChild(!isEditingChild);
   };
 
-  const handleParentSave = () => {
+  const handleParentSave = async () => {
+    if (!userId) {
+      alert("ユーザー情報が取得できません。ログインし直してください。");
+      return;
+    }
+    setLoading(true);
+    let newAvatarUrl = parentInfo.avatar_url;
+
+    // avatarファイルが存在する場合のみ、画像をアップロードする
+    if (avatar) {
+      newAvatarUrl = await uploadAvatar(avatar, userId);
+    }
+    const { data, error } = await updateProfile(userId, {
+      name: parentInfo.name,
+      avatar_url: newAvatarUrl,
+    });
+    if (error) throw error;
+
+    // UIを更新
+    setParentInfo((prev) => ({
+      ...prev,
+      name: data.name,
+      avatar_url: data.avatar_url,
+    }));
     setIsEditingParent(false);
-    console.log("ママの情報を保存:", parentInfo);
+    setAvatar(null);
+
+    setLoading(false);
   };
 
-  const handleChildSave = () => {
+  const handleChildSave = async () => {
+    if (!userId) {
+      alert("ユーザー情報が取得できません。ログインし直してください。");
+      return;
+    }
+    setLoading(true);
+
+    try {
+      // 子どものプロフィールを更新
+      await updateChild(childInfo.id, {
+        name: childInfo.name,
+        birthday: childInfo.birthday,
+      });
+      // アレルギー情報を一括更新
+      await upsertChildAllergens(childInfo.id, childInfo.allergens);
+      setIsEditingChild(false);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(
+          "子どもの情報更新中にエラーが発生しました:",
+          error.message
+        );
+        alert(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
     setIsEditingChild(false);
-    console.log("子供の情報を保存:", childInfo);
   };
+
   const handleLogout = () => {
     setShowLogoutConfirm(false);
     // ログアウト処理
-    console.log("ログアウト");
   };
+  const handleToggleAllergen = (allergenId: number) => {
+    if (!childInfo) return;
 
-  const handleAddAllergy = () => {
-    const newAllergy = prompt("アレルギー食材を入力してください");
-    if (newAllergy && !childInfo.allergies.includes(newAllergy)) {
+    if (childInfo.allergens.includes(allergenId)) {
       setChildInfo({
         ...childInfo,
-        allergies: [...childInfo.allergies, newAllergy],
+        allergens: childInfo.allergens.filter(
+          (id: number) => id !== allergenId
+        ),
+      });
+    } else {
+      setChildInfo({
+        ...childInfo,
+        allergens: [...childInfo.allergens, allergenId],
       });
     }
-  };
-
-  const handleRemoveAllergy = (allergyToRemove: string) => {
-    setChildInfo({
-      ...childInfo,
-      allergies: childInfo.allergies.filter(
-        (allergy) => allergy !== allergyToRemove
-      ),
-    });
   };
 
   const menuItems = [
     {
       id: "favorites",
       title: "お気に入り",
-      stats: `${stats.favorites}`,
       icon: <FavoriteBorderIcon />,
       color: "text-red-500",
       bgColor: "bg-red-100",
@@ -112,21 +265,19 @@ export default function MyPage() {
     {
       id: "created",
       title: "作成したレシピ",
-      stats: `${stats.createdRecipes}`,
       icon: <MenuBookIcon />,
       color: "text-purple-500",
       bgColor: "bg-purple-100",
       link: "/mypage/recipes/created",
     },
-    {
-      id: "drafts",
-      title: "下書きレシピ",
-      stats: `${stats.draftRecipes}`,
-      icon: <EditNoteIcon />,
-      color: "text-amber-500",
-      bgColor: "bg-amber-100",
-      link: "/mypage/recipes/drafts",
-    },
+    // {
+    //   id: "drafts",
+    //   title: "下書きレシピ",
+    //   icon: <EditNoteIcon />,
+    //   color: "text-amber-500",
+    //   bgColor: "bg-amber-100",
+    //   link: "/mypage/recipes/drafts",
+    // },
   ];
 
   return (
@@ -137,6 +288,7 @@ export default function MyPage() {
         <section>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
+              {/* 名前 */}
               <h2 className="text-lg font-bold text-stone-700">
                 {isEditingParent ? (
                   <input
@@ -145,34 +297,62 @@ export default function MyPage() {
                     onChange={(e) =>
                       setParentInfo({ ...parentInfo, name: e.target.value })
                     }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500 mr-2"
                   />
                 ) : (
                   parentInfo.name
                 )}
                 のプロフィール
               </h2>
-              <button
-                onClick={
-                  isEditingParent ? handleParentSave : handleParentEditToggle
-                }
-                className={`flex items-center px-4 py-2 rounded-xl font-medium transition-colors ${
-                  isEditingParent
-                    ? "bg-purple-500 text-white hover:bg-purple-600"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                {isEditingParent ? (
-                  "保存"
-                ) : (
-                  <>
-                    <EditIcon />
-                    <span className="ml-2">編集</span>
-                  </>
-                )}
-              </button>
+              {/* ボタン */}
+              {isEditingParent ? (
+                <button
+                  onClick={handleParentSave}
+                  className="flex items-center px-4 py-2 rounded-xl font-medium transition-colors bg-purple-500 text-white hover:bg-purple-600"
+                >
+                  保存
+                </button>
+              ) : (
+                <button
+                  onClick={handleParentEditToggle}
+                  className="flex items-center px-4 py-2 rounded-xl font-medium transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200"
+                >
+                  <EditIcon />
+                  <span className="ml-2">編集</span>
+                </button>
+              )}
             </div>
-            <div className="text-center text-6xl mb-6">{parentInfo.avatar}</div>
+            <div className="flex text-center justify-center text-6xl mb-6">
+              {isEditingParent ? (
+                <>
+                  <Avatar
+                    src={parentInfo.avatar_url ?? undefined}
+                    sx={{ width: 150, height: 150, cursor: "pointer" }}
+                    onClick={() => avatarInputRef.current?.click()}
+                  >
+                    {!parentInfo.avatar_url && (
+                      <FaceIcon sx={{ fontSize: 150 }} />
+                    )}
+                  </Avatar>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={onUpLoadImage}
+                    className="hidden"
+                  />
+                </>
+              ) : (
+                <Avatar
+                  src={parentInfo.avatar_url ?? undefined}
+                  sx={{ width: 150, height: 150 }}
+                >
+                  {!parentInfo.avatar_url && (
+                    <FaceIcon sx={{ fontSize: 150 }} />
+                  )}
+                </Avatar>
+              )}
+            </div>
 
             {/* 親プロフィール詳細 */}
             <div className="space-y-4">
@@ -183,14 +363,11 @@ export default function MyPage() {
                   </span>
                 </div>
                 {isEditingParent ? (
-                  <input
-                    type="email"
-                    value={parentInfo.email}
-                    onChange={(e) =>
-                      setParentInfo({ ...parentInfo, email: e.target.value })
-                    }
-                    className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
+                  <Link href="/resetEmail">
+                    <button className="text-purple-500 hover:text-purple-600 font-medium">
+                      変更する
+                    </button>
+                  </Link>
                 ) : (
                   <span className="text-stone-700">{parentInfo.email}</span>
                 )}
@@ -201,11 +378,13 @@ export default function MyPage() {
                   <span className="text-stone-600 font-medium">パスワード</span>
                 </div>
                 {isEditingParent ? (
-                  <button className="text-purple-500 hover:text-purple-600 font-medium">
-                    変更する
-                  </button>
+                  <Link href="/resetPassword">
+                    <button className="text-purple-500 hover:text-purple-600 font-medium">
+                      変更する
+                    </button>
+                  </Link>
                 ) : (
-                  <span className="text-stone-400">••••••••</span>
+                  <span className="text-stone-400">* * * * * *</span>
                 )}
               </div>
 
@@ -222,6 +401,7 @@ export default function MyPage() {
         {/* 子供のプロフィール */}
         <section>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
+            {/* 名前 */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-stone-700">
                 {isEditingChild ? (
@@ -258,75 +438,89 @@ export default function MyPage() {
                 )}
               </button>
             </div>
-
-            <div className="text-center text-6xl mb-6">{childInfo.avatar}</div>
-
+            {/* アバター画像 */}
+            <div className="text-center text-6xl mb-6">
+              <ChildCareIcon style={{ fontSize: 150 }} />
+            </div>
             <div className="space-y-4">
+              {/* 誕生日*/}
               <div className="flex items-center justify-between py-3 border-b border-stone-100">
-                <span className="text-stone-600 font-medium">月齢</span>
+                <span className="text-stone-600 font-medium">誕生日</span>
                 {isEditingChild ? (
-                  <select
-                    value={childInfo.age}
+                  <input
+                    type="date"
+                    value={childInfo.birthday || ""}
                     onChange={(e) =>
-                      setChildInfo({ ...childInfo, age: e.target.value })
+                      setChildInfo({ ...childInfo, birthday: e.target.value })
                     }
                     className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="5ヶ月">5ヶ月</option>
-                    <option value="6ヶ月">6ヶ月</option>
-                    <option value="7ヶ月">7ヶ月</option>
-                    <option value="8ヶ月">8ヶ月</option>
-                    <option value="9ヶ月">9ヶ月</option>
-                    <option value="10ヶ月">10ヶ月</option>
-                    <option value="11ヶ月">11ヶ月</option>
-                    <option value="12ヶ月">12ヶ月</option>
-                    <option value="18ヶ月">18ヶ月</option>
-                  </select>
+                  />
                 ) : (
-                  <span className="text-stone-700">{childInfo.age}</span>
+                  <span className="text-stone-700">{childInfo.birthday}</span>
                 )}
               </div>
-
+              {/* 月齢 */}
+              <div className="flex items-center justify-between py-3 border-b border-stone-100">
+                <span className="text-stone-600 font-medium">月齢</span>
+                <span className="text-stone-700">
+                  {childInfo.birthday
+                    ? calculateAgeInMonths(childInfo.birthday)
+                    : "不明"}
+                </span>
+              </div>
+              {/* アレルギー */}
               <div className="py-3">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-stone-600 font-medium">アレルギー</span>
-                  {isEditingChild && (
-                    <button
-                      onClick={handleAddAllergy}
-                      className="text-purple-500 hover:text-purple-600 font-medium text-sm"
-                    >
-                      + 追加
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {childInfo.allergies.length > 0 ? (
-                    childInfo.allergies.map((allergy, index) => (
-                      <div
-                        key={index}
-                        className="inline-flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
-                      >
-                        <span>{allergy}</span>
-                        {isEditingChild && (
-                          <button
-                            onClick={() => handleRemoveAllergy(allergy)}
-                            className="ml-2 text-red-500 hover:text-red-700"
+                  {/* 既存アレルギー */}
+                  {!isEditingChild &&
+                    childInfo.allergens &&
+                    childInfo.allergens.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {childInfo.allergens.map((allergenId: number) => (
+                          <div
+                            key={allergenId}
+                            className="inline-flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
                           >
-                            ×
-                          </button>
-                        )}
+                            <span>{getAllergenNameById(allergenId)}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  ) : (
-                    <span className="text-stone-400 text-sm">なし</span>
-                  )}
+                    )}
+                  {/*情報なし*/}
+                  {!isEditingChild &&
+                    (!childInfo.allergens ||
+                      childInfo.allergens.length === 0) &&
+                    allergens.length === 0 && (
+                      <span className="text-stone-400 text-sm ml-2">
+                        アレルギー情報がありません。
+                      </span>
+                    )}
                 </div>
+                {/* アレルギー一覧から選択（編集モード） */}
+                {isEditingChild && allergens.length > 0 && (
+                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 mt-2">
+                    {allergens.map((allergen) => (
+                      <button
+                        key={allergen.id}
+                        onClick={() => handleToggleAllergen(allergen.id)}
+                        className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
+                          childInfo.allergens.includes(allergen.id)
+                            ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                            : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
+                        }`}
+                      >
+                        <span>{allergen.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Menu Items */}
+        {/* メニュー */}
         <section>
           <div className="space-y-3 ">
             {menuItems.map((item) => (
@@ -338,12 +532,6 @@ export default function MyPage() {
                       <h4 className="font-bold text-stone-700 mr-4">
                         {item.title}
                       </h4>
-                      <p
-                        className={`w-10 text-sm text-stone-500 p-1 rounded-full ${item.bgColor}`}
-                      >
-                        {item.stats}
-                      </p>
-                      {/* <p className="text-sm text-stone-500">{item.subtitle}</p> */}
                     </div>
                     <ChevronRightIcon />
                   </div>

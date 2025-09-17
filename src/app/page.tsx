@@ -11,7 +11,6 @@ import {
   getRecipes,
   getIngredientsWithStatus,
   getFavoriteRecipeLogs,
-  // supabaseCreateServerClient,
 } from "@/lib/supabase";
 
 // ユーザー情報と子どもの情報を取得するヘルパー関数を仮定
@@ -31,9 +30,6 @@ async function getUserAndChildInfo() {
 }
 
 export default async function Home() {
-  // const supabase = supabaseCreateServerClient();
-  // const { data: { session } } = await supabase.auth.getSession();
-
   const userAndChildInfo = await getUserAndChildInfo();
 
   const { userId, childId, childAgeStage } = userAndChildInfo;

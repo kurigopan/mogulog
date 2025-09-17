@@ -514,6 +514,49 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_favorite_ingredients: {
+        Args: { user_id: string }
+        Returns: {
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          id: number
+          image_url: string
+          is_favorite: boolean
+          name: string
+          nutrition: Json
+          seasons: string[]
+          stage_info: Json
+          start_stage: string
+          tips: string[]
+          updated_at: string
+          updated_by: string
+        }[]
+      }
+      get_favorite_recipes: {
+        Args: { user_id: string }
+        Returns: {
+          category: string
+          cooking_time: string
+          created_at: string
+          created_by: string
+          description: string
+          id: number
+          image_url: string
+          ingredients: Json
+          is_favorite: boolean
+          is_private: boolean
+          memo: string
+          name: string
+          servings: string
+          start_stage: string
+          steps: Json
+          tags: string[]
+          updated_at: string
+          updated_by: string
+        }[]
+      }
       get_ingredients_with_status: {
         Args: { child_id_param: number; parent_id_param: string }
         Returns: {

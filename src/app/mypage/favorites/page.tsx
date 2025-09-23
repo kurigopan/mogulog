@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FavoriteBorderIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import { CardItem, Recipe } from "@/types/types";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
+import { CardItem } from "@/types/types";
 
 export default function FavoriteRecipes() {
   const setLoading = useSetAtom(loadingAtom);
@@ -18,9 +19,13 @@ export default function FavoriteRecipes() {
     []
   );
   const userId = useAtomValue(userIdAtom);
+  const router = useRouter();
 
   useEffect(() => {
-    if (!userId) return;
+    // TODO:エラーの修正
+    if (userId === null) {
+      router.push("/");
+    }
     setLoading(true);
     const fetchFavorites = async () => {
       const recipes = await getFavoriteRecipes(userId);
@@ -30,7 +35,7 @@ export default function FavoriteRecipes() {
     };
     fetchFavorites();
     setLoading(false);
-  }, []);
+  }, [userId]);
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -39,7 +44,7 @@ export default function FavoriteRecipes() {
         {/* レシピ一覧 */}
         {favoriteIngredients.length > 0 || favoriteRecipes.length > 0 ? (
           <ListCard
-            listCardItems={[...favoriteIngredients, ...favoriteRecipes]}
+            cardItems={[...favoriteIngredients, ...favoriteRecipes]}
             pageName={"favorites"}
           />
         ) : (
@@ -47,7 +52,7 @@ export default function FavoriteRecipes() {
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
               <FavoriteBorderIcon className="text-purple-500 text-3xl" />
             </div>
-            <h3 className="text-lg font-semibold text-stone-700 mb-2">
+            <h3 className="text-lg font-semibold text-stone-700 mb-4">
               お気に入りがありません
             </h3>
             <p className="text-stone-500 mb-6">
@@ -57,7 +62,7 @@ export default function FavoriteRecipes() {
             </p>
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors font-medium"
+              className="inline-flex items-center px-6 py-3 bg-purple-400 text-white rounded-full hover:bg-purple-600 transition-colors font-medium"
             >
               さがしにいく
             </Link>

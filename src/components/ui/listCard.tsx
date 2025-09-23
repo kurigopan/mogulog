@@ -13,16 +13,19 @@ import {
   ClearIcon,
 } from "@/icons";
 import { CardItem } from "@/types/types";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 
-interface ListCardProps {
-  listCardItems: CardItem[];
+type ListCardProps = {
+  cardItems: CardItem[];
   pageName: pageType;
-}
+};
 
 type pageType = "favorites" | "drafts" | "history" | "created" | "search";
 
-export default function ListCard({ listCardItems, pageName }: ListCardProps) {
-  const [cardItems, setListCardItems] = useState<CardItem[]>([]);
+export default function ListCard({ cardItems, pageName }: ListCardProps) {
+  const [listCardItems, setListCardItems] = useState<CardItem[]>([]);
+  const setLoading = useSetAtom(loadingAtom);
 
   const handleFavoriteClick = (
     e: React.MouseEvent<HTMLElement>,
@@ -30,7 +33,7 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    const updateCardItems = cardItems.map((prevItem) =>
+    const updateCardItems = listCardItems.map((prevItem) =>
       item.id == prevItem.id
         ? { ...prevItem, isFavorite: !prevItem.isFavorite }
         : prevItem
@@ -46,7 +49,7 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
         `「${item.name}」を削除しますか？この操作は取り消せません。`
       )
     ) {
-      const updateCardItems = cardItems.filter(
+      const updateCardItems = listCardItems.filter(
         (prevItem) => item.id !== prevItem.id
       );
       setListCardItems(updateCardItems);
@@ -70,7 +73,7 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
             {item.isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
           </button>
         );
-      case "drafts":
+      // case "drafts":
       case "created":
         return (
           <div className="flex">
@@ -94,14 +97,16 @@ export default function ListCard({ listCardItems, pageName }: ListCardProps) {
   };
 
   useEffect(() => {
-    setListCardItems(listCardItems);
-  }, [listCardItems]);
+    setLoading(true);
+    setListCardItems(cardItems);
+    setLoading(false);
+  }, [cardItems]);
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      {cardItems.map((item) => (
+      {listCardItems.map((item) => (
         <Link
-          key={item.id}
+          key={`${item.type}-${item.id}`}
           href={
             item.type === "recipe"
               ? `/recipes/${item.id}`

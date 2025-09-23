@@ -46,6 +46,7 @@ export { default as RestaurantIcon } from "@mui/icons-material/Restaurant";
 export { default as RiceBowlIcon } from "@mui/icons-material/RiceBowl";
 export { default as ScheduleIcon } from "@mui/icons-material/Schedule";
 export { default as SearchIcon } from "@mui/icons-material/Search";
+export { default as SearchOffIcon } from "@mui/icons-material/SearchOff";
 export { default as ShareIcon } from "@mui/icons-material/Share";
 export { default as StarIcon } from "@mui/icons-material/Star";
 export { default as TipsAndUpdatesIcon } from "@mui/icons-material/TipsAndUpdates";

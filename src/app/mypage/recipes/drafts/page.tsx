@@ -65,7 +65,7 @@ export default function DraftRecipes() {
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}
         {sortedRecipes.length > 0 ? (
-          <ListCard listCardItems={sortedRecipes} pageName={"drafts"} />
+          <ListCard cardItems={sortedRecipes} pageName={"drafts"} />
         ) : (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">

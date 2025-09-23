@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ExpandLessIcon, ExpandMoreIcon, SearchIcon } from "@/icons";
+import {
+  ExpandLessIcon,
+  ExpandMoreIcon,
+  SearchIcon,
+  SearchOffIcon,
+} from "@/icons";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import ListCard from "@/components/ui/ListCard";
@@ -189,11 +194,11 @@ export default function SearchResults() {
 
         {/* 検索結果一覧 */}
         {sortedResults.length > 0 ? (
-          <ListCard listCardItems={sortedResults} pageName="search" />
+          <ListCard cardItems={sortedResults} pageName="search" />
         ) : searchQuery ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center text-3xl">
-              😔
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+              <SearchOffIcon className="text-purple-500 text-3xl" />
             </div>
             <h3 className="text-lg font-semibold text-stone-700 mb-2">
               検索結果が見つかりませんでした
@@ -217,7 +222,7 @@ export default function SearchResults() {
         ) : (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
-              <SearchIcon />
+              <SearchIcon className="text-purple-500 text-3xl" />
             </div>
             <h3 className="text-lg font-semibold text-stone-700 mb-2">
               何をお探しですか？

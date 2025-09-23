@@ -31,7 +31,7 @@ export default function RecentViewed() {
       <div className="p-4 space-y-6">
         {/* アイテム一覧 */}
         {recentlyViewed.length > 0 ? (
-          <ListCard listCardItems={recentlyViewed} pageName="history" />
+          <ListCard cardItems={recentlyViewed} pageName="history" />
         ) : recentlyViewed.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">

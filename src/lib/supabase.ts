@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { formatRecipeForSupabase } from "@/lib/utils";
+import { formatRecipeForSupabase } from "@/types/schemas";
 import { Database } from "@/types/supabase";
 import {
   rpcIngredientSchema,
@@ -28,8 +28,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabaseクライアントのインスタンスを作成
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-// 現在のユーザーを取得する関数
-export async function getCurrentUser() {
+// ユーザー情報（メールアドレス）を取得する関数
+export async function getUser() {
   const {
     data: { user },
     error,
@@ -146,17 +146,17 @@ export async function searchRecipesWithAllergens(
   }
 
   // Zodスキーマを使ってデータをバリデーション
-  const validatedData = z.array(rpcRecipeSchema).parse(data);
+  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
 
   // フロントエンドの型に変換
-  return validatedData.map((d) => recipeSchema.parse(d));
+  return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
 // ingredientsの型定義に含まれるeaten,ng,isFavoriteを補完するために、
 // ユーザーと子どものIDに基づいて、食材リストとステータスを取得するカスタム関数を呼び出す
 export async function getIngredientsWithStatus(
-  userId: string,
-  childId: number
+  userId: string | null = null,
+  childId: number | null = null
 ) {
   const { data, error } = await supabase.rpc("get_ingredients_with_status", {
     parent_id_param: userId,
@@ -176,7 +176,7 @@ export async function getIngredientsWithStatus(
 }
 
 // recipesの型定義に含まれるisFavoriteを補完するために、レシピリストを取得するカスタム関数を呼び出す
-export async function getRecipes(userId: string) {
+export async function getRecipes(userId: string | null = null) {
   const { data, error } = await supabase.rpc("get_recipes", {
     parent_id_param: userId,
   });
@@ -185,12 +185,12 @@ export async function getRecipes(userId: string) {
     console.error("Failed to fetch recipes:", error);
     return [];
   }
-
+  console.log(data);
   // Zodスキーマを使ってデータをバリデーション
-  const validatedData = z.array(rpcRecipeSchema).parse(data);
+  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
 
   // フロントエンドの型に変換
-  return validatedData.map((d) => recipeSchema.parse(d));
+  return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
 // 単一のレシピを取得する
@@ -262,7 +262,7 @@ export async function getFavoriteIngredients(userId: string) {
   });
 
   if (error) {
-    console.error("Failed to fetch favorite ingredients:", error);
+    console.error("お気に入り食材の取得に失敗しました:", error);
     return [];
   }
 
@@ -280,7 +280,7 @@ export async function getFavoriteRecipes(userId: string) {
   });
 
   if (error) {
-    console.error("Failed to fetch favorite recipes:", error);
+    console.error("お気に入りレシピの取得に失敗しました:", error);
     return [];
   }
 
@@ -555,14 +555,95 @@ export async function uploadAvatar(file: File, userId: string) {
     return null;
   }
 
-  // 非公開URLを取得したい場合
-  const signedUrlData = await supabase.storage
-    .from(bucketName)
-    .createSignedUrl(filePath, 60);
+  const signedUrl = await getSignedUrl(filePath);
 
-  if (signedUrlData.error) {
-    console.error("署名付きURL取得エラー:", signedUrlData.error.message);
+  return signedUrl;
+}
+
+export async function getSignedUrl(filePath: string) {
+  const { data, error } = await supabase.storage
+    .from("avatars")
+    .createSignedUrl(filePath, 3600);
+
+  if (error) {
+    console.error("署名付きURL取得エラー:", error.message);
     return null;
   }
-  return signedUrlData.data.signedUrl;
+  if (data && data.signedUrl) {
+    return data.signedUrl;
+  }
+  return null;
+}
+
+// ユーザーが作成したレシピを取得
+export async function getRecipesCreatedByUser(userId: string) {
+  const { data, error } = await supabase.rpc("get_recipes_created_by_user", {
+    user_id: userId,
+  });
+
+  if (error) {
+    console.error("レシピの取得に失敗しました:", error);
+    return [];
+  }
+
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
+
+  // フロントエンドの型に変換
+  return validatedData.map((d) => recipeCardSchema.parse(d));
+}
+
+export async function signUp(email: string, password: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+  });
+
+  if (error) {
+    console.error("サインアップに失敗しました:", error.message);
+    return;
+  }
+}
+export async function login(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+
+  if (error) {
+    console.error("ログインに失敗しました:", error.message);
+    return;
+  }
+  return data;
+}
+
+export async function logout() {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("ログアウトに失敗しました:", error.message);
+    return;
+  }
+}
+
+export async function updateEmail(newEmail: string) {
+  const { error } = await supabase.auth.updateUser({
+    email: newEmail,
+  });
+
+  if (error) {
+    console.error("メールアドレスの更新に失敗しました:", error.message);
+    return;
+  }
+}
+
+export async function updatePassword(newPassword: string) {
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    console.error("パスワードの更新に失敗しました:", error.message);
+    return;
+  }
 }

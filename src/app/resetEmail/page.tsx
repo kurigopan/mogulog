@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSetAtom } from "jotai";
 import { ChildCareIcon, MailOutlineIcon } from "@/icons";
-import { supabase } from "@/lib/supabase";
+import { updateEmail } from "@/lib/supabase";
 import { loadingAtom } from "@/lib/atoms";
 
 type ValidationErrors = {
@@ -24,18 +24,9 @@ export default function UpdateEmail() {
       return;
     }
     setErrors(null);
-
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({
-      email: newEmail,
-    });
+    await updateEmail(newEmail);
     setLoading(false);
-
-    if (error) {
-      setErrors({ general: [error.message] });
-      return;
-    }
-
     setIsSuccess(true);
   };
 

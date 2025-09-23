@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSetAtom } from "jotai";
 import {
   VisibilityIcon,
   VisibilityOffIcon,
   ChildCareIcon,
   PasswordIcon,
 } from "@/icons";
-import { supabase } from "@/lib/supabase";
+import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
+import { updatePassword } from "@/lib/supabase";
 
 type ValidationErrors = {
   [key: string]: string[];
@@ -32,24 +32,11 @@ export default function ResetPassword() {
       return;
     }
     setErrors(null);
-
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-
+    await updatePassword(newPassword);
     setLoading(false);
-
-    if (error) {
-      setErrors({ general: [error.message] });
-      return;
-    }
-
     setIsSuccess(true);
-    // 成功したら数秒後にログインページへリダイレクトなども可能
-    setTimeout(() => {
-      router.push("/login");
-    }, 3000);
+    router.push("/login");
   };
 
   return (

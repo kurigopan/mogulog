@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAtom } from "jotai";
 import { VisibilityIcon, VisibilityOffIcon, ChildCareIcon } from "@/icons";
-import { supabase } from "@/lib/supabase";
-import { sessionAtom, loadingAtom } from "@/lib/atoms";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
+import { signUp } from "@/lib/supabase";
 import { signupSchema } from "@/types/schemas";
 import { User } from "@/types/types";
 
@@ -15,15 +15,15 @@ type ValidationErrors = {
 
 export default function SignUp() {
   const router = useRouter();
-  const [session, setSession] = useAtom(sessionAtom);
-  const [loading, setLoading] = useAtom(loadingAtom);
+  // const [session, setSession] = useAtom(sessionAtom);
+  const setLoading = useSetAtom(loadingAtom);
   const [userData, setUserData] = useState<User>({
     email: "",
     password: "",
   });
   const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
+  // const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
 
   // useEffect(() => {
   //   if (session) {
@@ -45,20 +45,8 @@ export default function SignUp() {
       return;
     }
     setErrors(null);
-
     setLoading(true);
-    const { data, error: authError } = await supabase.auth.signUp({
-      email: userData.email,
-      password: userData.password,
-    });
-
-    if (authError) {
-      setErrors({ general: [authError.message] });
-      return;
-    }
-    console.log("User signed up successfully:", data);
-    console.log("Session:", session);
-
+    await signUp(userData.email, userData.password);
     setLoading(false);
     router.push("/profile");
   };

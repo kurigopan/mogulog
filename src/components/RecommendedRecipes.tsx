@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { RecommendIcon } from "@/icons";
 import Card from "@/components/ui/Card";
-import { Recipe } from "@/types/types";
+import { CardItem } from "@/types/types";
 
 type RecommendedRecipesProps = {
-  allRecipes: Recipe[];
+  allRecipes: CardItem[];
   childAgeStage: string;
 };
 
@@ -14,7 +14,7 @@ export default function RecommendedRecipes({
   allRecipes,
   childAgeStage,
 }: RecommendedRecipesProps) {
-  const [recommendedRecipes, setRecommendedRecipes] = useState<Recipe[]>([]);
+  const [recommendedRecipes, setRecommendedRecipes] = useState<CardItem[]>([]);
 
   useEffect(() => {
     // 子どもの月齢でフィルター

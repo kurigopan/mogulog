@@ -124,6 +124,7 @@ export interface FormData {
 }
 
 export interface ParentInfo {
+  id: Profile["id"];
   name: Profile["name"];
   avatar_url: Profile["avatar_url"];
   email: User["email"];
@@ -131,9 +132,10 @@ export interface ParentInfo {
 }
 
 export interface ChildInfo {
-  id: number;
+  id: Child["id"];
   name: Child["name"];
   birthday: Child["birthday"];
   age: string;
+  ageStage: string;
   allergens: Child["allergens"];
 }

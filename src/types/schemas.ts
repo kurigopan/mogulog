@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { Season, ingredientNutrition } from "./types";
-import { convertUtcToJst } from "@/utils/date";
+import { Recipe, Season, ingredientNutrition } from "./types";
+import { convertUtcToJst } from "@/lib/utils";
 
 export const signupSchema = z.object({
   email: z
@@ -197,7 +197,7 @@ export const dbRecipeSchema = z.object({
 // is_favoriteがBooleanとして含まれる
 export const rpcRecipeSchema = dbRecipeSchema.extend({
   is_favorite: z.boolean().nullable(),
-  is_own: z.boolean(),
+  is_own: z.boolean().nullable(),
   author: z.string(),
 });
 export const rpcRecipeCardSchema = dbRecipeSchema.extend({
@@ -268,3 +268,35 @@ export const recipeCardSchema = rpcRecipeCardSchema.transform((dbData) => {
     // status: dbData.status,
   };
 });
+
+/**
+ * フロントエンドのレシピデータをSupabaseのデータベースの形式に変換する
+ * @param recipe - 変換するレシピデータ（IDを除く）
+ * @returns Supabaseのrecipesテーブルに挿入可能なデータ
+ */
+export function formatRecipeForSupabase(
+  recipe: Omit<Recipe, "id">,
+  userId: string
+) {
+  // フロントエンドのcamelCaseキーをデータベースのsnake_caseキーにマッピング
+  // ingredientsとstepsはJSONBカラムなので、JSON.stringifyで文字列に変換
+  return {
+    name: recipe.name,
+    image_url: recipe.image,
+    description: recipe.description,
+    category: recipe.category,
+    start_stage: recipe.startStage,
+    cooking_time: recipe.cookingTime,
+    servings: recipe.servings,
+    tags: recipe.tags,
+    is_private: recipe.isPrivate,
+    memo: recipe.savedMemo,
+    // status: recipe.status,
+    ingredients: recipe.ingredients.map((ing) =>
+      JSON.parse(JSON.stringify(ing))
+    ),
+    steps: recipe.steps.map((step) => JSON.parse(JSON.stringify(step))),
+    created_by: userId,
+    updated_by: userId,
+  };
+}

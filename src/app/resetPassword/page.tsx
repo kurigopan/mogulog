@@ -36,7 +36,7 @@ export default function ResetPassword() {
     await updatePassword(newPassword);
     setLoading(false);
     setIsSuccess(true);
-    router.push("/login");
+    router.push("/authform");
   };
 
   return (

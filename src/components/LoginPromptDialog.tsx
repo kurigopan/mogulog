@@ -29,11 +29,11 @@ export default function LoginPromptDialog() {
         <Button
           onClick={() => {
             setOpen(false);
-            router.push("/login");
+            router.push("/authform");
           }}
           autoFocus
         >
-          ログインへ
+          ログイン・新規登録へ
         </Button>
       </DialogActions>
     </Dialog>

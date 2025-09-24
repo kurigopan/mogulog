@@ -158,7 +158,7 @@ export default function Welcome() {
 
           {/* ボタン */}
           <div className="space-y-3">
-            <Link href="/signup">
+            <Link href="/authform">
               <button className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all mb-2">
                 ログイン・新規登録する
               </button>

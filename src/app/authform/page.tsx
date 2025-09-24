@@ -1,39 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { VisibilityIcon, VisibilityOffIcon, ChildCareIcon } from "@/icons";
-import { useSetAtom } from "jotai";
-import { sessionAtom, loadingAtom } from "@/lib/atoms";
-import { login } from "@/lib/supabase";
+import { useAtom, useSetAtom } from "jotai";
+import { loadingAtom, sessionAtom } from "@/lib/atoms";
+import { login, signUp } from "@/lib/supabase";
+import { signupSchema } from "@/types/schemas";
+import { User } from "@/types/types";
 
 type ValidationErrors = {
   [key: string]: string[];
 };
 
-export default function Login() {
+export default function AuthForm() {
   const router = useRouter();
-  const setSession = useSetAtom(sessionAtom);
+  const [session, setSession] = useAtom(sessionAtom);
   const setLoading = useSetAtom(loadingAtom);
-  const [userData, setUserData] = useState({ email: "", password: "" });
+  const [userData, setUserData] = useState<User>({
+    email: "",
+    password: "",
+  });
   const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  // const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
+
+  // useEffect(() => {
+  //   if (session) {
+  //     router.push("/");
+  //   }
+  // }, [session, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = signupSchema.safeParse(userData);
+    if (!result.success) {
+      setErrors(result.error.flatten().fieldErrors);
+      return;
+    }
     setErrors(null);
     setLoading(true);
-    const data = await login(userData.email, userData.password);
-    if (data) {
-      setSession(data.session);
+
+    const { data: loginData, error: loginError } = await login(
+      userData.email,
+      userData.password
+    );
+    if (loginError) {
+      // 未登録の場合は "Invalid login credentials"
+      if (loginError.message.includes("Invalid login credentials")) {
+        const { data: signupData, error: signupError } = await signUp(
+          userData.email,
+          userData.password
+        );
+
+        if (signupError) {
+          console.error("サインアップに失敗しました:", signupError.message);
+        } else {
+          // サインアップ成功 → プロフィール初期設定へ
+          setSession(signupData.session);
+          router.push("/profile");
+        }
+      } else {
+        console.error("ログインに失敗しました:", loginError.message);
+      }
+    } else {
+      // 既存ユーザー → ホームへ
+      setSession(loginData.session);
+      router.push("/");
     }
     setLoading(false);
-    router.push("/"); // ログイン成功後にホームへ
   };
 
   return (
@@ -50,16 +91,27 @@ export default function Login() {
 
         <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold text-stone-700 text-center mb-2">
-            ログイン
+            ログイン / 新規登録
           </h2>
-
+          {/* {isSignUpSuccess ? (
+            // 新規登録が成功した場合のメッセージ
+            <div className="text-center p-6 space-y-4">
+              <h3 className="text-xl font-bold text-stone-700">
+                メールを確認してください
+              </h3>
+              <p className="text-stone-600">
+                ご入力いただいたメールアドレスに確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。
+              </p>
+            </div>
+          ) : (
+            <> */}
           {errors?.general && (
             <div className="text-red-500 text-sm text-center mb-4">
               {errors.general[0]}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-stone-600 mb-2">
                 メールアドレス
@@ -71,8 +123,10 @@ export default function Login() {
                 onChange={handleChange}
                 className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
               />
+              {errors?.email && (
+                <p className="mt-2 text-sm text-red-500">{errors.email[0]}</p>
+              )}
             </div>
-
             <div className="relative">
               <label className="block text-sm font-medium text-stone-600 mb-2">
                 パスワード
@@ -91,26 +145,22 @@ export default function Login() {
               >
                 {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
               </button>
+              {errors?.password && (
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.password[0]}
+                </p>
+              )}
             </div>
-
             <button
-              type="submit"
+              onClick={handleSignup}
               className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
             >
-              ログイン
+              登録する
             </button>
-          </form>
-
-          <div className="text-center mt-4">
-            <a
-              href="/forgot-password"
-              className="text-sm text-purple-500 hover:underline"
-            >
-              パスワードを忘れた場合
-            </a>
           </div>
+          {/* </>
+          )} */}
         </div>
-
         <div className="p-4 text-center">
           <p className="text-xs text-stone-400">© 2025 もぐログ</p>
         </div>

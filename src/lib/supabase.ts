@@ -644,23 +644,15 @@ export async function signUp(email: string, password: string) {
     email: email,
     password: password,
   });
-
-  if (error) {
-    console.error("サインアップに失敗しました:", error.message);
-    return;
-  }
+  return { data, error };
 }
+
 export async function login(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
   });
-
-  if (error) {
-    console.error("ログインに失敗しました:", error.message);
-    return;
-  }
-  return data;
+  return { data, error };
 }
 
 export async function logout() {

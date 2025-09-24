@@ -13,28 +13,28 @@ import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
 import { CardItem } from "@/types/types";
 
 export default function FavoriteRecipes() {
+  const router = useRouter();
   const setLoading = useSetAtom(loadingAtom);
   const [favoriteRecipes, setFavoriteRecipes] = useState<CardItem[]>([]);
   const [favoriteIngredients, setFavoriteIngredients] = useState<CardItem[]>(
     []
   );
   const userId = useAtomValue(userIdAtom);
-  const router = useRouter();
 
   useEffect(() => {
-    // TODO:エラーの修正
-    if (userId === null) {
+    if (userId) {
+      setLoading(true);
+      const fetchFavorites = async () => {
+        const recipes = await getFavoriteRecipes(userId);
+        setFavoriteRecipes(recipes);
+        const ingredients = await getFavoriteIngredients(userId);
+        setFavoriteIngredients(ingredients);
+      };
+      fetchFavorites();
+      setLoading(false);
+    } else {
       router.push("/");
     }
-    setLoading(true);
-    const fetchFavorites = async () => {
-      const recipes = await getFavoriteRecipes(userId);
-      setFavoriteRecipes(recipes);
-      const ingredients = await getFavoriteIngredients(userId);
-      setFavoriteIngredients(ingredients);
-    };
-    fetchFavorites();
-    setLoading(false);
   }, [userId]);
 
   return (

@@ -76,7 +76,13 @@ export type Category =
   | "乳製品"
   | "卵"
   | "その他";
-export type Stage = "初期" | "中期" | "後期" | "完了期";
+export type Stage =
+  | "離乳食開始前"
+  | "初期"
+  | "中期"
+  | "後期"
+  | "完了期"
+  | "離乳食終了";
 export type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
 export type Season = "通年" | "春" | "夏" | "秋" | "冬";
 // export type Status = "draft" | "published";

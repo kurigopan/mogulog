@@ -27,6 +27,7 @@ export const convertUtcToJst = (utcDate: string) => {
   return new Date(formatter.format(date).replace(/\//g, "-"));
 };
 
+// 月齢を計算
 export const calculateAgeInMonths = (birthday: string): number | null => {
   const birthDate = new Date(birthday);
   const today = new Date();
@@ -36,6 +37,7 @@ export const calculateAgeInMonths = (birthday: string): number | null => {
   return totalMonths >= 0 ? totalMonths : null;
 };
 
+// 月齢から離乳食の段階を取得
 export const getAgeStage = (months: number | null): string => {
   if (months === null) return "未設定";
 

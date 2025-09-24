@@ -557,6 +557,32 @@ export type Database = {
           updated_by: string;
         }[];
       };
+      get_ingredient_by_id: {
+        Args: {
+          child_id_param: number | null;
+          ingredient_id_param: number;
+          parent_id_param: string | null;
+        };
+        Returns: {
+          category: string;
+          created_at: string;
+          created_by: string;
+          description: string;
+          eaten: boolean;
+          id: number;
+          image_url: string;
+          is_favorite: boolean;
+          name: string;
+          ng: boolean;
+          nutrition: Json;
+          seasons: string[];
+          stage_info: Json;
+          start_stage: string;
+          tips: string[];
+          updated_at: string;
+          updated_by: string;
+        }[];
+      };
       get_ingredients_with_status: {
         Args: { child_id_param: number | null; parent_id_param: string | null };
         Returns: {
@@ -625,6 +651,7 @@ export type Database = {
           image_url: string;
           ingredients: Json;
           is_favorite: boolean;
+          is_own: boolean;
           is_private: boolean;
           memo: string;
           name: string;
@@ -648,7 +675,6 @@ export type Database = {
           image_url: string;
           ingredients: Json;
           is_favorite: boolean;
-          is_own: boolean;
           is_private: boolean;
           memo: string;
           name: string;
@@ -683,6 +709,33 @@ export type Database = {
           stage_info: Json;
           start_stage: string;
           tips: string[];
+          updated_at: string;
+          updated_by: string;
+        }[];
+      };
+      search_recipes_by_ingredient: {
+        Args: {
+          age_stage_param: string;
+          ingredient_name_param: string;
+          parent_id_param: string | null;
+        };
+        Returns: {
+          category: string;
+          cooking_time: string;
+          created_at: string;
+          created_by: string;
+          description: string;
+          id: number;
+          image_url: string;
+          ingredients: Json;
+          is_favorite: boolean;
+          is_private: boolean;
+          memo: string;
+          name: string;
+          servings: string;
+          start_stage: string;
+          steps: Json;
+          tags: string[];
           updated_at: string;
           updated_by: string;
         }[];

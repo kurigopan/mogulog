@@ -152,8 +152,53 @@ export async function searchRecipesWithAllergens(
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
-// ingredientsの型定義に含まれるeaten,ng,isFavoriteを補完するために、
-// ユーザーと子どものIDに基づいて、食材リストとステータスを取得するカスタム関数を呼び出す
+// 離乳食段階と食材名を考慮したレシピ検索
+export async function searchRecipesByIngredient(
+  parentId: string | null = null,
+  ingredientName: string,
+  ageStage: string
+) {
+  const { data, error } = await supabase.rpc("search_recipes_by_ingredient", {
+    parent_id_param: parentId,
+    ingredient_name_param: ingredientName,
+    age_stage_param: ageStage,
+  });
+
+  if (error) {
+    console.error("Failed to fetch recipes:", error);
+    return [];
+  }
+
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
+
+  // フロントエンドの型に変換
+  return validatedData.map((d) => recipeCardSchema.parse(d));
+}
+
+export async function getIngredientById(
+  userId: string | null = null,
+  childId: number | null = null,
+  ingredientId: number
+) {
+  const { data, error } = await supabase.rpc("get_ingredient_by_id", {
+    parent_id_param: userId,
+    child_id_param: childId,
+    ingredient_id_param: ingredientId,
+  });
+
+  if (error) {
+    console.error("Failed to fetch ingredient:", error);
+    return null;
+  }
+
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = rpcIngredientSchema.parse(data[0]);
+
+  // フロントエンドの型に変換
+  return ingredientSchema.parse(validatedData);
+}
+
 export async function getIngredientsWithStatus(
   userId: string | null = null,
   childId: number | null = null
@@ -185,7 +230,6 @@ export async function getRecipes(userId: string | null = null) {
     console.error("Failed to fetch recipes:", error);
     return [];
   }
-  console.log(data);
   // Zodスキーマを使ってデータをバリデーション
   const validatedData = z.array(rpcRecipeCardSchema).parse(data);
 

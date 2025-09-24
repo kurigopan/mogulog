@@ -16,6 +16,7 @@ export { default as DraftsIcon } from "@mui/icons-material/Drafts";
 export { default as EditIcon } from "@mui/icons-material/Edit";
 export { default as EditNoteIcon } from "@mui/icons-material/EditNote";
 export { default as ErrorIcon } from "@mui/icons-material/Error";
+export { default as ErrorOutlineIcon } from "@mui/icons-material/ErrorOutline";
 export { default as ExpandLessIcon } from "@mui/icons-material/ExpandLess";
 export { default as ExpandMoreIcon } from "@mui/icons-material/ExpandMore";
 export { default as FaceIcon } from "@mui/icons-material/Face";

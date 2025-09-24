@@ -237,8 +237,10 @@ export async function getRecipes(userId: string | null = null) {
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
-// 単一のレシピを取得する
-export async function getRecipeById(userId: string, recipeId: number) {
+export async function getRecipeById(
+  userId: string | null = null,
+  recipeId: number
+) {
   const { data, error } = await supabase.rpc("get_recipe_by_id", {
     parent_id_param: userId,
     recipe_id_param: recipeId,
@@ -246,14 +248,14 @@ export async function getRecipeById(userId: string, recipeId: number) {
 
   if (error) {
     console.error("Failed to fetch recipe:", error);
-    return [];
+    return null;
   }
 
   // Zodスキーマを使ってデータをバリデーション
-  const validatedData = z.array(rpcRecipeSchema).parse(data);
+  const validatedData = rpcRecipeSchema.parse(data[0]);
 
   // フロントエンドの型に変換
-  return validatedData.map((d) => recipeSchema.parse(d));
+  return recipeSchema.parse(validatedData);
 }
 
 // レシピIDに基づいてアレルゲンのIDと名前を取得

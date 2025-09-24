@@ -1,7 +1,9 @@
 "use client";
 
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Avatar } from "@mui/material";
 import {
   EditIcon,
   ChevronRightIcon,
@@ -15,119 +17,41 @@ import {
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { allergensAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
 import {
-  getAllergens,
-  getChild,
-  getChildAllergens,
-  getCurrentUser,
-  getProfile,
+  allergensAtom,
+  childIdAtom,
+  childInfoAtom,
+  loadingAtom,
+  parentInfoAtom,
+  sessionAtom,
+  userIdAtom,
+} from "@/lib/atoms";
+import {
+  logout,
   updateChild,
   updateProfile,
   uploadAvatar,
   upsertChildAllergens,
 } from "@/lib/supabase";
-import { ChildInfo, ParentInfo } from "@/types/types";
-import { Avatar } from "@mui/material";
 
 export default function MyPage() {
   const [isEditingParent, setIsEditingParent] = useState(false);
   const [isEditingChild, setIsEditingChild] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const userId = useAtomValue(userIdAtom);
   const setLoading = useSetAtom(loadingAtom);
-  const [allergens, setAllergens] = useAtom(allergensAtom);
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<File | null>(null);
+  const setSession = useSetAtom(sessionAtom);
+  const allergens = useAtomValue(allergensAtom);
+  const [parentInfo, setParentInfo] = useAtom(parentInfoAtom);
+  const [childInfo, setChildInfo] = useAtom(childInfoAtom);
+  const [userId, setUserId] = useAtom(userIdAtom);
+  const childId = useAtomValue(childIdAtom);
+  const router = useRouter();
 
-  const [parentInfo, setParentInfo] = useState<ParentInfo>({
-    name: "親",
-    avatar_url: null,
-    email: "未設定",
-    joinDate: "不明",
-  });
-
-  const childInitialState: ChildInfo = {
-    id: 0,
-    name: "こども",
-    birthday: "未設定",
-    age: "未設定",
-    allergens: [],
-  };
-
-  const [childInfo, setChildInfo] = useState<ChildInfo>(childInitialState);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-
-      try {
-        const [userData, profileData, childData, allergensResponse] =
-          await Promise.all([
-            getCurrentUser(),
-            getProfile(userId),
-            getChild(userId),
-            getAllergens(),
-          ]);
-        if (allergensResponse) {
-          setAllergens(allergensResponse);
-        }
-        if (userData && profileData) {
-          setParentInfo({
-            name: profileData.name || "親",
-            avatar_url: profileData.avatar_url || null,
-            email: userData.email || "未設定",
-            joinDate:
-              (profileData.created_at &&
-                new Date(profileData.created_at).toLocaleDateString("ja-JP", {
-                  year: "numeric",
-                  month: "long",
-                })) ||
-              "不明",
-          });
-        }
-        if (childData) {
-          const childAllergenData = await getChildAllergens(childData.id);
-          setChildInfo({
-            id: childData.id || 0,
-            name: childData.name || "こども",
-            birthday: childData.birthday || "未設定",
-            age:
-              (childData.birthday &&
-                calculateAgeInMonths(childData.birthday)) ||
-              "未設定",
-            allergens: childAllergenData || [],
-          });
-        } else {
-          // 子どものデータがnullの場合、childInfoもnullに設定
-          setChildInfo(childInitialState);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(
-            "ユーザー情報の取得中にエラーが発生しました:",
-            error.message
-          );
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [userId, setLoading, setAllergens]);
-  //　アバター画像の取得
-  useEffect(() => {
-    if (parentInfo && parentInfo.avatar_url) {
-      setAvatarUrl(parentInfo.avatar_url);
-    }
-  }, [parentInfo]);
+  if (!userId || !childId) {
+    router.push("/");
+  }
 
   // アバター画像の変更処理
   const onUpLoadImage = useCallback(
@@ -137,26 +61,18 @@ export default function MyPage() {
       // ファイルが選択されていない場合
       if (!files || files.length === 0) {
         setParentInfo((prev) => ({ ...prev, avatar_url: null }));
-        return;
+        setAvatar(null);
+      } else {
+        // 画像URLを生成してparentInfoにセット
+        const imageUrl = URL.createObjectURL(files[0]);
+        console.log("Generated image URL:", imageUrl);
+        setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
+        // 画像をセット
+        setAvatar(files[0]);
       }
-
-      // 画像URLを生成してparentInfoにセット
-      const imageUrl = URL.createObjectURL(files[0]);
-      setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
-      // 画像をセット
-      setAvatar(files[0]);
     },
     []
   );
-
-  const calculateAgeInMonths = (birthday: string) => {
-    const birthDate = new Date(birthday);
-    const today = new Date();
-    const years = today.getFullYear() - birthDate.getFullYear();
-    const months = today.getMonth() - birthDate.getMonth();
-    const totalMonths = years * 12 + months;
-    return totalMonths >= 0 ? `${totalMonths}ヶ月` : "不明";
-  };
 
   const getAllergenNameById = (id: number) => {
     const allergen = allergens.find((a) => a.id === id);
@@ -172,50 +88,39 @@ export default function MyPage() {
   };
 
   const handleParentSave = async () => {
-    if (!userId) {
-      alert("ユーザー情報が取得できません。ログインし直してください。");
-      return;
-    }
     setLoading(true);
     let newAvatarUrl = parentInfo.avatar_url;
 
     // avatarファイルが存在する場合のみ、画像をアップロードする
     if (avatar) {
-      newAvatarUrl = await uploadAvatar(avatar, userId);
+      newAvatarUrl = await uploadAvatar(avatar, userId!);
     }
-    const { data, error } = await updateProfile(userId, {
+    const { data, error } = await updateProfile(userId!, {
       name: parentInfo.name,
       avatar_url: newAvatarUrl,
     });
     if (error) throw error;
-
     // UIを更新
     setParentInfo((prev) => ({
       ...prev,
       name: data.name,
-      avatar_url: data.avatar_url,
+      avatar_url: newAvatarUrl,
     }));
     setIsEditingParent(false);
     setAvatar(null);
-
     setLoading(false);
   };
 
   const handleChildSave = async () => {
-    if (!userId) {
-      alert("ユーザー情報が取得できません。ログインし直してください。");
-      return;
-    }
     setLoading(true);
-
     try {
       // 子どものプロフィールを更新
-      await updateChild(childInfo.id, {
+      await updateChild(childId!, {
         name: childInfo.name,
         birthday: childInfo.birthday,
       });
       // アレルギー情報を一括更新
-      await upsertChildAllergens(childInfo.id, childInfo.allergens);
+      await upsertChildAllergens(childId!, childInfo.allergens);
       setIsEditingChild(false);
     } catch (error) {
       if (error instanceof Error) {
@@ -231,10 +136,14 @@ export default function MyPage() {
     setIsEditingChild(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowLogoutConfirm(false);
-    // ログアウト処理
+    await logout();
+    setUserId(null);
+    setSession(null);
+    router.push("/");
   };
+
   const handleToggleAllergen = (allergenId: number) => {
     if (!childInfo) return;
 
@@ -463,9 +372,7 @@ export default function MyPage() {
               <div className="flex items-center justify-between py-3 border-b border-stone-100">
                 <span className="text-stone-600 font-medium">月齢</span>
                 <span className="text-stone-700">
-                  {childInfo.birthday
-                    ? calculateAgeInMonths(childInfo.birthday)
-                    : "不明"}
+                  {childInfo.birthday ? childInfo.age : "未設定"}
                 </span>
               </div>
               {/* アレルギー */}

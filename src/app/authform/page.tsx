@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { VisibilityIcon, VisibilityOffIcon, ChildCareIcon } from "@/icons";
-import { useAtom, useSetAtom } from "jotai";
-import { loadingAtom, sessionAtom } from "@/lib/atoms";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
 import { login, signUp } from "@/lib/supabase";
 import { signupSchema } from "@/types/schemas";
 import { User } from "@/types/types";
@@ -15,7 +15,6 @@ type ValidationErrors = {
 
 export default function AuthForm() {
   const router = useRouter();
-  const [session, setSession] = useAtom(sessionAtom);
   const setLoading = useSetAtom(loadingAtom);
   const [userData, setUserData] = useState<User>({
     email: "",
@@ -24,12 +23,6 @@ export default function AuthForm() {
   const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   // const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
-
-  // useEffect(() => {
-  //   if (session) {
-  //     router.push("/");
-  //   }
-  // }, [session, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,14 +40,14 @@ export default function AuthForm() {
     setErrors(null);
     setLoading(true);
 
-    const { data: loginData, error: loginError } = await login(
+    const { error: loginError } = await login(
       userData.email,
       userData.password
     );
     if (loginError) {
       // 未登録の場合は "Invalid login credentials"
       if (loginError.message.includes("Invalid login credentials")) {
-        const { data: signupData, error: signupError } = await signUp(
+        const { error: signupError } = await signUp(
           userData.email,
           userData.password
         );
@@ -62,16 +55,12 @@ export default function AuthForm() {
         if (signupError) {
           console.error("サインアップに失敗しました:", signupError.message);
         } else {
-          // サインアップ成功 → プロフィール初期設定へ
-          setSession(signupData.session);
           router.push("/profile");
         }
       } else {
         console.error("ログインに失敗しました:", loginError.message);
       }
     } else {
-      // 既存ユーザー → ホームへ
-      setSession(loginData.session);
       router.push("/");
     }
     setLoading(false);

@@ -1,20 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSetAtom } from "jotai";
+import Image from "next/image";
 import { AccountBoxIcon } from "@/icons";
-import { sessionAtom, loadingAtom } from "@/lib/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import {
   createChild,
   createChildAllergens,
   createProfile,
   getAllergens,
+  getChild,
 } from "@/lib/supabase";
 import { Allergen, FormData } from "@/types/types";
 import { step1Schema, step2Schema } from "@/types/schemas";
-import { supabase } from "@/lib/supabase";
 
 type ValidationErrors = {
   [key: string]: string[];
@@ -22,7 +22,6 @@ type ValidationErrors = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  //   const [session, setSession] = useAtom(sessionAtom);
   const setLoading = useSetAtom(loadingAtom);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -43,6 +42,7 @@ export default function ProfilePage() {
   const [fileMessage, setFileMessage] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
   const [today, setToday] = useState("");
+  const userId = useAtomValue(userIdAtom);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,23 +68,6 @@ export default function ProfilePage() {
         setFormData((prev) => ({ ...prev, avatar_url: null }));
         return;
       }
-      const fileSize = files[0]?.size / 1024 / 1024; // size in MB
-      const fileType = files[0]?.type; // MIME type of the file
-
-      // 画像サイズが ２MBを超える場合
-      if (fileSize > 2) {
-        setFileMessage("画像サイズが2MB以下にする必要があります。");
-        setFormData((prev) => ({ ...prev, avatar_url: null }));
-        return;
-      }
-
-      // ファイル形式がjpgまたはpngでない場合
-      if (fileType !== "image/jpeg" && fileType !== "image/png") {
-        setFileMessage("画像はjpgまたはpng形式である必要があります。");
-        setFormData((prev) => ({ ...prev, avatar_url: null }));
-        return;
-      }
-      setFileMessage("");
 
       // 画像URLを生成してformDataにセット
       const imageUrl = URL.createObjectURL(files[0]);
@@ -130,36 +113,17 @@ export default function ProfilePage() {
       .map((key) => parseInt(key, 10));
 
     try {
-      // ユーザー情報を取得
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error("ユーザー情報の取得に失敗しました。");
-      }
-
       // プロフィールと子どもの情報を登録
-      const { error: profileError } = await createProfile(formData, user.id);
-      const { data: childId, error: childError } = await createChild(
-        formData,
-        user.id
-      );
-
-      if (profileError || childError) {
-        throw new Error("プロフィール情報の登録に失敗しました。");
-      }
+      await createProfile(formData, userId!);
+      const childId = await createChild(formData, userId!);
 
       // アレルゲン情報を登録
       if (childId) {
-        const { error: allergenError } = await createChildAllergens(
+        await createChildAllergens(
           { ...formData, allergens: selectedAllergenIds },
           childId,
-          user.id
+          userId!
         );
-        if (allergenError) {
-          throw new Error("アレルゲン情報の登録に失敗しました。");
-        }
       }
 
       // 成功したらホーム画面へ遷移
@@ -173,7 +137,6 @@ export default function ProfilePage() {
         setErrors({ general: ["不明なエラーが発生しました。"] });
       }
     } finally {
-      // 成功・失敗にかかわらずローディングを終了
       setLoading(false);
     }
   };
@@ -202,16 +165,6 @@ export default function ProfilePage() {
     const date = new Date().toISOString().split("T")[0];
     setToday(date);
   }, []);
-
-  //   if (loading || !session) {
-  //     return (
-  //       <div className="min-h-screen flex items-center justify-center">
-  //         <div className="text-purple-500 animate-spin">
-  //           <ChildCareIcon className="text-5xl" />
-  //         </div>
-  //       </div>
-  //     );
-  //   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-50 flex flex-col">

@@ -36,7 +36,7 @@ export async function getUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
-    console.error("Failed to fetch current user:", error);
+    console.error("Failed to fetch user:", error);
     return null;
   }
 
@@ -381,10 +381,10 @@ export async function createChild(
 
   if (error) {
     console.error("子どもの登録に失敗しました:", error);
-    return { data: null, error };
+    return null;
   }
 
-  return { data: data[0].id };
+  return data[0].id;
 }
 
 export async function createChildAllergens(

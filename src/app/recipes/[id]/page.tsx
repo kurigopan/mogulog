@@ -72,7 +72,11 @@ export default function RecipeDetail({
     content = (
       <div className="flex items-center space-x-2">
         <ShareButton title={recipe.name} />
-        <FavoriteButton />
+        <FavoriteButton
+          itemId={id}
+          itemType="recipe"
+          initialIsFavorited={recipe.isFavorite}
+        />
       </div>
     );
   } else {

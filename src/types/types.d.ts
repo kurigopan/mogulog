@@ -145,3 +145,27 @@ export interface ChildInfo {
   ageStage: string;
   allergens: Child["allergens"];
 }
+
+export type TableName =
+  | "recipes"
+  | "ingredients"
+  | "favorites"
+  | "profiles"
+  | "children"
+  | "child_allergens"
+  | "allergens"
+  | "favorites_recipes"
+  | "favorites_ingredients";
+
+export interface FavoritesRecipes {
+  parent_id: string;
+  recipe_id: number;
+  created_by: string;
+  updated_by: string;
+}
+export interface FavoritesIngredients {
+  parent_id: string;
+  ingredient_id: number;
+  created_by: string;
+  updated_by: string;
+}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { HomeIcon, FavoriteIcon, ListIcon, PersonIcon, AddIcon } from "@/icons";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loginDialogAtom, sessionAtom } from "@/lib/atoms";
+import { loginDialogAtom, sessionAtom, userIdAtom } from "@/lib/atoms";
 
 type HeaderProps = {
   pageName?: pageType;
@@ -12,8 +12,8 @@ type HeaderProps = {
 type pageType = "create" | "edit";
 
 export default function Footer({ pageName }: HeaderProps) {
-  const session = useAtomValue(sessionAtom);
   const setLoginDialogOpen = useSetAtom(loginDialogAtom);
+  const userId = useAtomValue(userIdAtom);
 
   const navigationButtons = [
     { href: "/", icon: <HomeIcon />, label: "ホーム" },
@@ -32,11 +32,8 @@ export default function Footer({ pageName }: HeaderProps) {
     },
   ];
 
-  const handleClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    requiresAuth: boolean
-  ) => {
-    if (requiresAuth && !session) {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!userId) {
       e.preventDefault(); // ページ遷移を阻止
       setLoginDialogOpen(true);
     }
@@ -51,7 +48,7 @@ export default function Footer({ pageName }: HeaderProps) {
             <Link
               key={index}
               href={button.href}
-              onClick={(e) => handleClick(e, button.requiresAuth || false)}
+              onClick={(e) => handleClick(e)}
               className="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-purple-50 transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <div className="text-stone-400 mb-1">{button.icon}</div>

@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { VisibilityIcon, VisibilityOffIcon, ChildCareIcon } from "@/icons";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { login, signUp } from "@/lib/supabase";
-import { signupSchema } from "@/types/schemas";
+import { login, signup } from "@/lib/supabase";
+import { registerSchema } from "@/types/schemas";
 import { User } from "@/types/types";
 
 type ValidationErrors = {
@@ -32,7 +32,7 @@ export default function AuthForm() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = signupSchema.safeParse(userData);
+    const result = registerSchema.safeParse(userData);
     if (!result.success) {
       setErrors(result.error.flatten().fieldErrors);
       return;
@@ -47,7 +47,7 @@ export default function AuthForm() {
     if (loginError) {
       // 未登録の場合は "Invalid login credentials"
       if (loginError.message.includes("Invalid login credentials")) {
-        const { error: signupError } = await signUp(
+        const { error: signupError } = await signup(
           userData.email,
           userData.password
         );

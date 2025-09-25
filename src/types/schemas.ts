@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Recipe, Season, ingredientNutrition } from "./types";
 import { convertUtcToJst } from "@/lib/utils";
 
-export const signupSchema = z.object({
+export const registerSchema = z.object({
   email: z
     .string()
     .email({ message: "有効なメールアドレスを入力してください" }),

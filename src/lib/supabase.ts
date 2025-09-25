@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, PostgrestError } from "@supabase/supabase-js";
 import { z } from "zod";
 import { formatRecipeForSupabase } from "@/types/schemas";
 import { Database } from "@/types/supabase";
@@ -457,14 +457,19 @@ export async function createRecipe(
   const { data, error } = await supabase
     .from("recipes")
     .insert([formattedData])
-    .select();
+    .select()
+    .single();
 
   if (error) {
     console.error("レシピの登録に失敗しました:", error);
-    return { data: null, error };
+    throw error;
   }
 
-  return data;
+  // Zodスキーマを使ってデータをバリデーション
+  const validatedData = rpcRecipeSchema.parse(data);
+
+  // フロントエンドの型に変換
+  return recipeSchema.parse(validatedData);
 }
 
 export async function updateProfile(
@@ -538,7 +543,7 @@ export async function upsertChildAllergens(
  * @param recipeData - 更新するレシピデータ
  */
 export async function updateRecipe(
-  id: number,
+  recipeId: number,
   recipeData: Omit<Recipe, "id">,
   userId: string
 ) {
@@ -546,7 +551,7 @@ export async function updateRecipe(
   const { data, error } = await supabase
     .from("recipes")
     .update(formattedData)
-    .eq("id", id)
+    .eq("recipe_id", recipeId)
     .select();
 
   if (error) {
@@ -639,7 +644,7 @@ export async function getRecipesCreatedByUser(userId: string) {
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
-export async function signUp(email: string, password: string) {
+export async function signup(email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password,

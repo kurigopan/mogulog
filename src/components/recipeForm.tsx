@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { FormControlLabel, Switch } from "@mui/material";
+// import { FormControlLabel, Switch } from "@mui/material";
 import {
   AddIcon,
   // InfoOutlineIcon,
@@ -14,20 +14,18 @@ import {
   ClearIcon,
   ErrorIcon,
 } from "@/icons";
+import { useAtomValue, useSetAtom } from "jotai";
+import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import {
   createRecipe,
   createRecipeAllergens,
   deleteRecipe,
   deleteRecipeAllergens,
   getAllergens,
-  getCurrentUser,
   getRecipeAllergensById,
-  supabase,
   updateRecipe,
 } from "@/lib/supabase";
 import { Allergen, Category, Recipe, Stage } from "@/types/types";
-import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
 const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];
@@ -74,42 +72,11 @@ export default function RecipeForm({
     string[]
   >([]);
   const [image, setImage] = useState<string | null>(null);
+  const userId = useAtomValue(userIdAtom);
 
-  // // 画像ファイル処理（実際の実装ではファイルアップロード処理が必要）
-  // const handleImageUpload = (file: File, callback: (url: string) => void) => {
-  //   // 実際の実装では、ここでファイルをサーバーにアップロードしてURLを取得
-  //   // 現在はダミーのURL生成
-  //   const reader = new FileReader();
-  //   reader.onload = (e) => {
-  //     callback(e.target?.result as string);
-  //   };
-  //   reader.readAsDataURL(file);
-  // };
-
-  // // メイン画像の変更処理
-  // const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     handleImageUpload(file, (url) => {
-  //       setFormData((prev) => ({ ...prev, image: url }));
-  //     });
-  //   }
-  // };
-
-  // // ステップ画像の変更処理
-  // const handleStepImageChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   stepIndex: number
-  // ) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     handleImageUpload(file, (url) => {
-  //       const newSteps = [...formData.steps];
-  //       newSteps[stepIndex] = { ...newSteps[stepIndex], image: url };
-  //       setFormData((prev) => ({ ...prev, steps: newSteps }));
-  //     });
-  //   }
-  // };
+  if (!userId) {
+    router.push("/");
+  }
 
   //　画像の取得
   useEffect(() => {
@@ -332,20 +299,14 @@ export default function RecipeForm({
     try {
       let recipeId;
       let newRecipeData; // createRecipeの戻り値を受け取る変数
-      const user = await getCurrentUser();
-      if (!user) throw new Error("ユーザー情報が取得できません");
 
       if (isEditMode && initialData?.id) {
         // 編集モードの場合、IDを使ってレシピを更新
-        await updateRecipe(initialData.id, formData, user.id);
+        await updateRecipe(initialData.id, formData, userId!);
         recipeId = initialData.id;
       } else {
         // 新規作成モードの場合、レシピを作成
-        const { data, error } = await createRecipe(formData, user.id);
-        if (error || !data) {
-          throw new Error("レシピの作成に失敗しました。");
-        }
-        newRecipeData = data[0];
+        newRecipeData = await createRecipe(formData, userId!);
         recipeId = newRecipeData.id;
       }
       // 選択されたアレルゲン情報を抽出
@@ -357,12 +318,11 @@ export default function RecipeForm({
       await deleteRecipeAllergens(recipeId);
 
       // 新しいアレルゲンデータを登録
-      await createRecipeAllergens(recipeId, selectedAllergenIds, user.id);
+      await createRecipeAllergens(recipeId, selectedAllergenIds, userId!);
 
-      console.log("レシピとアレルゲン情報を保存しました:", recipeId);
       router.push("/");
-    } catch (error) {
-      console.error("レシピの保存に失敗しました:", error);
+    } catch {
+      // TODO: エラーが発生したら更新をロールバックする処理を実装
     } finally {
       setIsSaving(false);
     }
@@ -384,14 +344,9 @@ export default function RecipeForm({
     if (!initialData?.id) return;
     setIsSaving(true);
     try {
-      const { error } = await deleteRecipe(initialData.id);
-      if (error) {
-        throw error;
-      }
-      console.log("レシピを削除しました");
+      await deleteRecipe(initialData.id);
       router.push("/");
-    } catch (error) {
-      console.error("レシピの削除に失敗しました:", error);
+    } catch {
     } finally {
       setIsSaving(false);
       setShowConfirm(false);

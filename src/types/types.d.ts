@@ -169,3 +169,22 @@ export interface FavoritesIngredients {
   created_by: string;
   updated_by: string;
 }
+
+export type PageName =
+  | "home"
+  | "ingredientDetail"
+  | "recipeDetail"
+  | "favorites"
+  | "drafts"
+  | "created"
+  | "edit"
+  | "history"
+  | "search"
+  | "ingredientsList";
+
+export type FavoriteUpdate = {
+  itemId: number;
+  itemType: string;
+  isFavorited: boolean;
+  timestamp: number;
+} | null;

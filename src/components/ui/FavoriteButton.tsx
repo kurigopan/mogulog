@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { FavoriteBorderIcon, FavoriteIcon } from "@/icons";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loginDialogAtom, sessionAtom, userIdAtom } from "@/lib/atoms";
+import { favoriteUpdateAtom, loginDialogAtom, userIdAtom } from "@/lib/atoms";
 import { toggleFavoriteItem } from "@/lib/supabase";
 import { Type } from "@/types/types";
 
@@ -22,6 +22,7 @@ export default function FavoriteButton({
   const [isLoading, setIsLoading] = useState(false);
   const userId = useAtomValue(userIdAtom);
   const setLoginDialogOpen = useSetAtom(loginDialogAtom);
+  const setFavoriteUpdate = useSetAtom(favoriteUpdateAtom);
 
   const handleToggleFavorite = useCallback(async () => {
     if (!userId) {
@@ -31,7 +32,7 @@ export default function FavoriteButton({
 
     setIsLoading(true);
     const previousState = isFavorited;
-
+    const newState = !previousState;
     try {
       const success = await toggleFavoriteItem(
         userId,
@@ -43,6 +44,12 @@ export default function FavoriteButton({
       if (!success) {
         // 失敗時、状態を元に戻す
         setIsFavorited(previousState);
+        setFavoriteUpdate({
+          itemId,
+          itemType,
+          isFavorited: previousState,
+          timestamp: Date.now(),
+        });
         console.error(`お気に入り操作(${itemType})に失敗しました。`);
         alert(
           previousState
@@ -50,7 +57,13 @@ export default function FavoriteButton({
             : "お気に入り登録に失敗しました。"
         );
       } else {
-        setIsFavorited(!previousState);
+        setIsFavorited(newState);
+        setFavoriteUpdate({
+          itemId,
+          itemType,
+          isFavorited: newState,
+          timestamp: Date.now(), // 強制更新のためのタイムスタンプ
+        });
       }
     } catch (error) {
       console.error("お気に入り操作中に予期せぬエラーが発生:", error);
@@ -59,7 +72,7 @@ export default function FavoriteButton({
     } finally {
       setIsLoading(false);
     }
-  }, [userId, itemId, itemType, isFavorited]);
+  }, [userId, itemId, itemType, isFavorited, setFavoriteUpdate]);
 
   const heartIcon = isFavorited ? (
     <FavoriteIcon className="w-6 h-6" />
@@ -67,7 +80,7 @@ export default function FavoriteButton({
     <FavoriteBorderIcon className="w-6 h-6" />
   );
   const buttonStyle = isFavorited
-    ? "bg-red-100 text-red-500 hover:bg-red-200"
+    ? "text-red-500 hover:bg-stone-100"
     : "hover:bg-stone-100 text-stone-500";
 
   return (

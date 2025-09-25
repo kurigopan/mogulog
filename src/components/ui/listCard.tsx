@@ -1,110 +1,43 @@
 "use client";
 
 import React from "react";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  FavoriteIcon,
-  FavoriteBorderIcon,
-  ImageIcon,
-  EditIcon,
-  DeleteIcon,
-  ClearIcon,
-} from "@/icons";
-import { CardItem } from "@/types/types";
-import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { ImageIcon } from "@/icons";
+import { CardItem, PageName } from "@/types/types";
+import FavoriteButton from "@/components/ui/FavoriteButton";
 
 type ListCardProps = {
   cardItems: CardItem[];
-  pageName: pageType;
+  pageName: PageName;
 };
 
-type pageType = "favorites" | "drafts" | "history" | "created" | "search";
-
 export default function ListCard({ cardItems, pageName }: ListCardProps) {
-  const [listCardItems, setListCardItems] = useState<CardItem[]>([]);
-  const setLoading = useSetAtom(loadingAtom);
-
-  const handleFavoriteClick = (
-    e: React.MouseEvent<HTMLElement>,
-    item: CardItem
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const updateCardItems = listCardItems.map((prevItem) =>
-      item.id == prevItem.id
-        ? { ...prevItem, isFavorite: !prevItem.isFavorite }
-        : prevItem
-    );
-    setListCardItems(updateCardItems);
-  };
-
-  const handleDelete = (e: React.MouseEvent<HTMLElement>, item: CardItem) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (
-      window.confirm(
-        `「${item.name}」を削除しますか？この操作は取り消せません。`
-      )
-    ) {
-      const updateCardItems = listCardItems.filter(
-        (prevItem) => item.id !== prevItem.id
-      );
-      setListCardItems(updateCardItems);
-    }
-  };
-
   const iconArea = (item: CardItem) => {
-    switch (pageName) {
-      case "search":
-      case "history":
-      case "favorites":
-        return (
-          <button
-            onClick={(e) => handleFavoriteClick(e, item)}
-            className={`p-2 rounded-full transition-colors ${
-              item.isFavorite
-                ? "text-red-500 hover:bg-red-200"
-                : "hover:bg-stone-100 text-stone-500"
-            }`}
-          >
-            {item.isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-          </button>
-        );
-      // case "drafts":
-      case "created":
-        return (
-          <div className="flex">
-            <Link
-              href={`/recipes/${item.id}/edit`}
-              className="p-2 text-stone-500 hover:text-blue-500 transition-colors"
-              title="編集"
-            >
-              <EditIcon />
-            </Link>
-            <button
-              onClick={(e) => handleDelete(e, item)}
-              className="p-2 text-stone-500 hover:text-red-500 transition-colors"
-              title="削除"
-            >
-              <ClearIcon />
-            </button>
-          </div>
-        );
+    if (
+      pageName === "search" ||
+      pageName === "history" ||
+      pageName === "favorites"
+    ) {
+      return (
+        <div
+          onClick={(e) => e.preventDefault()}
+          onTouchStart={(e) => e.stopPropagation()}
+        >
+          <FavoriteButton
+            itemId={item.id}
+            itemType={item.type}
+            initialIsFavorited={item.isFavorite || false}
+          />
+        </div>
+      );
     }
+    return null;
   };
-
-  useEffect(() => {
-    setLoading(true);
-    setListCardItems(cardItems);
-    setLoading(false);
-  }, [cardItems]);
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      {listCardItems.map((item) => (
+      {cardItems.map((item) => (
         <Link
           key={`${item.type}-${item.id}`}
           href={
@@ -160,7 +93,7 @@ export default function ListCard({ cardItems, pageName }: ListCardProps) {
                       </span>
                     )}
                   </div>
-                  <div>{iconArea(item)}</div>
+                  <div className="flex-shrink-0">{iconArea(item)}</div>
                 </div>
               </div>
             </div>

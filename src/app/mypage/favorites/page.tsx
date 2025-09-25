@@ -8,11 +8,11 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/atoms";
+import { favoriteUpdateAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
 import { CardItem } from "@/types/types";
 
-export default function FavoriteRecipes() {
+export default function Favorites() {
   const router = useRouter();
   const setLoading = useSetAtom(loadingAtom);
   const [favoriteRecipes, setFavoriteRecipes] = useState<CardItem[]>([]);
@@ -20,15 +20,19 @@ export default function FavoriteRecipes() {
     []
   );
   const userId = useAtomValue(userIdAtom);
+  const favoriteUpdate = useAtomValue(favoriteUpdateAtom);
+  // const [removedItemKeys, setRemovedItemKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (userId) {
       setLoading(true);
       const fetchFavorites = async () => {
         const recipes = await getFavoriteRecipes(userId);
-        setFavoriteRecipes(recipes);
+        setFavoriteRecipes(recipes.map((r) => ({ ...r, isFavorite: true })));
         const ingredients = await getFavoriteIngredients(userId);
-        setFavoriteIngredients(ingredients);
+        setFavoriteIngredients(
+          ingredients.map((i) => ({ ...i, isFavorite: true }))
+        );
       };
       fetchFavorites();
       setLoading(false);
@@ -37,16 +41,38 @@ export default function FavoriteRecipes() {
     }
   }, [userId]);
 
+  useEffect(() => {
+    if (!favoriteUpdate) return;
+
+    const { itemId, itemType, isFavorited } = favoriteUpdate;
+
+    const updateList = (prevList: CardItem[]) => {
+      // リスト全体をマップし、対象アイテムの isFavorite フラグを更新
+      return prevList.map((item) => {
+        if (item.id === itemId && item.type === itemType) {
+          // ⭐️ isFavorite フラグをトグル（これでハートの塗りつぶし状態が変わる）
+          return { ...item, isFavorite: isFavorited };
+        }
+        return item;
+      });
+    };
+
+    if (itemType === "recipe") {
+      setFavoriteRecipes(updateList);
+    } else if (itemType === "ingredient") {
+      setFavoriteIngredients(updateList);
+    }
+  }, [favoriteUpdate]);
+
+  const displayItems = [...favoriteIngredients, ...favoriteRecipes];
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Header title="お気に入り" />
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}
-        {favoriteIngredients.length > 0 || favoriteRecipes.length > 0 ? (
-          <ListCard
-            cardItems={[...favoriteIngredients, ...favoriteRecipes]}
-            pageName={"favorites"}
-          />
+        {displayItems.length > 0 ? (
+          <ListCard cardItems={displayItems} pageName={"favorites"} />
         ) : (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">

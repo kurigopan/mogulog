@@ -30,8 +30,8 @@ export default function RecipeDetail({
   const id = Number(unwrapParams.id);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-  // const [memo, setMemo] = useState("");
   const userId = useAtomValue(userIdAtom);
+  // const [memo, setMemo] = useState("");
 
   // const infoText = "自分専用なので他の人は見れません";
 

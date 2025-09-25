@@ -676,7 +676,6 @@ export type Database = {
       get_recipes: {
         Args: { parent_id_param: string | null };
         Returns: {
-          author: string;
           category: string;
           cooking_time: string;
           created_at: string;
@@ -686,7 +685,6 @@ export type Database = {
           image_url: string;
           ingredients: Json;
           is_favorite: boolean;
-          is_own: boolean;
           is_private: boolean;
           memo: string;
           name: string;
@@ -699,7 +697,7 @@ export type Database = {
         }[];
       };
       get_recipes_created_by_user: {
-        Args: { user_id: string };
+        Args: { parent_id_param: string };
         Returns: {
           category: string;
           cooking_time: string;

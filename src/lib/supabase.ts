@@ -1,4 +1,4 @@
-import { createClient, PostgrestError } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { formatRecipeForSupabase } from "@/types/schemas";
 import { Database } from "@/types/supabase";
@@ -100,7 +100,7 @@ export async function getAllergens() {
   return data;
 }
 
-// アレルゲンを考慮した食材検索
+// アレルゲンを除外した食材検索
 export async function searchIngredientsWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
@@ -121,23 +121,21 @@ export async function searchIngredientsWithAllergens(
     console.error("Error fetching ingredients:", error);
     return null;
   }
-  // Zodスキーマを使ってデータをバリデーション
-  const validatedData = z.array(rpcIngredientSchema).parse(data);
 
-  // フロントエンドの型に変換
+  const validatedData = z.array(rpcIngredientSchema).parse(data);
   return validatedData.map((d) => ingredientSchema.parse(d));
 }
 
-// アレルゲンを考慮したレシピ検索
+// アレルゲンを除外したレシピ検索
 export async function searchRecipesWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
-  parentId: string | null = null
+  userId: string | null = null
 ) {
   const { data, error } = await supabase.rpc("search_recipes_with_allergens", {
     search_term: searchTerm,
     excluded_allergen_ids: excludedAllergenIds,
-    parent_id_param: parentId,
+    parent_id_param: userId,
   });
 
   if (error) {
@@ -145,21 +143,18 @@ export async function searchRecipesWithAllergens(
     return [];
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-
-  // フロントエンドの型に変換
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
 // 離乳食段階と食材名を考慮したレシピ検索
 export async function searchRecipesByIngredient(
-  parentId: string | null = null,
+  userId: string | null = null,
   ingredientName: string,
   ageStage: string
 ) {
   const { data, error } = await supabase.rpc("search_recipes_by_ingredient", {
-    parent_id_param: parentId,
+    parent_id_param: userId,
     ingredient_name_param: ingredientName,
     age_stage_param: ageStage,
   });
@@ -169,13 +164,26 @@ export async function searchRecipesByIngredient(
     return [];
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-
-  // フロントエンドの型に変換
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
+// レシピ一覧を取得
+export async function getRecipes(userId: string | null = null) {
+  const { data, error } = await supabase.rpc("get_recipes", {
+    parent_id_param: userId,
+  });
+
+  if (error) {
+    console.error("Failed to fetch recipes:", error);
+    return [];
+  }
+
+  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
+  return validatedData.map((d) => recipeCardSchema.parse(d));
+}
+
+// 食材IDに基づいて食材情報を取得
 export async function getIngredientById(
   userId: string | null = null,
   childId: number | null = null,
@@ -192,51 +200,11 @@ export async function getIngredientById(
     return null;
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = rpcIngredientSchema.parse(data[0]);
-
-  // フロントエンドの型に変換
   return ingredientSchema.parse(validatedData);
 }
 
-export async function getIngredientsWithStatus(
-  userId: string | null = null,
-  childId: number | null = null
-) {
-  const { data, error } = await supabase.rpc("get_ingredients_with_status", {
-    parent_id_param: userId,
-    child_id_param: childId,
-  });
-
-  if (error) {
-    console.error("Failed to fetch ingredients with status:", error);
-    return [];
-  }
-
-  // Zodスキーマを使ってデータをバリデーション
-  const validatedData = z.array(rpcIngredientSchema).parse(data);
-
-  // フロントエンドの型に変換
-  return validatedData.map((d) => ingredientSchema.parse(d));
-}
-
-// recipesの型定義に含まれるisFavoriteを補完するために、レシピリストを取得するカスタム関数を呼び出す
-export async function getRecipes(userId: string | null = null) {
-  const { data, error } = await supabase.rpc("get_recipes", {
-    parent_id_param: userId,
-  });
-
-  if (error) {
-    console.error("Failed to fetch recipes:", error);
-    return [];
-  }
-  // Zodスキーマを使ってデータをバリデーション
-  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-
-  // フロントエンドの型に変換
-  return validatedData.map((d) => recipeCardSchema.parse(d));
-}
-
+// レシピIDに基づいてレシピ情報を取得
 export async function getRecipeById(
   userId: string | null = null,
   recipeId: number
@@ -251,11 +219,27 @@ export async function getRecipeById(
     return null;
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = rpcRecipeSchema.parse(data[0]);
-
-  // フロントエンドの型に変換
   return recipeSchema.parse(validatedData);
+}
+
+// 食材一覧と子どもの食べた履歴を取得
+export async function getIngredientsWithStatus(
+  userId: string | null = null,
+  childId: number | null = null
+) {
+  const { data, error } = await supabase.rpc("get_ingredients_with_status", {
+    parent_id_param: userId,
+    child_id_param: childId,
+  });
+
+  if (error) {
+    console.error("Failed to fetch ingredients with status:", error);
+    return [];
+  }
+
+  const validatedData = z.array(rpcIngredientSchema).parse(data);
+  return validatedData.map((d) => ingredientSchema.parse(d));
 }
 
 // レシピIDに基づいてアレルゲンのIDと名前を取得
@@ -312,10 +296,7 @@ export async function getFavoriteIngredients(userId: string) {
     return [];
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = z.array(rpcIngredientCardSchema).parse(data);
-
-  // フロントエンドの型に変換
   return validatedData.map((d) => ingredientCardSchema.parse(d));
 }
 
@@ -330,10 +311,7 @@ export async function getFavoriteRecipes(userId: string) {
     return [];
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-
-  // フロントエンドの型に変換
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
@@ -446,9 +424,6 @@ export async function createRecipeAllergens(
   return data;
 }
 
-/**
- * @param recipeData - 登録するレシピデータ
- */
 export async function createRecipe(
   recipeData: Omit<Recipe, "id">,
   userId: string
@@ -465,10 +440,7 @@ export async function createRecipe(
     throw error;
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = rpcRecipeSchema.parse(data);
-
-  // フロントエンドの型に変換
   return recipeSchema.parse(validatedData);
 }
 
@@ -538,10 +510,6 @@ export async function upsertChildAllergens(
   return { error: insertError };
 }
 
-/**
- * @param id - 更新するレシピのID
- * @param recipeData - 更新するレシピデータ
- */
 export async function updateRecipe(
   recipeId: number,
   recipeData: Omit<Recipe, "id">,
@@ -576,9 +544,6 @@ export async function deleteRecipeAllergens(recipeId: number) {
   return { error: null };
 }
 
-/**
- * @param id - 削除するレシピのID
- */
 export async function deleteRecipe(id: number) {
   const { error } = await supabase.from("recipes").delete().eq("id", id);
 
@@ -629,7 +594,7 @@ export async function getSignedUrl(filePath: string) {
 // ユーザーが作成したレシピを取得
 export async function getRecipesCreatedByUser(userId: string) {
   const { data, error } = await supabase.rpc("get_recipes_created_by_user", {
-    user_id: userId,
+    parent_id_param: userId,
   });
 
   if (error) {
@@ -637,10 +602,7 @@ export async function getRecipesCreatedByUser(userId: string) {
     return [];
   }
 
-  // Zodスキーマを使ってデータをバリデーション
   const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-
-  // フロントエンドの型に変換
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 

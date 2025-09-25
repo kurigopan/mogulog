@@ -14,19 +14,27 @@ import {
 } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Ingredient, ingredientStageInfo } from "@/types/types";
+import { Ingredient } from "@/types/types";
 import { getIngredientsWithStatus } from "@/lib/supabase";
-import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  childIdAtom,
+  childInfoAtom,
+  loadingAtom,
+  userIdAtom,
+} from "@/lib/atoms";
+import { getAgeStageDisplay } from "@/lib/utils";
 
 export default function IngredientsList() {
-  const [childAge, setChildAge] = useState("7-8");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStageFilter, setSelectedStageFilter] = useState("all");
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const setLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
+  const childId = useAtomValue(childIdAtom);
+  const childInfo = useAtomValue(childInfoAtom);
 
   const categories = [
     { value: "all", label: "すべて" },
@@ -114,57 +122,26 @@ export default function IngredientsList() {
     return true;
   });
 
-  // 月齢を段階表示に変換する関数（縦揃え対応）
-  const getAgeStageDisplay = (stageInfo: ingredientStageInfo[]) => {
-    const allStages = ["初", "中", "後", "完"];
-
-    // stageInfo からアクティブな stage を抽出
-    const activeStages = stageInfo
-      .filter((s) => s.suitable)
-      .map((s) => s.stage);
-
-    return allStages.map((stage) => {
-      const isActive =
-        (stage === "初" && activeStages.includes("初期")) ||
-        (stage === "中" && activeStages.includes("中期")) ||
-        (stage === "後" && activeStages.includes("後期")) ||
-        (stage === "完" && activeStages.includes("完了期"));
-
-      return { stage, isActive };
-    });
-  };
-
-  // 現在の月齢段階を取得
-  const getCurrentStage = () => {
-    if (childAge === "5-6") return "初";
-    if (childAge === "7-8") return "中";
-    if (childAge === "9-11") return "後";
-    if (childAge === "12-18") return "完";
-    return "初";
-  };
-
-  const currentStage = getCurrentStage();
-
   // ヘルプテキスト
   const helpText =
     "初：初期（5-6ヶ月）、中：中期（7-8ヶ月）、後：後期（9-11ヶ月）、完：完了期（12-18ヶ月）";
 
   useEffect(() => {
+    setLoading(true);
     const fetchIngredients = async () => {
-      setLoading(true);
-      const data = await getIngredientsWithStatus(
-        "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-        1
-      );
-      if (data) {
-        setIngredients(data);
+      let ingredientsData;
+      if (userId && childId) {
+        ingredientsData = await getIngredientsWithStatus(userId, childId);
+      } else {
+        ingredientsData = await getIngredientsWithStatus();
       }
-      setLoading(false);
-      console.log();
+      if (ingredientsData) {
+        setIngredients(ingredientsData);
+      }
     };
-
     fetchIngredients();
-  }, []);
+    setLoading(false);
+  }, [userId, childId]);
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -331,13 +308,13 @@ export default function IngredientsList() {
                                   key={stage}
                                   className={`text-sm w-7 h-7 flex items-center justify-center rounded-full font-medium border-1 transition-all ${
                                     isActive
-                                      ? stage === currentStage
+                                      ? stage === childInfo.ageStage
                                         ? "bg-purple-200 text-purple-800 border-purple-400 font-bold shadow-sm"
                                         : "bg-purple-100 text-purple-700 border-purple-300"
                                       : "bg-stone-50 text-stone-400 border-stone-200"
                                   }`}
                                 >
-                                  {isActive ? stage : "・"}
+                                  {isActive ? stage.charAt(0) : "・"}
                                 </span>
                               ))}
                             </div>

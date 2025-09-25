@@ -1,4 +1,9 @@
-import { CardItem, Ingredient, Season } from "@/types/types";
+import {
+  CardItem,
+  Ingredient,
+  ingredientStageInfo,
+  Season,
+} from "@/types/types";
 import { getFavoriteRecipeLogs } from "./supabase";
 
 /**
@@ -47,6 +52,24 @@ export const getAgeStage = (months: number | null): string => {
   if (months <= 11) return "後期";
   if (months <= 18) return "完了期";
   return "離乳食終了";
+};
+
+// 離乳食段階表示に変換する関数（縦揃え対応）
+export const getAgeStageDisplay = (stageInfo: ingredientStageInfo[]) => {
+  const allStages = ["初期", "中期", "後期", "完了期"];
+
+  // stageInfo からアクティブな stage を抽出
+  const activeStages = stageInfo.filter((s) => s.suitable).map((s) => s.stage);
+
+  return allStages.map((stage) => {
+    const isActive =
+      (stage === "初期" && activeStages.includes("初期")) ||
+      (stage === "中期" && activeStages.includes("中期")) ||
+      (stage === "後期" && activeStages.includes("後期")) ||
+      (stage === "完了期" && activeStages.includes("完了期"));
+
+    return { stage, isActive };
+  });
 };
 
 // 旬の食材 (月齢と季節を考慮)

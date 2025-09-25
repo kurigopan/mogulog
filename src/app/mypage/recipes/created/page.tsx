@@ -19,17 +19,17 @@ export default function CreatedRecipes() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!userId) {
+    if (userId) {
+      setLoading(true);
+      const fetchRecipes = async () => {
+        const recipes = await getRecipesCreatedByUser(userId);
+        setCreatedRecipes(recipes);
+      };
+      fetchRecipes();
+      setLoading(false);
+    } else {
       router.push("/");
-      return;
     }
-    setLoading(true);
-    const fetchRecipes = async () => {
-      const recipes = await getRecipesCreatedByUser(userId);
-      setCreatedRecipes(recipes);
-    };
-    fetchRecipes();
-    setLoading(false);
   }, [userId]);
 
   return (

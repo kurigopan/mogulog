@@ -104,8 +104,8 @@ export async function getAllergens() {
 export async function searchIngredientsWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
-  userId: string,
-  childId: number
+  userId: string | null = null,
+  childId: number | null = null
 ) {
   const { data, error } = await supabase.rpc(
     "search_ingredients_with_allergens",
@@ -132,7 +132,7 @@ export async function searchIngredientsWithAllergens(
 export async function searchRecipesWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
-  parentId: string
+  parentId: string | null = null
 ) {
   const { data, error } = await supabase.rpc("search_recipes_with_allergens", {
     search_term: searchTerm,
@@ -304,7 +304,7 @@ export async function getFavoriteRecipeLogs() {
 // ユーザーごとの食材お気に入り登録データを取得する関数
 export async function getFavoriteIngredients(userId: string) {
   const { data, error } = await supabase.rpc("get_favorite_ingredients", {
-    user_id: userId,
+    parent_id_param: userId,
   });
 
   if (error) {
@@ -322,7 +322,7 @@ export async function getFavoriteIngredients(userId: string) {
 // ユーザーごとのレシピお気に入り登録データを取得する関数
 export async function getFavoriteRecipes(userId: string) {
   const { data, error } = await supabase.rpc("get_favorite_recipes", {
-    user_id: userId,
+    parent_id_param: userId,
   });
 
   if (error) {

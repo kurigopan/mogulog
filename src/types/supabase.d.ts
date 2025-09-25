@@ -175,6 +175,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "children_auth_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles_public";
+            referencedColumns: ["id"];
           }
         ];
       };
@@ -220,6 +227,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "favorites_ingredients_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles_public";
+            referencedColumns: ["id"];
           }
         ];
       };
@@ -264,6 +278,13 @@ export type Database = {
             columns: ["parent_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "favorites_recipes_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles_public";
             referencedColumns: ["id"];
           }
         ];
@@ -511,11 +532,25 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      profiles_public: {
+        Row: {
+          id: string | null;
+          name: string | null;
+        };
+        Insert: {
+          id?: string | null;
+          name?: string | null;
+        };
+        Update: {
+          id?: string | null;
+          name?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       get_favorite_ingredients: {
-        Args: { user_id: string };
+        Args: { parent_id_param: string };
         Returns: {
           category: string;
           created_at: string;
@@ -535,7 +570,7 @@ export type Database = {
         }[];
       };
       get_favorite_recipes: {
-        Args: { user_id: string };
+        Args: { parent_id_param: string };
         Returns: {
           category: string;
           cooking_time: string;
@@ -688,9 +723,9 @@ export type Database = {
       };
       search_ingredients_with_allergens: {
         Args: {
-          child_id_param: number;
+          child_id_param: number | null;
           excluded_allergen_ids: number[];
-          parent_id_param: string;
+          parent_id_param: string | null;
           search_term: string;
         };
         Returns: {
@@ -698,12 +733,10 @@ export type Database = {
           created_at: string;
           created_by: string;
           description: string;
-          eaten: boolean;
           id: number;
           image_url: string;
           is_favorite: boolean;
           name: string;
-          ng: boolean;
           nutrition: Json;
           seasons: string[];
           stage_info: Json;
@@ -743,11 +776,10 @@ export type Database = {
       search_recipes_with_allergens: {
         Args: {
           excluded_allergen_ids: number[];
-          parent_id_param: string;
+          parent_id_param: string | null;
           search_term: string;
         };
         Returns: {
-          author: string;
           category: string;
           cooking_time: string;
           created_at: string;
@@ -757,7 +789,6 @@ export type Database = {
           image_url: string;
           ingredients: Json;
           is_favorite: boolean;
-          is_own: boolean;
           is_private: boolean;
           memo: string;
           name: string;

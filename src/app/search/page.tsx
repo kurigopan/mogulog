@@ -7,17 +7,17 @@ import {
   SearchIcon,
   SearchOffIcon,
 } from "@/icons";
-import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import { Allergen, CardItem } from "@/types/types";
+import { useAtomValue, useSetAtom } from "jotai";
+import { childIdAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
 import {
   getAllergens,
   searchIngredientsWithAllergens,
   searchRecipesWithAllergens,
 } from "@/lib/supabase";
-import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { Allergen, CardItem } from "@/types/types";
 
 export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +31,8 @@ export default function SearchResults() {
   const [allergenExclusions, setAllergenExclusions] = useState<
     Record<string, boolean>
   >({});
+  const userId = useAtomValue(userIdAtom);
+  const childId = useAtomValue(childIdAtom);
 
   // 検索処理
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -51,20 +53,30 @@ export default function SearchResults() {
         .filter((id) => allergenExclusions[id] === true)
         .map(Number);
 
+      let ingredientsData: CardItem[] | null = [];
+      let recipesData: CardItem[] | null = [];
       // Promise.allを使ってレシピと食材の検索を同時に実行
-      const [ingredientsData, recipesData] = await Promise.all([
-        searchIngredientsWithAllergens(
-          currentQuery,
-          excludedAllergenIds,
-          "32836782-4f6d-4dc3-92ea-4faf03ed86a5",
-          1
-        ),
-        searchRecipesWithAllergens(
-          currentQuery,
-          excludedAllergenIds,
-          "32836782-4f6d-4dc3-92ea-4faf03ed86a5"
-        ),
-      ]);
+      if (userId) {
+        [ingredientsData, recipesData] = await Promise.all([
+          searchIngredientsWithAllergens(
+            currentQuery,
+            excludedAllergenIds,
+            userId,
+            childId
+          ),
+          searchRecipesWithAllergens(currentQuery, excludedAllergenIds, userId),
+        ]);
+      } else {
+        [ingredientsData, recipesData] = await Promise.all([
+          searchIngredientsWithAllergens(
+            currentQuery,
+            excludedAllergenIds,
+            null,
+            null
+          ),
+          searchRecipesWithAllergens(currentQuery, excludedAllergenIds, null),
+        ]);
+      }
 
       // 結果を結合し、食材を上に、レシピを下に配置
       const combinedResults: CardItem[] = [];

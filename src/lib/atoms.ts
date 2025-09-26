@@ -1,6 +1,12 @@
 import { atom } from "jotai";
 import { Session } from "@supabase/supabase-js";
-import { Allergen, ChildInfo, ParentInfo, User } from "@/types/types";
+import {
+  Allergen,
+  ChildInfo,
+  FavoriteUpdate,
+  ParentInfo,
+  User,
+} from "@/types/types";
 
 export const sessionAtom = atom<Session | null>(null);
 export const loginDialogAtom = atom(false);
@@ -28,3 +34,6 @@ export const childInfoAtom = atom<ChildInfo>({
   allergens: [],
 });
 export const childIdAtom = atom<number | null>(null);
+
+//  気に入り操作の変更を通知するためのアトム
+export const favoriteUpdateAtom = atom<FavoriteUpdate>(null);

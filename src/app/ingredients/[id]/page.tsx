@@ -14,6 +14,7 @@ import { saveRecentlyViewedItem } from "@/lib/localstorage";
 import { useAtomValue } from "jotai";
 import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/atoms";
 import { CardItem, Ingredient } from "@/types/types";
+import IngredientStatusButtons from "@/components/ui/IngredientStatusButtons";
 
 export default function IngredientDetail({
   params,
@@ -24,20 +25,20 @@ export default function IngredientDetail({
   const id = Number(unwrapParams.id);
   const [ingredient, setIngredient] = useState<Ingredient | null>(null);
   const [relatedRecipes, setRelatedRecipes] = useState<CardItem[]>([]);
-  const [hasEaten, setHasEaten] = useState(false);
-  const [isNG, setIsNG] = useState(false);
+  // const [hasEaten, setHasEaten] = useState(false);
+  // const [isNG, setIsNG] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
 
-  const handleEatenClick = () => {
-    setHasEaten((prev) => !prev);
-  };
+  // const handleEatenClick = () => {
+  //   setHasEaten((prev) => !prev);
+  // };
 
-  const handleNGClick = () => {
-    setIsNG((prev) => !prev);
-  };
+  // const handleNGClick = () => {
+  //   setIsNG((prev) => !prev);
+  // };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -137,7 +138,7 @@ export default function IngredientDetail({
                 </p>
 
                 {/* 食べたNGボタン */}
-                <div className="flex justify-center space-x-3 mt-6">
+                {/* <div className="flex justify-center space-x-3 mt-6">
                   <button
                     onClick={handleEatenClick}
                     className={`w-50 flex items-center justify-center py-3 px-4 rounded-full font-medium transition-all ${
@@ -160,7 +161,8 @@ export default function IngredientDetail({
                     <CancelIcon />
                     <span className="ml-2">NG</span>
                   </button>
-                </div>
+                </div> */}
+                <IngredientStatusButtons ingredient={ingredient} />
               </div>
             </section>
 

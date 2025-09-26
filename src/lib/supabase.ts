@@ -729,3 +729,48 @@ export async function toggleFavoriteItem(
     return true;
   }
 }
+
+export async function upsertIngredientStatus(
+  childId: number,
+  ingredientId: number,
+  status: string,
+  userId: string
+) {
+  const { data, error } = await supabase.from("child_ingredient_logs").upsert(
+    {
+      child_id: childId,
+      ingredient_id: ingredientId,
+      status: status,
+      created_by: userId,
+      updated_by: userId,
+      updated_at: new Date().toISOString(),
+      // 既存レコードがあれば created_at はそのまま保持
+    },
+    {
+      onConflict: "child_id, ingredient_id", // このユニーク制約を想定
+      ignoreDuplicates: false,
+    }
+  );
+
+  if (error) {
+    console.error("Error upserting ingredient status:", error.message);
+    return null;
+  }
+  return data;
+}
+
+export async function deleteIngredientStatus(
+  childId: number,
+  ingredientId: number
+) {
+  const { error } = await supabase
+    .from("child_ingredient_logs")
+    .delete()
+    .match({ child_id: childId, ingredient_id: ingredientId });
+
+  if (error) {
+    console.error("Error deleting ingredient status:", error.message);
+    return false;
+  }
+  return true;
+}

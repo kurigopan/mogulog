@@ -15,7 +15,11 @@ import {
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Ingredient } from "@/types/types";
-import { getIngredientsWithStatus } from "@/lib/supabase";
+import {
+  deleteIngredientStatus,
+  getIngredientsWithStatus,
+  upsertIngredientStatus,
+} from "@/lib/supabase";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
   childIdAtom,
@@ -60,32 +64,90 @@ export default function IngredientsList() {
     { value: "ng", label: "NG" },
   ];
 
-  const toggleEaten = (id: number) => {
+  const toggleEaten = async (ingredient: Ingredient) => {
+    if (!userId || !childId) return;
+
+    // 1. **必要なステータスを事前に計算し、ローカル変数に確定させる**
+    const originalEatenStatus = ingredient.eaten;
+    const originalNgStatus = ingredient.ng;
+    const newEatenStatus = !originalEatenStatus;
+    // 2. **UIを即時更新（楽観的更新）**
     setIngredients((prev) =>
-      prev.map((ingredient) =>
-        ingredient.id === id
-          ? {
-              ...ingredient,
-              eaten: !ingredient.eaten,
-              ng: ingredient.eaten ? ingredient.ng : false,
-            }
-          : ingredient
-      )
+      prev.map((ing) => {
+        if (ing.id !== ingredient.id) return ing;
+        return {
+          ...ing,
+          eaten: newEatenStatus,
+          ng: newEatenStatus ? false : ing.ng,
+        };
+      })
     );
+    // 3. **DB操作を実行**
+    try {
+      if (newEatenStatus) {
+        // true: 食べたとして登録/更新
+        await upsertIngredientStatus(childId, ingredient.id, "eaten", userId);
+      } else {
+        // false: 未経験としてDBから削除
+        await deleteIngredientStatus(childId, ingredient.id);
+      }
+    } catch (error) {
+      console.error("DB更新エラー (eaten):", error);
+
+      // 4. **DB操作失敗** -> 状態を元の値にロールバック
+      setIngredients((prev) =>
+        prev.map((ing) => {
+          if (ing.id !== ingredient.id) return ing;
+          return {
+            ...ing,
+            eaten: originalEatenStatus,
+            ng: originalNgStatus,
+          };
+        })
+      );
+    }
   };
 
-  const toggleNG = (id: number) => {
+  const toggleNG = async (ingredient: Ingredient) => {
+    if (!userId || !childId) return;
+    // 1. **必要なステータスを事前に計算し、ローカル変数に確定させる**
+    const originalEatenStatus = ingredient.eaten;
+    const originalNgStatus = ingredient.ng;
+    const newNgStatus = !originalNgStatus;
+    // 2. **UIを即時更新（楽観的更新）**
     setIngredients((prev) =>
-      prev.map((ingredient) =>
-        ingredient.id === id
-          ? {
-              ...ingredient,
-              ng: !ingredient.ng,
-              eaten: ingredient.ng ? ingredient.eaten : false,
-            }
-          : ingredient
-      )
+      prev.map((ing) => {
+        if (ing.id !== ingredient.id) return ing;
+        return {
+          ...ing,
+          eaten: newNgStatus ? false : ing.eaten,
+          ng: newNgStatus,
+        };
+      })
     );
+    // 3. **DB操作を実行**
+    try {
+      if (newNgStatus) {
+        // true -> 'ng'として登録/更新
+        await upsertIngredientStatus(childId, ingredient.id, "ng", userId);
+      } else {
+        // false -> 未経験としてDBから削除
+        await deleteIngredientStatus(childId, ingredient.id);
+      }
+    } catch (error) {
+      console.error("DB更新エラー (ng):", error);
+      // 4. **DB操作失敗** -> 状態を元の値にロールバック
+      setIngredients((prev) =>
+        prev.map((ing) => {
+          if (ing.id !== ingredient.id) return ing;
+          return {
+            ...ing,
+            eaten: originalEatenStatus,
+            ng: originalNgStatus,
+          };
+        })
+      );
+    }
   };
 
   const filteredIngredients = ingredients.filter((ingredient) => {
@@ -325,7 +387,7 @@ export default function IngredientsList() {
                             {/* 食べたチェック */}
                             <div className="w-12 text-center">
                               <button
-                                onClick={() => toggleEaten(ingredient.id)}
+                                onClick={() => toggleEaten(ingredient)}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${
                                   ingredient.eaten
                                     ? "text-green-600 hover:text-green-700"
@@ -343,7 +405,7 @@ export default function IngredientsList() {
                             {/* NGチェック */}
                             <div className="w-10 text-center">
                               <button
-                                onClick={() => toggleNG(ingredient.id)}
+                                onClick={() => toggleNG(ingredient)}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${
                                   ingredient.ng
                                     ? "text-red-600 hover:text-red-700"

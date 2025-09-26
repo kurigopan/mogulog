@@ -49,9 +49,11 @@ export default function MyPage() {
   const childId = useAtomValue(childIdAtom);
   const router = useRouter();
 
-  if (!userId || !childId) {
-    router.push("/");
-  }
+  console.log("userId:", userId);
+  console.log("childId:", childId);
+  // if (!userId || !childId) {
+  //   router.push("/");
+  // }
 
   // アバター画像の変更処理
   const onUpLoadImage = useCallback(

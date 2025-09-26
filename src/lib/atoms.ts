@@ -35,5 +35,5 @@ export const childInfoAtom = atom<ChildInfo>({
 });
 export const childIdAtom = atom<number | null>(null);
 
-//  気に入り操作の変更を通知するためのアトム
+//  お気に入り操作の変更を通知するためのアトム
 export const favoriteUpdateAtom = atom<FavoriteUpdate>(null);

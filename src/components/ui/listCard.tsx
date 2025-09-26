@@ -4,16 +4,16 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ImageIcon } from "@/icons";
-import { CardItem, PageName } from "@/types/types";
+import { ListCardItem, PageName } from "@/types/types";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 
 type ListCardProps = {
-  cardItems: CardItem[];
+  cardItems: ListCardItem[];
   pageName: PageName;
 };
 
 export default function ListCard({ cardItems, pageName }: ListCardProps) {
-  const iconArea = (item: CardItem) => {
+  const iconArea = (item: ListCardItem) => {
     if (
       pageName === "search" ||
       pageName === "history" ||

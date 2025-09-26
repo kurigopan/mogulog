@@ -10,11 +10,11 @@ import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import { getRecipesCreatedByUser } from "@/lib/supabase";
-import { CardItem } from "@/types/types";
+import { ListCardItem } from "@/types/types";
 
 export default function CreatedRecipes() {
   const setLoading = useSetAtom(loadingAtom);
-  const [createdRecipes, setCreatedRecipes] = useState<CardItem[]>([]);
+  const [createdRecipes, setCreatedRecipes] = useState<ListCardItem[]>([]);
   const userId = useAtomValue(userIdAtom);
   const router = useRouter();
 

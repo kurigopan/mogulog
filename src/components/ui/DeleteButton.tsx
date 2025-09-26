@@ -1,6 +1,7 @@
 "use client";
 
 import { ClearIcon, DeleteIcon } from "@/icons";
+import { CardItem } from "@/types/types";
 
 export default function DeleteButton() {
   const handleDelete = (e: React.MouseEvent<HTMLElement>, item: CardItem) => {

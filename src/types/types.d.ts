@@ -6,11 +6,14 @@ export interface CardItem {
   category: Category;
   type: Type;
   startStage: Stage;
-  isFavorite: boolean;
   date: Date;
 }
 
-export interface Ingredient extends CardItem {
+export interface ListCardItem extends CardItem {
+  isFavorite: boolean;
+}
+
+export interface Ingredient extends ListCardItem {
   eaten: boolean;
   ng: boolean;
   season: Season[];
@@ -19,7 +22,7 @@ export interface Ingredient extends CardItem {
   tips: string[];
 }
 
-export interface Recipe extends CardItem {
+export interface Recipe extends ListCardItem {
   cookingTime: string | null;
   servings: string | null;
   ingredients: recipeIngredient[];

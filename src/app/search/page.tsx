@@ -17,12 +17,12 @@ import {
   searchIngredientsWithAllergens,
   searchRecipesWithAllergens,
 } from "@/lib/supabase";
-import { Allergen, CardItem } from "@/types/types";
+import { Allergen, ListCardItem } from "@/types/types";
 
 export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const [results, setResults] = useState<CardItem[]>([]);
+  const [results, setResults] = useState<ListCardItem[]>([]);
   const setLoading = useSetAtom(loadingAtom);
   // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
   const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
@@ -53,8 +53,8 @@ export default function SearchResults() {
         .filter((id) => allergenExclusions[id] === true)
         .map(Number);
 
-      let ingredientsData: CardItem[] | null = [];
-      let recipesData: CardItem[] | null = [];
+      let ingredientsData: ListCardItem[] | null = [];
+      let recipesData: ListCardItem[] | null = [];
       // Promise.allを使ってレシピと食材の検索を同時に実行
       if (userId) {
         [ingredientsData, recipesData] = await Promise.all([
@@ -79,7 +79,7 @@ export default function SearchResults() {
       }
 
       // 結果を結合し、食材を上に、レシピを下に配置
-      const combinedResults: CardItem[] = [];
+      const combinedResults: ListCardItem[] = [];
       if (ingredientsData) {
         combinedResults.push(...ingredientsData);
       }

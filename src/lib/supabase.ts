@@ -131,8 +131,8 @@ export async function searchIngredientsWithAllergens(
     return null;
   }
 
-  const validatedData = z.array(rpcIngredientSchema).parse(data);
-  return validatedData.map((d) => ingredientSchema.parse(d));
+  const validatedData = z.array(rpcIngredientCardSchema).parse(data);
+  return validatedData.map((d) => ingredientCardSchema.parse(d));
 }
 
 // アレルゲンを除外したレシピ検索

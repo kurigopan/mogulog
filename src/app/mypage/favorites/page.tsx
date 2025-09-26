@@ -10,15 +10,15 @@ import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { favoriteUpdateAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
-import { CardItem } from "@/types/types";
+import { ListCardItem } from "@/types/types";
 
 export default function Favorites() {
   const router = useRouter();
   const setLoading = useSetAtom(loadingAtom);
-  const [favoriteRecipes, setFavoriteRecipes] = useState<CardItem[]>([]);
-  const [favoriteIngredients, setFavoriteIngredients] = useState<CardItem[]>(
-    []
-  );
+  const [favoriteRecipes, setFavoriteRecipes] = useState<ListCardItem[]>([]);
+  const [favoriteIngredients, setFavoriteIngredients] = useState<
+    ListCardItem[]
+  >([]);
   const userId = useAtomValue(userIdAtom);
   const favoriteUpdate = useAtomValue(favoriteUpdateAtom);
   // const [removedItemKeys, setRemovedItemKeys] = useState<string[]>([]);
@@ -46,7 +46,7 @@ export default function Favorites() {
 
     const { itemId, itemType, isFavorited } = favoriteUpdate;
 
-    const updateList = (prevList: CardItem[]) => {
+    const updateList = (prevList: ListCardItem[]) => {
       // リスト全体をマップし、対象アイテムの isFavorite フラグを更新
       return prevList.map((item) => {
         if (item.id === itemId && item.type === itemType) {

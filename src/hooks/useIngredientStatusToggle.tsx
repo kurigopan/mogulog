@@ -3,14 +3,15 @@ import { useAtomValue } from "jotai";
 import { userIdAtom, childIdAtom } from "@/lib/atoms";
 import { upsertIngredientStatus, deleteIngredientStatus } from "@/lib/supabase";
 import { Ingredient } from "@/types/types";
+import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   const [eaten, setEaten] = useState(ingredient.eaten);
   const [ng, setNG] = useState(ingredient.ng);
-
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const ingredientId = ingredient.id;
+  const requireLogin = useRequireLogin();
 
   useEffect(() => {
     setEaten(ingredient.eaten);
@@ -18,7 +19,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   }, [ingredient]);
 
   const toggleEaten = async () => {
-    if (!userId || !childId) return;
+    if (!requireLogin() || !childId) return;
 
     // 1. ローカル変数に確定
     const newEatenStatus = !eaten;
@@ -34,7 +35,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
     try {
       // 3. DB操作を実行
       if (newEatenStatus) {
-        await upsertIngredientStatus(childId, ingredientId, "eaten", userId);
+        await upsertIngredientStatus(childId, ingredientId, "eaten", userId!);
       } else {
         await deleteIngredientStatus(childId, ingredientId);
       }
@@ -48,7 +49,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   };
 
   const toggleNG = async () => {
-    if (!userId || !childId) return;
+    if (!requireLogin() || !childId) return;
 
     // 1. ローカル変数に確定
     const newNGStatus = !ng;
@@ -64,7 +65,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
     try {
       // 3. DB操作を実行
       if (newNGStatus) {
-        await upsertIngredientStatus(childId, ingredientId, "ng", userId);
+        await upsertIngredientStatus(childId, ingredientId, "ng", userId!);
       } else {
         await deleteIngredientStatus(childId, ingredientId);
       }

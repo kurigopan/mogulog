@@ -3,7 +3,6 @@
 import { use, useState, useEffect } from "react";
 import Image from "next/image";
 import { Tabs, Tab, Box } from "@mui/material";
-import { CheckCircleIcon, CancelIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Card from "@/components/ui/Card";
@@ -25,20 +24,10 @@ export default function IngredientDetail({
   const id = Number(unwrapParams.id);
   const [ingredient, setIngredient] = useState<Ingredient | null>(null);
   const [relatedRecipes, setRelatedRecipes] = useState<CardItem[]>([]);
-  // const [hasEaten, setHasEaten] = useState(false);
-  // const [isNG, setIsNG] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
-
-  // const handleEatenClick = () => {
-  //   setHasEaten((prev) => !prev);
-  // };
-
-  // const handleNGClick = () => {
-  //   setIsNG((prev) => !prev);
-  // };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -138,30 +127,6 @@ export default function IngredientDetail({
                 </p>
 
                 {/* 食べたNGボタン */}
-                {/* <div className="flex justify-center space-x-3 mt-6">
-                  <button
-                    onClick={handleEatenClick}
-                    className={`w-50 flex items-center justify-center py-3 px-4 rounded-full font-medium transition-all ${
-                      hasEaten
-                        ? "bg-green-100 text-green-600 border-2 border-green-200"
-                        : "bg-stone-100 text-stone-600 hover:bg-green-50 border-2 border-transparent"
-                    }`}
-                  >
-                    <CheckCircleIcon />
-                    <span className="ml-2">食べた</span>
-                  </button>
-                  <button
-                    onClick={handleNGClick}
-                    className={`w-50 flex items-center justify-center py-3 px-4 rounded-full font-medium transition-all ${
-                      isNG
-                        ? "bg-red-100 text-red-600 border-2 border-red-200"
-                        : "bg-stone-100 text-stone-600 hover:bg-red-50 border-2 border-transparent"
-                    }`}
-                  >
-                    <CancelIcon />
-                    <span className="ml-2">NG</span>
-                  </button>
-                </div> */}
                 <IngredientStatusButtons ingredient={ingredient} />
               </div>
             </section>

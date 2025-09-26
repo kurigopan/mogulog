@@ -28,6 +28,7 @@ import {
   userIdAtom,
 } from "@/lib/atoms";
 import { getAgeStageDisplay } from "@/lib/utils";
+import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 export default function IngredientsList() {
   const [showFilters, setShowFilters] = useState(false);
@@ -39,6 +40,7 @@ export default function IngredientsList() {
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
+  const requireLogin = useRequireLogin();
 
   const categories = [
     { value: "all", label: "すべて" },
@@ -65,7 +67,7 @@ export default function IngredientsList() {
   ];
 
   const toggleEaten = async (ingredient: Ingredient) => {
-    if (!userId || !childId) return;
+    if (!requireLogin() || !childId) return;
 
     // 1. **必要なステータスを事前に計算し、ローカル変数に確定させる**
     const originalEatenStatus = ingredient.eaten;
@@ -86,7 +88,7 @@ export default function IngredientsList() {
     try {
       if (newEatenStatus) {
         // true: 食べたとして登録/更新
-        await upsertIngredientStatus(childId, ingredient.id, "eaten", userId);
+        await upsertIngredientStatus(childId, ingredient.id, "eaten", userId!);
       } else {
         // false: 未経験としてDBから削除
         await deleteIngredientStatus(childId, ingredient.id);
@@ -109,7 +111,7 @@ export default function IngredientsList() {
   };
 
   const toggleNG = async (ingredient: Ingredient) => {
-    if (!userId || !childId) return;
+    if (!requireLogin() || !childId) return;
     // 1. **必要なステータスを事前に計算し、ローカル変数に確定させる**
     const originalEatenStatus = ingredient.eaten;
     const originalNgStatus = ingredient.ng;
@@ -129,7 +131,7 @@ export default function IngredientsList() {
     try {
       if (newNgStatus) {
         // true -> 'ng'として登録/更新
-        await upsertIngredientStatus(childId, ingredient.id, "ng", userId);
+        await upsertIngredientStatus(childId, ingredient.id, "ng", userId!);
       } else {
         // false -> 未経験としてDBから削除
         await deleteIngredientStatus(childId, ingredient.id);

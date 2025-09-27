@@ -4,27 +4,39 @@ import { useEffect, useState } from "react";
 import { RecommendIcon } from "@/icons";
 import Card from "@/components/ui/Card";
 import { CardItem } from "@/types/types";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
+import { getRecommendedRecipes } from "@/lib/supabase";
 
 type RecommendedRecipesProps = {
-  allRecipes: CardItem[];
   childAgeStage: string;
 };
 
 export default function RecommendedRecipes({
-  allRecipes,
   childAgeStage,
 }: RecommendedRecipesProps) {
   const [recommendedRecipes, setRecommendedRecipes] = useState<CardItem[]>([]);
+  const setLoading = useSetAtom(loadingAtom);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 子どもの月齢でフィルター
-    const filteredRecipes = allRecipes.filter(
-      (recipe) => recipe.startStage === childAgeStage
-    );
-    // シャッフルして先頭5件を推薦レシピに設定
-    const shuffled = [...filteredRecipes].sort(() => 0.5 - Math.random());
-    setRecommendedRecipes(shuffled.slice(0, 5));
-  }, [allRecipes, childAgeStage]);
+    const fetchRecipes = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const recipes = await getRecommendedRecipes(childAgeStage);
+        if (recipes) {
+          setRecommendedRecipes(recipes);
+        }
+      } catch {
+        setError("予期せぬエラーが発生しました");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, [childAgeStage]);
 
   return (
     <>

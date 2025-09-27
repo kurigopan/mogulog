@@ -63,8 +63,7 @@ export const ingredientStageInfoSchema = z.object({
 });
 
 // 1. データベースから直接取得するデータのスキーマを定義
-// APIレスポンスに status情報が含まれるため、rpcIngredientSchemaにリネーム
-const dbIngredientSchema = z.object({
+const dbIngredientCardSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string().nullable(),
@@ -81,75 +80,56 @@ const dbIngredientSchema = z.object({
   updated_by: z.string(),
 });
 // カスタム関数が返すデータのZodスキーマを定義
-export const rpcIngredientSchema = dbIngredientSchema.extend({
+export const rpcIngredientListCardSchema = dbIngredientCardSchema.extend({
+  is_favorite: z.boolean().nullable(),
+});
+export const rpcIngredientDetailSchema = dbIngredientCardSchema.extend({
   is_favorite: z.boolean().nullable(),
   eaten: z.boolean().nullable(),
   ng: z.boolean().nullable(),
 });
-export const rpcIngredientCardSchema = dbIngredientSchema.extend({
-  is_favorite: z.boolean().nullable(),
-});
 
 // 2. rpcIngredientSchemaを使い、.transform()でフロントエンドの型に変換
-export const ingredientSchema = rpcIngredientSchema.transform((dbData) => {
-  return {
-    // --- プロパティ名のマッピング ---
-    image: dbData.image_url,
-    startStage: dbData.start_stage,
-    season: dbData.seasons as Season[],
+const ingredientSchema = (dbData: z.infer<typeof dbIngredientCardSchema>) => ({
+  // --- プロパティ名のマッピング ---
+  image: dbData.image_url,
+  startStage: dbData.start_stage,
+  season: dbData.seasons as Season[],
 
-    // --- 値の変換 ---
-    date: new Date(dbData.updated_at),
+  // --- 値の変換 ---
+  date: new Date(dbData.updated_at),
 
-    // --- 固定値やデフォルト値の追加 ---
-    type: "ingredient" as const, // フロントで必要な固定値
+  // --- 固定値やデフォルト値の追加 ---
+  type: "ingredient" as const, // フロントで必要な固定値
 
-    // --- isFavorite, eaten, ngはnullの場合falseに変換 ---
+  // --- そのまま渡すプロパティ ---
+  id: dbData.id,
+  name: dbData.name,
+  description: dbData.description,
+  category: dbData.category,
+  stageInfo: dbData.stage_info,
+  nutrition: dbData.nutrition as ingredientNutrition,
+  tips: dbData.tips,
+});
+export const ingredientCardSchema =
+  dbIngredientCardSchema.transform(ingredientSchema);
+export const ingredientListCardSchema = rpcIngredientListCardSchema.transform(
+  (dbData) => ({
+    ...ingredientSchema(dbData),
+    isFavorite: dbData.is_favorite ?? false,
+  })
+);
+export const ingredientDetailSchema = rpcIngredientDetailSchema.transform(
+  (dbData) => ({
+    ...ingredientSchema(dbData),
     isFavorite: dbData.is_favorite ?? false,
     eaten: dbData.eaten ?? false,
     ng: dbData.ng ?? false,
-
-    // --- そのまま渡すプロパティ ---
-    id: dbData.id,
-    name: dbData.name,
-    description: dbData.description,
-    category: dbData.category,
-    stageInfo: dbData.stage_info,
-    nutrition: dbData.nutrition as ingredientNutrition,
-    tips: dbData.tips,
-  };
-});
-export const ingredientCardSchema = rpcIngredientCardSchema.transform(
-  (dbData) => {
-    return {
-      // --- プロパティ名のマッピング ---
-      image: dbData.image_url,
-      startStage: dbData.start_stage,
-      season: dbData.seasons as Season[],
-
-      // --- 値の変換 ---
-      date: new Date(dbData.updated_at),
-
-      // --- 固定値やデフォルト値の追加 ---
-      type: "ingredient" as const, // フロントで必要な固定値
-
-      // --- isFavorite, eaten, ngはnullの場合falseに変換 ---
-      isFavorite: dbData.is_favorite ?? false,
-
-      // --- そのまま渡すプロパティ ---
-      id: dbData.id,
-      name: dbData.name,
-      description: dbData.description,
-      category: dbData.category,
-      stageInfo: dbData.stage_info,
-      nutrition: dbData.nutrition as ingredientNutrition,
-      tips: dbData.tips,
-    };
-  }
+  })
 );
 
 // ingredientsテーブルからのレスポンス全体（配列）のスキーマ
-export const ingredientsResponseSchema = z.array(dbIngredientSchema);
+export const ingredientsResponseSchema = z.array(dbIngredientCardSchema);
 
 // スキーマからTypeScriptの型を推論
 export type SupabaseSeason = z.infer<typeof seasonSchema>;
@@ -172,8 +152,7 @@ export const recipeStepSchema = z.object({
 });
 
 // 1.データベースから直接取得するレシピデータのスキーマを定義
-// APIレスポンスに status情報が含まれるため、rpcIngredientSchemaにリネーム
-export const dbRecipeSchema = z.object({
+export const dbRecipeCardSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string().nullable(),
@@ -194,80 +173,53 @@ export const dbRecipeSchema = z.object({
   updated_by: z.string(),
 });
 // カスタム関数が返すデータのZodスキーマを定義
-// is_favoriteがBooleanとして含まれる
-export const rpcRecipeSchema = dbRecipeSchema.extend({
+export const rpcRecipeListCardSchema = dbRecipeCardSchema.extend({
+  is_favorite: z.boolean().nullable(),
+});
+export const rpcRecipeDetailSchema = dbRecipeCardSchema.extend({
   is_favorite: z.boolean().nullable(),
   is_own: z.boolean().nullable(),
   author: z.string(),
 });
-export const rpcRecipeCardSchema = dbRecipeSchema.extend({
-  is_favorite: z.boolean().nullable(),
-});
 
 // 2.rpcRecipeSchemaを使い、.transform()でフロントエンドの型に変換
-export const recipeSchema = rpcRecipeSchema.transform((dbData) => {
-  return {
-    // --- プロパティ名のマッピング ---
-    image: dbData.image_url,
-    startStage: dbData.start_stage,
-    cookingTime: dbData.cooking_time,
-    isPrivate: dbData.is_private,
-    savedMemo: dbData.memo,
+const recipeSchema = (dbData: z.infer<typeof dbRecipeCardSchema>) => ({
+  // --- プロパティ名のマッピング ---
+  image: dbData.image_url,
+  startStage: dbData.start_stage,
+  cookingTime: dbData.cooking_time,
+  isPrivate: dbData.is_private,
+  savedMemo: dbData.memo,
 
-    // --- 値の変換 ---
-    date: convertUtcToJst(dbData.updated_at),
+  // --- 値の変換 ---
+  date: convertUtcToJst(dbData.updated_at),
 
-    // --- 固定値やデフォルト値の追加 ---
-    type: "recipe" as const, // フロントで必要な固定値
+  // --- 固定値やデフォルト値の追加 ---
+  type: "recipe" as const,
 
-    // --- isFavoriteはnullの場合falseに変換 ---
-    isFavorite: dbData.is_favorite ?? false,
-    isOwn: dbData.is_own ?? false,
-    author: dbData.author,
-
-    // --- そのまま渡すプロパティ ---
-    id: dbData.id,
-    name: dbData.name,
-    description: dbData.description,
-    category: dbData.category,
-    servings: dbData.servings,
-    tags: dbData.tags,
-    ingredients: dbData.ingredients,
-    steps: dbData.steps,
-    // status: dbData.status,
-  };
+  // --- そのまま渡すプロパティ ---
+  id: dbData.id,
+  name: dbData.name,
+  description: dbData.description,
+  category: dbData.category,
+  servings: dbData.servings,
+  tags: dbData.tags,
+  ingredients: dbData.ingredients,
+  steps: dbData.steps,
 });
-
-export const recipeCardSchema = rpcRecipeCardSchema.transform((dbData) => {
-  return {
-    // --- プロパティ名のマッピング ---
-    image: dbData.image_url,
-    startStage: dbData.start_stage,
-    cookingTime: dbData.cooking_time,
-    isPrivate: dbData.is_private,
-    savedMemo: dbData.memo,
-
-    // --- 値の変換 ---
-    date: convertUtcToJst(dbData.updated_at),
-
-    // --- 固定値やデフォルト値の追加 ---
-    type: "recipe" as const, // フロントで必要な固定値
-
-    // --- isFavoriteはnullの場合falseに変換 ---
+export const recipeCardSchema = dbRecipeCardSchema.transform(recipeSchema);
+export const recipeListCardSchema = rpcRecipeListCardSchema.transform(
+  (dbData) => ({
+    ...recipeSchema(dbData),
     isFavorite: dbData.is_favorite ?? false,
-
-    // --- そのまま渡すプロパティ ---
-    id: dbData.id,
-    name: dbData.name,
-    description: dbData.description,
-    category: dbData.category,
-    servings: dbData.servings,
-    tags: dbData.tags,
-    ingredients: dbData.ingredients,
-    steps: dbData.steps,
-    // status: dbData.status,
-  };
-});
+  })
+);
+export const recipeDetailSchema = rpcRecipeDetailSchema.transform((dbData) => ({
+  ...recipeSchema(dbData),
+  isFavorite: dbData.is_favorite ?? false,
+  isOwn: dbData.is_own ?? false,
+  author: dbData.author,
+}));
 
 /**
  * フロントエンドのレシピデータをSupabaseのデータベースの形式に変換する

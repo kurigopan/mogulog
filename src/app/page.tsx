@@ -89,10 +89,7 @@ export default async function Home() {
         </section>
 
         {/* おすすめのレシピ  */}
-        <RecommendedRecipes
-          allRecipes={allRecipes}
-          childAgeStage={childAgeStage}
-        />
+        <RecommendedRecipes childAgeStage={childAgeStage} />
 
         {/* 最近見たもの */}
         <RecentItems />

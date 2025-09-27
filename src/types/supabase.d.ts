@@ -719,6 +719,28 @@ export type Database = {
           updated_by: string;
         }[];
       };
+      get_recommended_recipes: {
+        Args: { limit_count: number; stage: string };
+        Returns: {
+          category: string;
+          cooking_time: string | null;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          id: number;
+          image_url: string | null;
+          ingredients: Json;
+          is_private: boolean;
+          memo: string | null;
+          name: string;
+          servings: string | null;
+          start_stage: string;
+          steps: Json;
+          tags: string[];
+          updated_at: string;
+          updated_by: string;
+        }[];
+      };
       search_ingredients_with_allergens: {
         Args: {
           child_id_param: number | null;

@@ -1,17 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { formatRecipeForSupabase } from "@/types/schemas";
-import { Database } from "@/types/supabase";
 import {
-  rpcIngredientSchema,
-  ingredientSchema,
-  rpcRecipeSchema,
-  recipeSchema,
-  rpcIngredientCardSchema,
-  ingredientCardSchema,
+  dbRecipeCardSchema,
+  formatRecipeForSupabase,
+  ingredientDetailSchema,
+  ingredientListCardSchema,
   recipeCardSchema,
-  rpcRecipeCardSchema,
+  recipeDetailSchema,
+  recipeListCardSchema,
+  rpcIngredientDetailSchema,
+  rpcIngredientListCardSchema,
+  rpcRecipeDetailSchema,
+  rpcRecipeListCardSchema,
 } from "@/types/schemas";
+import { Database } from "@/types/supabase";
 import {
   Child,
   ChildAllergens,
@@ -131,8 +133,8 @@ export async function searchIngredientsWithAllergens(
     return null;
   }
 
-  const validatedData = z.array(rpcIngredientCardSchema).parse(data);
-  return validatedData.map((d) => ingredientCardSchema.parse(d));
+  const validatedData = z.array(rpcIngredientListCardSchema).parse(data);
+  return validatedData.map((d) => ingredientListCardSchema.parse(d));
 }
 
 // アレルゲンを除外したレシピ検索
@@ -152,8 +154,8 @@ export async function searchRecipesWithAllergens(
     return [];
   }
 
-  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-  return validatedData.map((d) => recipeCardSchema.parse(d));
+  const validatedData = z.array(rpcRecipeListCardSchema).parse(data);
+  return validatedData.map((d) => recipeListCardSchema.parse(d));
 }
 
 // 離乳食段階と食材名を考慮したレシピ検索
@@ -173,7 +175,7 @@ export async function searchRecipesByIngredient(
     return [];
   }
 
-  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
+  const validatedData = z.array(dbRecipeCardSchema).parse(data);
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
@@ -188,7 +190,7 @@ export async function getRecipes(userId: string | null = null) {
     return [];
   }
 
-  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
+  const validatedData = z.array(dbRecipeCardSchema).parse(data);
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
@@ -209,8 +211,8 @@ export async function getIngredientById(
     return null;
   }
 
-  const validatedData = rpcIngredientSchema.parse(data[0]);
-  return ingredientSchema.parse(validatedData);
+  const validatedData = rpcIngredientDetailSchema.parse(data[0]);
+  return ingredientDetailSchema.parse(validatedData);
 }
 
 // レシピIDに基づいてレシピ情報を取得
@@ -228,8 +230,8 @@ export async function getRecipeById(
     return null;
   }
 
-  const validatedData = rpcRecipeSchema.parse(data[0]);
-  return recipeSchema.parse(validatedData);
+  const validatedData = rpcRecipeDetailSchema.parse(data[0]);
+  return recipeDetailSchema.parse(validatedData);
 }
 
 // 食材一覧と子どもの食べた履歴を取得
@@ -247,8 +249,8 @@ export async function getIngredientsWithStatus(
     return [];
   }
 
-  const validatedData = z.array(rpcIngredientSchema).parse(data);
-  return validatedData.map((d) => ingredientSchema.parse(d));
+  const validatedData = z.array(rpcIngredientDetailSchema).parse(data);
+  return validatedData.map((d) => ingredientDetailSchema.parse(d));
 }
 
 // レシピIDに基づいてアレルゲンのIDと名前を取得
@@ -305,8 +307,8 @@ export async function getFavoriteIngredients(userId: string) {
     return [];
   }
 
-  const validatedData = z.array(rpcIngredientCardSchema).parse(data);
-  return validatedData.map((d) => ingredientCardSchema.parse(d));
+  const validatedData = z.array(rpcIngredientListCardSchema).parse(data);
+  return validatedData.map((d) => ingredientListCardSchema.parse(d));
 }
 
 // ユーザーごとのレシピお気に入り登録データを取得する関数
@@ -320,8 +322,8 @@ export async function getFavoriteRecipes(userId: string) {
     return [];
   }
 
-  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-  return validatedData.map((d) => recipeCardSchema.parse(d));
+  const validatedData = z.array(rpcRecipeListCardSchema).parse(data);
+  return validatedData.map((d) => recipeListCardSchema.parse(d));
 }
 
 export async function createProfile(
@@ -449,8 +451,8 @@ export async function createRecipe(
     throw error;
   }
 
-  const validatedData = rpcRecipeSchema.parse(data);
-  return recipeSchema.parse(validatedData);
+  const validatedData = rpcRecipeDetailSchema.parse(data);
+  return recipeDetailSchema.parse(validatedData);
 }
 
 export async function updateProfile(
@@ -611,8 +613,8 @@ export async function getRecipesCreatedByUser(userId: string) {
     return [];
   }
 
-  const validatedData = z.array(rpcRecipeCardSchema).parse(data);
-  return validatedData.map((d) => recipeCardSchema.parse(d));
+  const validatedData = z.array(rpcRecipeListCardSchema).parse(data);
+  return validatedData.map((d) => recipeListCardSchema.parse(d));
 }
 
 export async function signup(email: string, password: string) {
@@ -773,4 +775,19 @@ export async function deleteIngredientStatus(
     return false;
   }
   return true;
+}
+
+// おすすめレシピを５件取得
+export async function getRecommendedRecipes(childAgeStage: string) {
+  const { data, error } = await supabase.rpc("get_recommended_recipes", {
+    stage: childAgeStage,
+    limit_count: 5,
+  });
+
+  if (error) {
+    console.error("Error fetching recommended recipes:", error.message);
+    return [];
+  }
+  const validatedData = z.array(dbRecipeCardSchema).parse(data);
+  return validatedData.map((d) => recipeCardSchema.parse(d));
 }

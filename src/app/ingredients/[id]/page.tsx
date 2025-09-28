@@ -180,7 +180,7 @@ export default function IngredientDetail({
                         <h4 className="text-xl font-bold text-stone-700">
                           離乳食{info.stage}
                         </h4>
-                        <span className="bg-purple-50 text-purple-600 px-3 py-2 rounded-full text-sm font-medium">
+                        <span className="bg-violet-50 text-violet-600 px-3 py-2 rounded-full text-sm font-medium">
                           {info.age}
                         </span>
                       </div>
@@ -275,7 +275,7 @@ export default function IngredientDetail({
                 <h3 className="text-lg font-bold text-stone-700 mb-4">
                   関連レシピ
                 </h3>
-                <Card cardItems={relatedRecipes} className="bg-purple-100" />
+                <Card cardItems={relatedRecipes} className="bg-violet-100" />
               </section>
             )}
           </>

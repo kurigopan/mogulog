@@ -35,21 +35,21 @@ export default function Card({ cardItems, className }: CardProps) {
                 />
               )}
             </div>
-            <h3 className="font-medium text-stone-700 text-sm mb-1 group-hover:text-purple-600 transition-colors">
+            <h3 className="font-medium text-stone-700 text-sm mb-1 group-hover:text-violet-600 transition-colors">
               {item.name}
             </h3>
             <div className="flex justify-center gap-4">
               <div
                 className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${
                   className ?? ""
-                } text-stone-600 mb-1 group-hover:bg-purple-100 transition-colors`}
+                } text-stone-600 mb-1 group-hover:bg-violet-100 transition-colors`}
               >
                 {item.startStage}
               </div>
               <div
                 className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${
                   className ?? ""
-                } text-stone-600 mb-1 group-hover:bg-purple-100 transition-colors`}
+                } text-stone-600 mb-1 group-hover:bg-violet-100 transition-colors`}
               >
                 {item.category}
               </div>

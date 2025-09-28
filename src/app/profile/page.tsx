@@ -167,7 +167,7 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-violet-50 flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold text-stone-700 text-center mb-2">
@@ -192,7 +192,7 @@ export default function ProfilePage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
+                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
                 />
                 {errors?.name && (
                   <p className="mt-2 text-sm text-red-500">{errors.name[0]}</p>
@@ -241,7 +241,7 @@ export default function ProfilePage() {
               </div>
               <button
                 onClick={handleNext}
-                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
               >
                 つぎへ
               </button>
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                   name="childName"
                   value={formData.childName}
                   onChange={handleChange}
-                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
+                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
                 />
                 {errors?.childName && (
                   <p className="mt-2 text-sm text-red-500">
@@ -276,7 +276,7 @@ export default function ProfilePage() {
                   name="childBirthday"
                   value={formData.childBirthday}
                   onChange={handleChange}
-                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
+                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
                 />
                 {errors?.childBirthday && (
                   <p className="mt-2 text-sm text-red-500">
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                       onClick={() => toggleAllergen(allergen.id)}
                       className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
                         allergenExclusions[allergen.id]
-                          ? "bg-purple-400 text-white"
+                          ? "bg-violet-400 text-white"
                           : "bg-stone-200 text-stone-600 hover:bg-stone-300"
                       }`}
                     >
@@ -308,7 +308,7 @@ export default function ProfilePage() {
               </div>
               <button
                 onClick={handleSaveProfile}
-                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
               >
                 保存してはじめる
               </button>

@@ -44,12 +44,12 @@ export default function Welcome() {
 
   if (currentScreen === "welcome") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 to-violet-50 flex flex-col">
         <div className="flex-1 flex flex-col items-center justify-center p-6">
           {/* Logo & Title */}
           <div className="text-center mb-8">
             <div className="flex justify-center items-center mb-3">
-              <div className="text-purple-400 text-4xl mr-3">
+              <div className="text-violet-400 text-4xl mr-3">
                 <ChildCareIcon fontSize="inherit" />
               </div>
               <h1 className="text-4xl font-bold text-stone-700">もぐログ</h1>
@@ -79,9 +79,9 @@ export default function Welcome() {
                 {freeFeatures.map((feature, index) => (
                   <div
                     key={index}
-                    className="flex items-start p-4 bg-purple-50 rounded-3xl"
+                    className="flex items-start p-4 bg-violet-50 rounded-3xl"
                   >
-                    <div className="flex-shrink-0 w-12 h-12 bg-white rounded-3xl flex items-center justify-center text-purple-500 mr-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-white rounded-3xl flex items-center justify-center text-violet-500 mr-4">
                       {feature.icon}
                     </div>
                     <div className="flex-1">
@@ -100,7 +100,7 @@ export default function Welcome() {
             {/* Start Button */}
             <button
               onClick={() => setCurrentScreen("loginPrompt")}
-              className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+              className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
             >
               <span>つぎへ</span>
               <ArrowForwardIcon className="ml-2" />
@@ -118,12 +118,12 @@ export default function Welcome() {
 
   // Login Prompt Screen
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-violet-50 flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         {/* Logo */}
         <div className="text-center mb-6">
           <div className="flex justify-center items-center mb-2">
-            <div className="text-purple-400 text-3xl mr-3">
+            <div className="text-violet-400 text-3xl mr-3">
               <ChildCareIcon />
             </div>
             <h1 className="text-3xl font-bold text-stone-700">もぐログ</h1>
@@ -133,8 +133,8 @@ export default function Welcome() {
         {/* ログインプロンプト */}
         <div className="bg-white rounded-3xl shadow-lg p-6 w-full max-w-md">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-              <LoginIcon className="text-purple-500 text-3xl" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-100 rounded-full mb-4">
+              <LoginIcon className="text-violet-500 text-3xl" />
             </div>
             <h2 className="text-xl font-bold text-stone-700 mb-2">
               ログインでもっと便利に！
@@ -145,11 +145,11 @@ export default function Welcome() {
           </div>
 
           {/* 機能一覧 */}
-          <div className="bg-purple-50 rounded-3xl p-6 mb-6">
+          <div className="bg-violet-50 rounded-3xl p-6 mb-6">
             <ul className="space-y-3">
               {loginFeatures.map((feature, index) => (
                 <li key={index} className="flex items-start">
-                  <CheckCircleOutlineIcon className="text-purple-400 text-lg mr-3 mt-0.5" />
+                  <CheckCircleOutlineIcon className="text-violet-400 text-lg mr-3 mt-0.5" />
                   <span className="text-stone-700 text-sm">{feature}</span>
                 </li>
               ))}
@@ -159,7 +159,7 @@ export default function Welcome() {
           {/* ボタン */}
           <div className="space-y-3">
             <Link href="/authform">
-              <button className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-purple-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all mb-2">
+              <button className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all mb-2">
                 ログイン・新規登録する
               </button>
             </Link>

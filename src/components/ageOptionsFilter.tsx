@@ -49,8 +49,8 @@ export default function AgeOptionsFilter() {
         className="flex items-center p-1 rounded-full transition-colors"
       >
         <span className="text-sm text-stone-600 font-normal">月齢</span>
-        <div className="flex items-center px-2 py-1 bg-purple-50 rounded-full ml-1 hover:bg-purple-100">
-          <span className="text-sm text-purple-600 font-medium">
+        <div className="flex items-center px-2 py-1 bg-violet-50 rounded-full ml-1 hover:bg-violet-100">
+          <span className="text-sm text-violet-600 font-medium">
             {childAge}ヶ月
           </span>
           <ExpandMoreIcon />
@@ -64,7 +64,7 @@ export default function AgeOptionsFilter() {
               onClick={() => handleAgeChange(option.value)}
               className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
                 childAge === option.value
-                  ? "bg-purple-100 text-purple-700 font-semibold"
+                  ? "bg-violet-100 text-violet-700 font-semibold"
                   : "text-stone-700 hover:bg-stone-100"
               }`}
             >

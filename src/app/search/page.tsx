@@ -147,7 +147,7 @@ export default function SearchResults() {
               type="text"
               placeholder="食材レシピを検索"
               onKeyDown={handleSearch}
-              className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300 transition-all shadow-sm"
+              className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 transition-all shadow-sm"
               autoFocus
             />
           </div>
@@ -161,7 +161,7 @@ export default function SearchResults() {
                 <span className="text-sm text-stone-600">
                   アレルゲン除外設定
                 </span>
-                <span className="ml-2 text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+                <span className="ml-2 text-xs bg-violet-100 text-violet-600 px-2 py-1 rounded-full">
                   {Object.values(allergenExclusions).filter(Boolean).length}
                   件除外中
                 </span>
@@ -210,7 +210,7 @@ export default function SearchResults() {
         ) : searchQuery ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
-              <SearchOffIcon className="text-purple-500 text-3xl" />
+              <SearchOffIcon className="text-violet-500 text-3xl" />
             </div>
             <h3 className="text-lg font-semibold text-stone-700 mb-2">
               検索結果が見つかりませんでした
@@ -234,7 +234,7 @@ export default function SearchResults() {
         ) : (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
-              <SearchIcon className="text-purple-500 text-3xl" />
+              <SearchIcon className="text-violet-500 text-3xl" />
             </div>
             <h3 className="text-lg font-semibold text-stone-700 mb-2">
               何をお探しですか？

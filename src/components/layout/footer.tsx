@@ -53,7 +53,7 @@ export default function Footer({ pageName }: HeaderProps) {
               key={index}
               href={button.href}
               onClick={(e) => handleClick(e, button.requiresAuth || false)}
-              className="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-purple-50 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-violet-50 transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <div className="text-stone-400 mb-1">{button.icon}</div>
               <span className="text-xs text-stone-500 font-medium">
@@ -68,7 +68,7 @@ export default function Footer({ pageName }: HeaderProps) {
       {pageName !== "create" && pageName !== "edit" && (
         <div className="fixed bottom-24 right-4">
           <Link href="/recipes/create">
-            <button className="w-14 h-14 bg-gradient-to-r from-purple-400 to-violet-400 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 group">
+            <button className="w-14 h-14 bg-gradient-to-r from-violet-400 to-violet-400 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 group">
               <div className="text-white group-hover:rotate-90 transition-transform duration-200">
                 <AddIcon />
               </div>

@@ -177,8 +177,8 @@ export default function MyPage() {
       id: "created",
       title: "作成したレシピ",
       icon: <MenuBookIcon />,
-      color: "text-purple-500",
-      bgColor: "bg-purple-100",
+      color: "text-violet-500",
+      bgColor: "bg-violet-100",
       link: "/mypage/recipes/created",
     },
     // {
@@ -208,7 +208,7 @@ export default function MyPage() {
                     onChange={(e) =>
                       setParentInfo({ ...parentInfo, name: e.target.value })
                     }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500 mr-2"
+                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
                   />
                 ) : (
                   parentInfo.name
@@ -219,7 +219,7 @@ export default function MyPage() {
               {isEditingParent ? (
                 <button
                   onClick={handleParentSave}
-                  className="flex items-center px-4 py-2 rounded-xl font-medium transition-colors bg-purple-500 text-white hover:bg-purple-600"
+                  className="flex items-center px-4 py-2 rounded-xl font-medium transition-colors bg-violet-500 text-white hover:bg-violet-600"
                 >
                   保存
                 </button>
@@ -275,7 +275,7 @@ export default function MyPage() {
                 </div>
                 {isEditingParent ? (
                   <Link href="/resetEmail">
-                    <button className="text-purple-500 hover:text-purple-600 font-medium">
+                    <button className="text-violet-500 hover:text-violet-600 font-medium">
                       変更する
                     </button>
                   </Link>
@@ -290,7 +290,7 @@ export default function MyPage() {
                 </div>
                 {isEditingParent ? (
                   <Link href="/resetPassword">
-                    <button className="text-purple-500 hover:text-purple-600 font-medium">
+                    <button className="text-violet-500 hover:text-violet-600 font-medium">
                       変更する
                     </button>
                   </Link>
@@ -322,7 +322,7 @@ export default function MyPage() {
                     onChange={(e) =>
                       setChildInfo({ ...childInfo, name: e.target.value })
                     }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 ) : (
                   childInfo.name
@@ -335,7 +335,7 @@ export default function MyPage() {
                 }
                 className={`flex items-center px-4 py-2 rounded-xl font-medium transition-colors ${
                   isEditingChild
-                    ? "bg-purple-500 text-white hover:bg-purple-600"
+                    ? "bg-violet-500 text-white hover:bg-violet-600"
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
@@ -364,7 +364,7 @@ export default function MyPage() {
                     onChange={(e) =>
                       setChildInfo({ ...childInfo, birthday: e.target.value })
                     }
-                    className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 ) : (
                   <span className="text-stone-700">{childInfo.birthday}</span>

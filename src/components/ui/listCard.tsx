@@ -72,7 +72,7 @@ export default function ListCard({ cardItems, pageName }: ListCardProps) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-stone-700 text-lg group-hover:text-purple-600 transition-colors">
+                  <h3 className="font-semibold text-stone-700 text-lg group-hover:text-violet-600 transition-colors">
                     {item.name}
                   </h3>
                 </div>

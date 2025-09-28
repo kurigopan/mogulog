@@ -111,10 +111,10 @@ export default function RecipeDetail({
 
               {/* 離乳食段階・カテゴリータグ */}
               <div className="flex justify-center space-x-2 mb-4">
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-sm font-medium">
                   {recipe.startStage}
                 </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-sm font-medium">
                   {recipe.category}
                 </span>
               </div>
@@ -139,11 +139,11 @@ export default function RecipeDetail({
               {/* アクションボタン(自作レシピの場合のみ表示) */}
               {recipe.isOwn && (
                 <div className="flex items-center justify-center gap-4">
-                  <button className=" py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600-600 hover:bg-purple-200 transition-colors">
+                  <button className=" py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600-600 hover:bg-violet-200 transition-colors">
                     <EditIcon />
                     <span className="ml-2">編集</span>
                   </button>
-                  <button className="py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600 hover:bg-purple-200 transition-colors">
+                  <button className="py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600 hover:bg-violet-200 transition-colors">
                     <DeleteIcon />
                     <span className="ml-2">削除</span>
                   </button>
@@ -194,7 +194,7 @@ export default function RecipeDetail({
                     className="bg-white rounded-2xl p-5 shadow-sm"
                   >
                     <div className="flex items-start">
-                      <div className="flex-shrink-0 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-violet-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
                         {step.step}
                       </div>
                       <div className="flex-1">
@@ -310,13 +310,13 @@ export default function RecipeDetail({
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               placeholder="アレンジ方法や感想を記録しましょう..."
-              className="w-full p-3 border border-stone-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full p-3 border border-stone-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               rows={4}
             />
             <div className="flex justify-end mt-3">
               <button
                 onClick={handleMemoSave}
-                className="px-6 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors font-medium"
+                className="px-6 py-2 bg-violet-500 text-white rounded-full hover:bg-violet-600 transition-colors font-medium"
               >
                 メモを保存
               </button>

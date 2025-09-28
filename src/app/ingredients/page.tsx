@@ -238,7 +238,7 @@ export default function IngredientsList() {
                     onClick={() => setSelectedCategory(category.value)}
                     className={`px-2 py-1 rounded-full text-sm transition-all ${
                       selectedCategory === category.value
-                        ? "bg-purple-100 text-purple-600 border border-purple-200"
+                        ? "bg-violet-100 text-violet-600 border border-violet-200"
                         : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
                     }`}
                   >
@@ -349,7 +349,7 @@ export default function IngredientsList() {
                     return (
                       <div
                         key={ingredient.id}
-                        className="px-4 py-4 hover:bg-purple-25 transition-colors"
+                        className="px-4 py-4 hover:bg-violet-25 transition-colors"
                       >
                         <div className="flex items-center">
                           {/* 食材名 */}
@@ -358,7 +358,7 @@ export default function IngredientsList() {
                               href={`/ingredients/${ingredient.id}`}
                               className="group"
                             >
-                              <h3 className="font-medium text-stone-700 text-base group-hover:text-purple-600 transition-colors">
+                              <h3 className="font-medium text-stone-700 text-base group-hover:text-violet-600 transition-colors">
                                 {ingredient.name}
                               </h3>
                             </Link>
@@ -373,8 +373,8 @@ export default function IngredientsList() {
                                   className={`text-sm w-7 h-7 flex items-center justify-center rounded-full font-medium border-1 transition-all ${
                                     isActive
                                       ? stage === childInfo.ageStage
-                                        ? "bg-purple-200 text-purple-800 border-purple-400 font-bold shadow-sm"
-                                        : "bg-purple-100 text-purple-700 border-purple-300"
+                                        ? "bg-violet-200 text-violet-800 border-violet-400 font-bold shadow-sm"
+                                        : "bg-violet-100 text-violet-700 border-violet-300"
                                       : "bg-stone-50 text-stone-400 border-stone-200"
                                   }`}
                                 >
@@ -446,7 +446,7 @@ export default function IngredientsList() {
                   setSelectedStageFilter("all");
                   setSelectedStatusFilter("all");
                 }}
-                className="px-6 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                className="px-6 py-2 bg-violet-100 text-violet-600 rounded-full text-sm font-medium hover:bg-violet-200 transition-colors"
               >
                 フィルターをリセット
               </button>

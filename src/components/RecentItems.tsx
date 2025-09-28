@@ -21,7 +21,7 @@ export default function RecentItems() {
             </h2>
             <Link
               href="/search/history"
-              className="text-sm text-purple-400 hover:text-purple-500 transition-colors"
+              className="text-sm text-violet-400 hover:text-violet-500 transition-colors"
             >
               すべて見る
             </Link>

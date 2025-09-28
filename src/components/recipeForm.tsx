@@ -487,7 +487,7 @@ export default function RecipeForm({
               value={formData.name}
               onChange={handleChange}
               placeholder="にんじんとかぼちゃの煮物"
-              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all font-medium text-lg"
+              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all font-medium text-lg"
               required
             />
 
@@ -504,7 +504,7 @@ export default function RecipeForm({
                     onClick={() => handleStageChange(stage)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                       formData.startStage.includes(stage)
-                        ? "bg-purple-100 text-purple-700 ring-2 ring-purple-300"
+                        ? "bg-violet-100 text-violet-700 ring-2 ring-violet-300"
                         : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                     }`}
                   >
@@ -527,7 +527,7 @@ export default function RecipeForm({
                     onClick={() => handleCategoryChange(category)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                       formData.category === category
-                        ? "bg-purple-100 text-purple-700 ring-2 ring-purple-300"
+                        ? "bg-violet-100 text-violet-700 ring-2 ring-violet-300"
                         : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                     }`}
                   >
@@ -547,7 +547,7 @@ export default function RecipeForm({
                   value={formData.cookingTime || ""}
                   onChange={handleChange}
                   placeholder="15分"
-                  className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ml-2"
+                  className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all ml-2"
                 />
               </div>
               <div className="flex items-center">
@@ -558,7 +558,7 @@ export default function RecipeForm({
                   value={formData.servings || ""}
                   onChange={handleChange}
                   placeholder="1食分"
-                  className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ml-2"
+                  className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all ml-2"
                 />
               </div>
             </div>
@@ -570,7 +570,7 @@ export default function RecipeForm({
               onChange={handleChange}
               placeholder="甘くて栄養満点！赤ちゃんが大好きな定番メニューです。自然の甘みで食べやすく、冷凍保存も可能です。"
               rows={4}
-              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
+              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
             />
 
             {/* 非公開設定 */}
@@ -618,7 +618,7 @@ export default function RecipeForm({
             <button
               type="button"
               onClick={handleAddIngredient}
-              className="flex items-center px-4 py-2 text-sm font-medium text-purple-600 hover:text-white hover:bg-purple-500 border border-purple-500 rounded-full transition-all"
+              className="flex items-center px-4 py-2 text-sm font-medium text-violet-600 hover:text-white hover:bg-violet-500 border border-violet-500 rounded-full transition-all"
             >
               <AddIcon className="w-4 h-4 mr-1" />
               追加
@@ -650,7 +650,7 @@ export default function RecipeForm({
                       value={ingredient.name}
                       onChange={(e) => handleIngredientChange(e, index)}
                       placeholder="にんじん"
-                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                     <input
                       type="text"
@@ -658,7 +658,7 @@ export default function RecipeForm({
                       value={ingredient.amount}
                       onChange={(e) => handleIngredientChange(e, index)}
                       placeholder="30g"
-                      className="w-24 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                      className="w-24 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                   </div>
                   <div className="flex justify-between mb-4">
@@ -668,7 +668,7 @@ export default function RecipeForm({
                       value={ingredient.note || ""}
                       onChange={(e) => handleIngredientChange(e, index)}
                       placeholder="皮を厚めに剥く"
-                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                   </div>
                 </div>
@@ -684,7 +684,7 @@ export default function RecipeForm({
             <button
               type="button"
               onClick={handleAddStep}
-              className="flex items-center px-4 py-2 text-sm font-medium text-purple-600 hover:text-white hover:bg-purple-500 border border-purple-500 rounded-full transition-all"
+              className="flex items-center px-4 py-2 text-sm font-medium text-violet-600 hover:text-white hover:bg-violet-500 border border-violet-500 rounded-full transition-all"
             >
               <AddIcon className="w-4 h-4 mr-1" />
               追加
@@ -718,7 +718,7 @@ export default function RecipeForm({
                   onChange={(e) => handleStepChange(e, index)}
                   placeholder="にんじんとかぼちゃを月齢に適した大きさに切る。にんじんは皮を厚めに剥き、かぼちゃは種とワタを取り除きます。"
                   rows={3}
-                  className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
+                  className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
                 />
 
                 {/* ステップ画像 */}
@@ -773,7 +773,7 @@ export default function RecipeForm({
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}
               placeholder="作り置きOK"
-              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all mb-4"
+              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all mb-4"
             />
             <div className="flex flex-wrap gap-2">
               {formData.tags.map((tag, index) => (
@@ -852,7 +852,7 @@ export default function RecipeForm({
           </button> */}
           <button
             type="submit"
-            className="flex items-center px-6 py-3 bg-purple-500 text-white rounded-full font-medium hover:bg-purple-600 transition-colors disabled:opacity-50"
+            className="flex items-center px-6 py-3 bg-violet-500 text-white rounded-full font-medium hover:bg-violet-600 transition-colors disabled:opacity-50"
             disabled={isSaving}
           >
             {isSaving ? (

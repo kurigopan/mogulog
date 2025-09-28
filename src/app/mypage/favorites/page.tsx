@@ -75,8 +75,8 @@ export default function Favorites() {
           <ListCard cardItems={displayItems} pageName={"favorites"} />
         ) : (
           <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-              <FavoriteBorderIcon className="text-purple-500 text-3xl" />
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center">
+              <FavoriteBorderIcon className="text-violet-500 text-3xl" />
             </div>
             <h3 className="text-lg font-semibold text-stone-700 mb-4">
               お気に入りがありません
@@ -88,7 +88,7 @@ export default function Favorites() {
             </p>
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 bg-purple-400 text-white rounded-full hover:bg-purple-600 transition-colors font-medium"
+              className="inline-flex items-center px-6 py-3 bg-violet-400 text-white rounded-full hover:bg-violet-600 transition-colors font-medium"
             >
               さがしにいく
             </Link>

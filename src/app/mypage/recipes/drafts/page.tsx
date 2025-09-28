@@ -38,7 +38,7 @@ export default function DraftRecipes() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="text-sm text-stone-600 bg-white border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300"
+          className="text-sm text-stone-600 bg-white border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300"
         >
           <option value="newest">新しい順</option>
           <option value="oldest">古い順</option>
@@ -81,7 +81,7 @@ export default function DraftRecipes() {
             </p>
             <Link
               href="/recipes/create"
-              className="inline-flex items-center px-6 py-3 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors font-medium"
+              className="inline-flex items-center px-6 py-3 bg-violet-500 text-white rounded-full hover:bg-violet-600 transition-colors font-medium"
             >
               新しいレシピを作成
             </Link>

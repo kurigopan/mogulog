@@ -32,7 +32,7 @@ export default function DraftRecipes() {
   });
 
   // ソート選択
-  const content = (
+  const tools = (
     <>
       {draftRecipes.length > 0 && (
         <select
@@ -60,7 +60,7 @@ export default function DraftRecipes() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header title="下書きレシピ" content={content} />
+      <Header title="下書きレシピ" tools={tools} />
 
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}

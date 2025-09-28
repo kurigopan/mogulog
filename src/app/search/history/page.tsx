@@ -26,7 +26,7 @@ export default function RecentViewed() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header title="最近見たもの" content={<RemoveButton />} />
+      <Header title="最近見たもの" tools={<RemoveButton />} />
 
       <div className="p-4 space-y-6">
         {/* アイテム一覧 */}

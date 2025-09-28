@@ -77,16 +77,16 @@ export default function IngredientDetail({
     }
   }, [ingredient]);
 
-  let content;
+  let tools;
   if (ingredient) {
-    content = <ShareButton title={ingredient.name} />;
+    tools = <ShareButton title={ingredient.name} />;
   } else {
-    content = <></>;
+    tools = <></>;
   }
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header title="食材詳細" content={content} />
+      <Header title="食材詳細" tools={tools} />
       <div className="p-4 space-y-6">
         {ingredient ? (
           <>

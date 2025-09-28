@@ -67,9 +67,9 @@ export default function RecipeDetail({
     }
   }, [recipe]);
 
-  let content;
+  let tools;
   if (recipe) {
-    content = (
+    tools = (
       <div className="flex items-center space-x-2">
         <ShareButton title={recipe.name} />
         <FavoriteButton
@@ -80,12 +80,12 @@ export default function RecipeDetail({
       </div>
     );
   } else {
-    content = <div></div>;
+    tools = <div></div>;
   }
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header title="レシピ詳細" content={content} />
+      <Header title="レシピ詳細" tools={tools} />
       <div className="p-4 space-y-6">
         {recipe ? (
           <>

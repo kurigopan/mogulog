@@ -6,10 +6,10 @@ import { PageName } from "@/types/types";
 type HeaderProps = {
   pageName?: PageName;
   title: string;
-  content?: ReactNode;
+  tools?: ReactNode;
 };
 
-export default function Header({ pageName, title, content }: HeaderProps) {
+export default function Header({ pageName, title, tools }: HeaderProps) {
   return (
     <header className="bg-white border-b border-stone-200 p-4 shadow-sm sticky top-0 z-10">
       <div className="flex items-center justify-between">
@@ -21,7 +21,7 @@ export default function Header({ pageName, title, content }: HeaderProps) {
           <h1 className="text-lg font-bold text-stone-700">{title}</h1>
         </div>
         {/* 右側のコンテンツ */}
-        <div className="flex items-center">{content}</div>
+        <div className="flex items-center">{tools}</div>
       </div>
     </header>
   );

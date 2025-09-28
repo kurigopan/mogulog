@@ -1,8 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import {
+  dbIngredientCardSchema,
   dbRecipeCardSchema,
   formatRecipeForSupabase,
+  ingredientCardSchema,
   ingredientDetailSchema,
   ingredientListCardSchema,
   recipeCardSchema,
@@ -179,20 +181,20 @@ export async function searchRecipesByIngredient(
   return validatedData.map((d) => recipeCardSchema.parse(d));
 }
 
-// レシピ一覧を取得
-export async function getRecipes(userId: string | null = null) {
-  const { data, error } = await supabase.rpc("get_recipes", {
-    parent_id_param: userId,
-  });
+// // レシピ一覧を取得
+// export async function getRecipes(userId: string | null = null) {
+//   const { data, error } = await supabase.rpc("get_recipes", {
+//     parent_id_param: userId,
+//   });
 
-  if (error) {
-    console.error("Failed to fetch recipes:", error);
-    return [];
-  }
+//   if (error) {
+//     console.error("Failed to fetch recipes:", error);
+//     return [];
+//   }
 
-  const validatedData = z.array(dbRecipeCardSchema).parse(data);
-  return validatedData.map((d) => recipeCardSchema.parse(d));
-}
+//   const validatedData = z.array(dbRecipeCardSchema).parse(data);
+//   return validatedData.map((d) => recipeCardSchema.parse(d));
+// }
 
 // 食材IDに基づいて食材情報を取得
 export async function getIngredientById(
@@ -282,19 +284,19 @@ export async function getRecipeAllergensById(recipeId: number) {
   return data.map((item) => item.allergen_id);
 }
 
-// お気に入り登録データを全て取得する関数
-export async function getFavoriteRecipeLogs() {
-  const { data, error } = await supabase
-    .from("favorites_recipes")
-    .select("recipe_id");
+// // お気に入り登録データを全て取得する関数
+// export async function getFavoriteRecipeLogs() {
+//   const { data, error } = await supabase
+//     .from("favorites_recipes")
+//     .select("recipe_id");
 
-  if (error) {
-    console.error("Failed to fetch favorite logs:", error);
-    return [];
-  }
+//   if (error) {
+//     console.error("Failed to fetch favorite logs:", error);
+//     return [];
+//   }
 
-  return data.map((item) => item.recipe_id);
-}
+//   return data.map((item) => item.recipe_id);
+// }
 
 // ユーザーごとの食材お気に入り登録データを取得する関数
 export async function getFavoriteIngredients(userId: string) {
@@ -786,6 +788,37 @@ export async function getRecommendedRecipes(childAgeStage: string) {
 
   if (error) {
     console.error("Error fetching recommended recipes:", error.message);
+    return [];
+  }
+  const validatedData = z.array(dbRecipeCardSchema).parse(data);
+  return validatedData.map((d) => recipeCardSchema.parse(d));
+}
+
+// 旬の食材 (月齢と季節を考慮)を５件取得
+export async function getSeasonalIngredients(childStageAge: string) {
+  const { data, error } = await supabase.rpc("get_seasonal_ingredients", {
+    stage: childStageAge,
+    limit_count: 5,
+  });
+
+  if (error) {
+    console.error("Error fetching seasonal ingredients:", error);
+    return [];
+  }
+
+  const validatedData = z.array(dbIngredientCardSchema).parse(data);
+  return validatedData.map((d) => ingredientCardSchema.parse(d));
+}
+
+// 人気のレシピを５件取得
+export async function getPopularRecipes(childAgeStage: string) {
+  const { data, error } = await supabase.rpc("get_popular_recipes", {
+    stage: childAgeStage,
+    limit_count: 5,
+  });
+
+  if (error) {
+    console.error("Error fetching popular recipes:", error.message);
     return [];
   }
   const validatedData = z.array(dbRecipeCardSchema).parse(data);

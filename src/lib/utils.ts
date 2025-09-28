@@ -1,10 +1,4 @@
-import {
-  CardItem,
-  Ingredient,
-  ingredientStageInfo,
-  Season,
-} from "@/types/types";
-import { getFavoriteRecipeLogs } from "./supabase";
+import { ingredientStageInfo } from "@/types/types";
 
 /**
  * UTCの日時をJST（日本標準時）の'YYYY-MM-DD HH:mm:ss'形式の文字列に変換します。
@@ -70,51 +64,4 @@ export const getAgeStageDisplay = (stageInfo: ingredientStageInfo[]) => {
 
     return { stage, isActive };
   });
-};
-
-// 旬の食材 (月齢と季節を考慮)
-export const getSeasonalIngredients = (
-  childAgeStage: string,
-  allIngredients: Ingredient[]
-) => {
-  const stages = ["初期", "中期", "後期", "完了期"];
-  const currentStageIndex = stages.indexOf(childAgeStage);
-  const stagesToInclude = stages.slice(0, currentStageIndex + 1);
-
-  const currentMonth = new Date().getMonth() + 1;
-  let season: Season;
-  if (currentMonth >= 3 && currentMonth <= 5) season = "春";
-  else if (currentMonth >= 6 && currentMonth <= 8) season = "夏";
-  else if (currentMonth >= 9 && currentMonth <= 11) season = "秋";
-  else season = "冬";
-
-  return allIngredients.filter(
-    (ingredient) =>
-      stagesToInclude.includes(ingredient.startStage) &&
-      ingredient.season.includes(season)
-  );
-};
-
-// 人気のレシピを計算
-export const getPopularRecipes = async (
-  allRecipes: CardItem[],
-  childAgeStage: string
-) => {
-  const favoriteRecipeLogs = await getFavoriteRecipeLogs();
-
-  const favoriteCounts = favoriteRecipeLogs.reduce((acc, recipeId) => {
-    acc[recipeId] = (acc[recipeId] || 0) + 1;
-    return acc;
-  }, {} as Record<number, number>);
-
-  const sortedRecipeIds = Object.entries(favoriteCounts)
-    .sort(([, countA], [, countB]) => countB - countA)
-    .map(([id]) => parseInt(id, 10));
-
-  return allRecipes
-    .filter((recipe) => recipe.startStage === childAgeStage)
-    .sort(
-      (a, b) => sortedRecipeIds.indexOf(a.id) - sortedRecipeIds.indexOf(b.id)
-    )
-    .slice(0, 5);
 };

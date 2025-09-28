@@ -87,7 +87,7 @@ export type Stage =
   | "完了期"
   | "離乳食終了";
 export type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
-export type Season = "通年" | "春" | "夏" | "秋" | "冬";
+export type Season = "春" | "夏" | "秋" | "冬";
 // export type Status = "draft" | "published";
 type Type = "recipe" | "ingredient";
 

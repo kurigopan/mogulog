@@ -549,6 +549,10 @@ export type Database = {
       };
     };
     Functions: {
+      get_current_season: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
       get_favorite_ingredients: {
         Args: { parent_id_param: string };
         Returns: {
@@ -636,6 +640,29 @@ export type Database = {
           stage_info: Json;
           start_stage: string;
           tips: string[];
+          updated_at: string;
+          updated_by: string;
+        }[];
+      };
+      get_popular_recipes: {
+        Args: { limit_count: number; stage: string };
+        Returns: {
+          category: string;
+          cooking_time: string;
+          created_at: string;
+          created_by: string;
+          description: string;
+          favorite_count: number;
+          id: number;
+          image_url: string;
+          ingredients: Json;
+          is_private: boolean;
+          memo: string;
+          name: string;
+          servings: string;
+          start_stage: string;
+          steps: Json;
+          tags: string[];
           updated_at: string;
           updated_by: string;
         }[];
@@ -737,6 +764,25 @@ export type Database = {
           start_stage: string;
           steps: Json;
           tags: string[];
+          updated_at: string;
+          updated_by: string;
+        }[];
+      };
+      get_seasonal_ingredients: {
+        Args: { limit_count: number; stage: string };
+        Returns: {
+          category: string;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          id: number;
+          image_url: string | null;
+          name: string;
+          nutrition: Json;
+          seasons: string[];
+          stage_info: Json;
+          start_stage: string;
+          tips: string[];
           updated_at: string;
           updated_by: string;
         }[];

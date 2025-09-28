@@ -63,7 +63,7 @@ export const ingredientStageInfoSchema = z.object({
 });
 
 // 1. データベースから直接取得するデータのスキーマを定義
-const dbIngredientCardSchema = z.object({
+export const dbIngredientCardSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string().nullable(),

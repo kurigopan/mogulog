@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteIcon } from "@/icons";
-import { removeRecentlyViewedItems } from "@/lib/localstorage";
+import { removeBrowsingHistory } from "@/lib/localstorage";
 
 export default function RemoveButton() {
   const handleRemove = (e: React.MouseEvent<HTMLElement>) => {
@@ -10,7 +10,7 @@ export default function RemoveButton() {
     if (
       window.confirm("閲覧履歴をすべて削除しますか？この操作は取り消せません。")
     ) {
-      removeRecentlyViewedItems();
+      removeBrowsingHistory();
     }
   };
 

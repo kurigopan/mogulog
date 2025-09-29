@@ -1,41 +1,45 @@
-import { Recipe, Ingredient } from "@/types/types";
+import { ListCardItem } from "@/types/types";
 
 // ローカルストレージに保存するキー
-const RECENTLY_VIEWED_KEY = "recentlyViewed";
+const VIEWED_KEY = "viewedItems";
 
-export const saveRecentlyViewedItem = (
-  item: Recipe | Ingredient
-): (Recipe | Ingredient)[] => {
-  // ローカルストレージから既存のアイテムを取得
+export const savedBrowsingHistory = (item: ListCardItem): void => {
   try {
-    const recentItemsString = localStorage.getItem(RECENTLY_VIEWED_KEY);
-    const recentItems: (Recipe | Ingredient)[] = recentItemsString
-      ? JSON.parse(recentItemsString)
+    const viewedItemsString = localStorage.getItem(VIEWED_KEY);
+    const viewedItems: ListCardItem[] = viewedItemsString
+      ? JSON.parse(viewedItemsString)
       : [];
 
     // 重複を避けるため、同じIDのアイテムを一度削除
-    const filteredItems = recentItems.filter((i) => i.id !== item.id);
+    const filteredItems = viewedItems.filter((i) => i.id !== item.id);
 
     // 新しいアイテムを配列の先頭に追加
-    const newRecentItems = [item, ...filteredItems].slice(0, 10); // 最大10件を保持
+    const newViewedItems = [item, ...filteredItems].slice(0, 20); // 最大20件を保持
 
     // ローカルストレージに保存
-    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(newRecentItems));
-
-    return newRecentItems;
+    localStorage.setItem(VIEWED_KEY, JSON.stringify(newViewedItems));
   } catch (error) {
-    console.error("Failed to save item to localStorage", error);
+    console.error("Failed to save browsing history to localStorage", error);
+  }
+};
+
+export const getBrowsingHistory = (limit?: number): ListCardItem[] => {
+  try {
+    const viewedItemsString = localStorage.getItem(VIEWED_KEY);
+    const viewedItems: ListCardItem[] = viewedItemsString
+      ? JSON.parse(viewedItemsString)
+      : [];
+    return limit ? viewedItems.slice(0, limit) : viewedItems;
+  } catch (error) {
+    console.error("Failed to get browsing history from localStorage", error);
     return [];
   }
 };
 
-export const removeRecentlyViewedItems = () => {
+export const removeBrowsingHistory = () => {
   try {
-    localStorage.removeItem(RECENTLY_VIEWED_KEY);
+    localStorage.removeItem(VIEWED_KEY);
   } catch (error) {
-    console.error(
-      "Failed to reset recently viewed items to localStorage",
-      error
-    );
+    console.error("Failed to reset viewed items to localStorage", error);
   }
 };

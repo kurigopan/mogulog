@@ -1,23 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { HistoryIcon } from "@/icons";
 import Card from "@/components/ui/Card";
-import useRecentItems from "@/hooks/useRecentItems";
+import { useSetAtom } from "jotai";
+import { loadingAtom } from "@/lib/atoms";
+import { getBrowsingHistory } from "@/lib/localstorage";
+import { ListCardItem } from "@/types/types";
 
-export default function RecentItems() {
-  const recentlyViewed = useRecentItems();
-  const recentlyViewed5 = recentlyViewed.slice(0, 5);
+export default function BrowsingHistory() {
+  const setLoading = useSetAtom(loadingAtom);
+  const [browsingHistory, setBrowsingHistory] = useState<ListCardItem[]>([]);
+
+  useEffect(() => {
+    setLoading(true);
+    const history = getBrowsingHistory(5);
+    setBrowsingHistory(history);
+    setLoading(false);
+  }, [setLoading]);
+
   return (
     <>
-      {recentlyViewed5.length > 0 && (
+      {browsingHistory.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-stone-700 flex items-center">
               <div className="text-stone-400 mr-2">
                 <HistoryIcon />
               </div>
-              最近見たもの
+              閲覧履歴
             </h2>
             <Link
               href="/search/history"
@@ -26,7 +38,7 @@ export default function RecentItems() {
               すべて見る
             </Link>
           </div>
-          <Card cardItems={recentlyViewed5} className="bg-stone-100" />
+          <Card cardItems={browsingHistory} className="bg-stone-100" />
         </section>
       )}
     </>

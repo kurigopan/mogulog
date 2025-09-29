@@ -4,7 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Card from "@/components/ui/Card";
 import AgeOptionsFilter from "@/components/AgeOptionsFilter";
-import RecentItems from "@/components/RecentItems";
+import BrowsingHistory from "@/components/BrowsingHistory";
 import {
   getUser,
   getChild,
@@ -19,9 +19,7 @@ export default async function Home() {
   let childAgeStage: string = "初期";
   if (user) {
     const child = await getChild(user.id);
-    if (!child) {
-      console.log("Using default age stage.");
-    } else {
+    if (child) {
       childAgeStage = getAgeStage(calculateAgeInMonths(child.birthday));
     }
   }
@@ -75,7 +73,7 @@ export default async function Home() {
               placeholder="レシピ・食材を検索"
               readOnly
               className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 transition-all shadow-sm hover:shadow-md"
-              style={{ borderRadius: "50px" }}
+              // style={{ borderRadius: "50px" }}
             />
           </div>
         </Link>
@@ -96,8 +94,8 @@ export default async function Home() {
             ))}
           </div>
         </section>
-        {/* 最近見たもの */}
-        <RecentItems />
+        {/* 閲覧履歴 */}
+        <BrowsingHistory />
       </div>
       <Footer />
     </div>

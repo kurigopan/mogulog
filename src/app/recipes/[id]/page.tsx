@@ -17,7 +17,7 @@ import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/lib/atoms";
-import { saveRecentlyViewedItem } from "@/lib/localstorage";
+import { savedBrowsingHistory } from "@/lib/localstorage";
 import { getRecipeAllergens, getRecipeById } from "@/lib/supabase";
 import { Allergen, Recipe } from "@/types/types";
 
@@ -63,7 +63,7 @@ export default function RecipeDetail({
   // コンポーネントがマウントされた時に、ローカルストレージに保存
   useEffect(() => {
     if (recipe) {
-      saveRecentlyViewedItem(recipe);
+      savedBrowsingHistory(recipe);
     }
   }, [recipe]);
 

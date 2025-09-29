@@ -9,7 +9,7 @@ import Card from "@/components/ui/Card";
 import ShareButton from "@/components/ui/ShareButton";
 import NotFoundPage from "@/components/NotFound";
 import { getIngredientById, searchRecipesByIngredient } from "@/lib/supabase";
-import { saveRecentlyViewedItem } from "@/lib/localstorage";
+import { savedBrowsingHistory } from "@/lib/localstorage";
 import { useAtomValue } from "jotai";
 import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/atoms";
 import { CardItem, Ingredient } from "@/types/types";
@@ -73,7 +73,7 @@ export default function IngredientDetail({
   // コンポーネントがマウントされた時に、ローカルストレージに保存
   useEffect(() => {
     if (ingredient) {
-      saveRecentlyViewedItem(ingredient);
+      savedBrowsingHistory(ingredient);
     }
   }, [ingredient]);
 

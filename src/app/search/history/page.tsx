@@ -1,38 +1,37 @@
 "use client";
 
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { HistoryIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import useRecentItems from "@/hooks/useRecentItems";
 import RemoveButton from "@/components/ui/RemoveButton";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
+import { getBrowsingHistory } from "@/lib/localstorage";
+import { ListCardItem } from "@/types/types";
 
-export default function RecentViewed() {
+export default function BrowsingHistoryPage() {
   const setLoading = useSetAtom(loadingAtom);
-  const recentlyViewed = useRecentItems();
+  const [browsingHistory, setBrowsingHistory] = useState<ListCardItem[]>([]);
 
   useEffect(() => {
-    // Simulate API call to fetch recent viewed items
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 800);
-  }, []);
+    const history = getBrowsingHistory();
+    setBrowsingHistory(history);
+    setLoading(false);
+  }, [setLoading]);
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header title="最近見たもの" tools={<RemoveButton />} />
+      <Header title="閲覧履歴" tools={<RemoveButton />} />
 
       <div className="p-4 space-y-6">
         {/* アイテム一覧 */}
-        {recentlyViewed.length > 0 ? (
-          <ListCard cardItems={recentlyViewed} pageName="history" />
-        ) : recentlyViewed.length === 0 ? (
+        {browsingHistory.length > 0 ? (
+          <ListCard cardItems={browsingHistory} pageName="history" />
+        ) : browsingHistory.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
               <HistoryIcon className="text-stone-300 text-3xl" />

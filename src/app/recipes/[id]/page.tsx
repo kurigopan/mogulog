@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   EditIcon,
@@ -18,7 +19,11 @@ import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/lib/atoms";
 import { savedBrowsingHistory } from "@/lib/localstorage";
-import { getRecipeAllergens, getRecipeById } from "@/lib/supabase";
+import {
+  deleteRecipe,
+  getRecipeAllergens,
+  getRecipeById,
+} from "@/lib/supabase";
 import { Allergen, Recipe } from "@/types/types";
 
 export default function RecipeDetail({
@@ -31,6 +36,7 @@ export default function RecipeDetail({
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
   const userId = useAtomValue(userIdAtom);
+  const router = useRouter();
   // const [memo, setMemo] = useState("");
 
   // const infoText = "自分専用なので他の人は見れません";
@@ -38,6 +44,32 @@ export default function RecipeDetail({
   // const handleMemoSave = () => {
   //   console.log("メモを保存:", memo);
   // };
+
+  // const handleEdit = () => {
+  //   router.push({ pathname: "/recipes/[id]/edit", query: { id } });
+  // };
+
+  const handleDelete = async () => {
+    if (!recipe) return;
+
+    const confirmDelete = window.confirm(
+      "本当にこのレシピを削除しますか？この操作は元に戻せません。"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      // レシピの削除
+      const response = await deleteRecipe(id);
+
+      if (response.error) {
+        alert("レシピを削除しました。");
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Error deleting recipe:", error);
+      alert("レシピの削除中にエラーが発生しました。");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,11 +171,18 @@ export default function RecipeDetail({
               {/* アクションボタン(自作レシピの場合のみ表示) */}
               {recipe.isOwn && (
                 <div className="flex items-center justify-center gap-4">
-                  <button className=" py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600-600 hover:bg-violet-200 transition-colors">
+                  <button
+                    onClick={() => router.push(`/recipes/${id}/edit`)}
+                    className=" py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600-600 hover:bg-violet-200 transition-colors"
+                  >
                     <EditIcon />
                     <span className="ml-2">編集</span>
                   </button>
-                  <button className="py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600 hover:bg-violet-200 transition-colors">
+
+                  <button
+                    onClick={handleDelete}
+                    className="py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600 hover:bg-violet-200 transition-colors"
+                  >
                     <DeleteIcon />
                     <span className="ml-2">削除</span>
                   </button>

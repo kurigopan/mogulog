@@ -532,7 +532,7 @@ export async function updateRecipe(
   const { data, error } = await supabase
     .from("recipes")
     .update(formattedData)
-    .eq("recipe_id", recipeId)
+    .eq("id", recipeId)
     .select();
 
   if (error) {
@@ -584,14 +584,14 @@ export async function uploadAvatar(file: File, userId: string) {
     return null;
   }
 
-  const signedUrl = await getSignedUrl(filePath);
+  const signedUrl = await getSignedUrl(filePath, bucketName);
 
   return signedUrl;
 }
 
-export async function getSignedUrl(filePath: string) {
+export async function getSignedUrl(filePath: string, bucketName: string) {
   const { data, error } = await supabase.storage
-    .from("avatars")
+    .from(bucketName)
     .createSignedUrl(filePath, 3600);
 
   if (error) {
@@ -600,6 +600,41 @@ export async function getSignedUrl(filePath: string) {
   }
   if (data && data.signedUrl) {
     return data.signedUrl;
+  }
+  return null;
+}
+
+export async function uploadImage(file: File, userId: string) {
+  const bucketName = "recipe-images";
+  // 1. ファイル拡張子を取得
+  const fileExt = file.name.split(".").pop();
+
+  // 2. UUIDを生成し、一意なファイルパスを作成
+  // 例: recipe-images/user_id/uuid.ext
+  const fileName = `${crypto.randomUUID()}.${fileExt}`;
+  const filePath = `${userId}/${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .upload(filePath, file, {
+      cacheControl: "3600",
+    });
+
+  if (error) {
+    console.error("アップロードエラー:", error.message);
+    return null;
+  }
+
+  const publicUrl = getPublicUrl(filePath, bucketName);
+
+  return publicUrl;
+}
+
+export function getPublicUrl(filePath: string, bucketName: string) {
+  const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+
+  if (data && data.publicUrl) {
+    return data.publicUrl;
   }
   return null;
 }

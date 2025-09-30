@@ -14,16 +14,16 @@ import {
   ClearIcon,
   ErrorIcon,
 } from "@/icons";
-import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/atoms";
+import { useAtomValue } from "jotai";
+import { userIdAtom } from "@/lib/atoms";
 import {
   createRecipe,
   createRecipeAllergens,
-  deleteRecipe,
   deleteRecipeAllergens,
   getAllergens,
   getRecipeAllergensById,
   updateRecipe,
+  uploadImage,
 } from "@/lib/supabase";
 import { Allergen, Category, Recipe, Stage } from "@/types/types";
 
@@ -65,26 +65,44 @@ export default function RecipeForm({
     Record<string, boolean>
   >({});
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-  const setLoading = useSetAtom(loadingAtom);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [suggestedAllergenNames, setSuggestedAllergenNames] = useState<
     string[]
   >([]);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const userId = useAtomValue(userIdAtom);
 
   if (!userId) {
     router.push("/");
   }
 
-  //　画像の取得
-  useEffect(() => {
-    if (formData && formData.image) {
-      setImage(formData.image);
-    }
-  }, [formData]);
+  // //　画像の取得
+  // useEffect(() => {
+  //   if (formData && formData.image) {
+  //     setImage(formData.image);
+  //   }
+  // }, [formData]);
 
+  // // 画像の変更処理
+  // const onUpLoadImage = useCallback(
+  //   (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     const files = e.target.files;
+
+  //     // ファイルが選択されていない場合
+  //     if (!files || files.length === 0) {
+  //       setFormData((prev) => ({ ...prev, image: null }));
+  //       return;
+  //     }
+
+  //     // 画像URLを生成してformDataにセット
+  //     const imageUrl = URL.createObjectURL(files[0]);
+  //     setFormData((prev) => ({ ...prev, image: imageUrl }));
+  //     // 画像をセット
+  //     setImage(files[0].name);
+  //   },
+  //   []
+  // );
   // 画像の変更処理
   const onUpLoadImage = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,14 +111,14 @@ export default function RecipeForm({
       // ファイルが選択されていない場合
       if (!files || files.length === 0) {
         setFormData((prev) => ({ ...prev, image: null }));
-        return;
+        setImage(null);
+      } else {
+        // 画像URLを生成してformDataにセット
+        const imageUrl = URL.createObjectURL(files[0]);
+        setFormData((prev) => ({ ...prev, image: imageUrl }));
+        // 画像をセット
+        setImage(files[0]);
       }
-
-      // 画像URLを生成してformDataにセット
-      const imageUrl = URL.createObjectURL(files[0]);
-      setFormData((prev) => ({ ...prev, image: imageUrl }));
-      // 画像をセット
-      setImage(files[0].name);
     },
     []
   );
@@ -299,28 +317,41 @@ export default function RecipeForm({
     try {
       let recipeId;
       let newRecipeData; // createRecipeの戻り値を受け取る変数
+      let newImageUrl = formData.image; // 画像URLを保持する変数
+
+      // imageファイルが存在する場合のみ、画像をアップロードする
+      if (image) {
+        newImageUrl = await uploadImage(image, userId!);
+      }
 
       if (isEditMode && initialData?.id) {
         // 編集モードの場合、IDを使ってレシピを更新
-        await updateRecipe(initialData.id, formData, userId!);
+        await updateRecipe(
+          initialData.id,
+          { ...formData, image: newImageUrl },
+          userId!
+        );
         recipeId = initialData.id;
+        setFormData((prev) => ({ ...prev, image: newImageUrl }));
       } else {
         // 新規作成モードの場合、レシピを作成
-        newRecipeData = await createRecipe(formData, userId!);
+        newRecipeData = await createRecipe(
+          { ...formData, image: newImageUrl },
+          userId!
+        );
         recipeId = newRecipeData.id;
+        setFormData((prev) => ({ ...prev, image: newImageUrl }));
       }
       // 選択されたアレルゲン情報を抽出
       const selectedAllergenIds = Object.keys(allergenInclusions)
         .filter((key) => allergenInclusions[parseInt(key, 10)])
         .map((key) => parseInt(key, 10));
-
       // 既存のアレルゲンデータを削除（編集モードの場合）
       await deleteRecipeAllergens(recipeId);
-
       // 新しいアレルゲンデータを登録
       await createRecipeAllergens(recipeId, selectedAllergenIds, userId!);
 
-      router.push("/");
+      router.push(`/recipes/${recipeId}`);
     } catch {
       // TODO: エラーが発生したら更新をロールバックする処理を実装
     } finally {
@@ -340,18 +371,18 @@ export default function RecipeForm({
   // };
 
   // レシピ削除処理
-  const handleDelete = async () => {
-    if (!initialData?.id) return;
-    setIsSaving(true);
-    try {
-      await deleteRecipe(initialData.id);
-      router.push("/");
-    } catch {
-    } finally {
-      setIsSaving(false);
-      setShowConfirm(false);
-    }
-  };
+  // const handleDelete = async () => {
+  //   if (!initialData?.id) return;
+  //   setIsSaving(true);
+  //   try {
+  //     await deleteRecipe(initialData.id);
+  //     router.push("/");
+  //   } catch {
+  //   } finally {
+  //     setIsSaving(false);
+  //     setShowConfirm(false);
+  //   }
+  // };
 
   // 編集モードの場合、初期データでフォームを初期化
   useEffect(() => {
@@ -831,7 +862,7 @@ export default function RecipeForm({
         {/* フォーム送信ボタン */}
         <div className="flex justify-center space-x-8 p-4">
           {/* 編集モードの場合のみ削除ボタンを表示 */}
-          {isEditMode && (
+          {/* {isEditMode && (
             <button
               type="button"
               onClick={() => setShowConfirm(true)}
@@ -840,7 +871,7 @@ export default function RecipeForm({
             >
               削除
             </button>
-          )}
+          )} */}
 
           {/* <button
             type="button"
@@ -867,7 +898,7 @@ export default function RecipeForm({
       </form>
 
       {/* 削除確認ダイアログ（モーダル） */}
-      {showConfirm && (
+      {/* {showConfirm && (
         <div className="fixed inset-0 bg-stone-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 shadow-xl w-full max-w-sm text-center">
             <h3 className="font-bold text-lg mb-2 text-stone-800">
@@ -892,7 +923,7 @@ export default function RecipeForm({
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -3,44 +3,55 @@
 import { useState, useEffect, useRef } from "react";
 import { ExpandMoreIcon } from "@/icons";
 
-export default function AgeOptionsFilter() {
-  const [childAge, setChildAge] = useState("");
+type AgeOptionsFilterProps = {
+  initialChildAgeStage: string;
+  onChildAgeStageChange: (newStage: string) => void;
+};
+
+export default function AgeOptionsFilter({
+  initialChildAgeStage,
+  onChildAgeStageChange,
+}: AgeOptionsFilterProps) {
+  const [childAgeStage, setChildAgeStage] = useState(initialChildAgeStage);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const ageOptions = [
-    { label: "5-6ヶ月", value: "5-6" },
-    { label: "7-8ヶ月", value: "7-8" },
-    { label: "9-11ヶ月", value: "9-11" },
-    { label: "12-18ヶ月", value: "12-18" },
+    { label: "5-6ヶ月", value: "初期" },
+    { label: "7-8ヶ月", value: "中期" },
+    { label: "9-11ヶ月", value: "後期" },
+    { label: "12-18ヶ月", value: "完了期" },
   ];
 
-  const handleAgeChange = (newAge) => {
-    setChildAge(newAge);
+  useEffect(() => {
+    setChildAgeStage(initialChildAgeStage);
+  }, [initialChildAgeStage]);
+
+  const handleStageChange = (newStage: string) => {
+    setChildAgeStage(newStage);
     setIsDropdownOpen(false);
-    // In a real application, you would trigger a data fetch or state update here
-    // to filter the content based on the new age.
+    onChildAgeStageChange(newStage);
   };
 
   useEffect(() => {
-    // localStorage is not supported in this environment, using mock data
-    setChildAge("7-8");
-  }, []);
-
-  useEffect(() => {
-    // Function to handle clicks outside the dropdown to close it
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
 
-    // Add event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownRef]);
+  }, []);
+
+  const currentAgeLabel = ageOptions.find(
+    (option) => option.value === childAgeStage
+  )?.label;
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -51,7 +62,7 @@ export default function AgeOptionsFilter() {
         <span className="text-sm text-stone-600 font-normal">月齢</span>
         <div className="flex items-center px-2 py-1 bg-violet-50 rounded-full ml-1 hover:bg-violet-100">
           <span className="text-sm text-violet-600 font-medium">
-            {childAge}ヶ月
+            {currentAgeLabel}
           </span>
           <ExpandMoreIcon />
         </div>
@@ -61,9 +72,9 @@ export default function AgeOptionsFilter() {
           {ageOptions.map((option) => (
             <button
               key={option.value}
-              onClick={() => handleAgeChange(option.value)}
+              onClick={() => handleStageChange(option.value)}
               className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
-                childAge === option.value
+                childAgeStage === option.value
                   ? "bg-violet-100 text-violet-700 font-semibold"
                   : "text-stone-700 hover:bg-stone-100"
               }`}

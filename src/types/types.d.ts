@@ -191,3 +191,12 @@ export type FavoriteUpdate = {
   isFavorited: boolean;
   timestamp: number;
 } | null;
+
+export interface CardContent {
+  id: string;
+  title: string;
+  icon: React.ReactElement;
+  color: string;
+  bgColor: string;
+  cardItems: CardItem[];
+}

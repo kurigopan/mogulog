@@ -1,4 +1,6 @@
-import { ingredientStageInfo } from "@/types/types";
+import React from "react";
+import { CardContent, CardItem, ingredientStageInfo } from "@/types/types";
+import { StarIcon, LocalFloristIcon, RecommendIcon } from "@/icons";
 
 /**
  * UTCの日時をJST（日本標準時）の'YYYY-MM-DD HH:mm:ss'形式の文字列に変換します。
@@ -64,4 +66,41 @@ export const getAgeStageDisplay = (stageInfo: ingredientStageInfo[]) => {
 
     return { stage, isActive };
   });
+};
+
+export const getCardContents = ({
+  popularRecipes,
+  seasonalIngredients,
+  recommendedRecipes,
+}: {
+  popularRecipes: CardItem[];
+  seasonalIngredients: CardItem[];
+  recommendedRecipes: CardItem[];
+}): CardContent[] => {
+  return [
+    {
+      id: "popular",
+      title: "人気のレシピ",
+      icon: React.createElement(StarIcon),
+      color: "text-orange-300",
+      bgColor: "bg-orange-100",
+      cardItems: popularRecipes,
+    },
+    {
+      id: "seasonal",
+      title: "旬の食材",
+      icon: React.createElement(LocalFloristIcon),
+      color: "text-blue-300",
+      bgColor: "bg-blue-100",
+      cardItems: seasonalIngredients,
+    },
+    {
+      id: "recommended",
+      title: "おすすめのレシピ",
+      icon: React.createElement(RecommendIcon),
+      color: "text-pink-300",
+      bgColor: "bg-pink-100",
+      cardItems: recommendedRecipes,
+    },
+  ];
 };

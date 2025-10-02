@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { HomeIcon, FavoriteIcon, ListIcon, PersonIcon, AddIcon } from "@/icons";
 import { useSetAtom } from "jotai";
-import { loginDialogAtom } from "@/lib/atoms";
+import { loginDialogSourceAtom } from "@/lib/atoms";
 import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 type HeaderProps = {
@@ -13,7 +13,7 @@ type HeaderProps = {
 type pageType = "create" | "edit";
 
 export default function Footer({ pageName }: HeaderProps) {
-  const setLoginDialogOpen = useSetAtom(loginDialogAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const requireLogin = useRequireLogin();
 
   const navigationButtons = [
@@ -39,7 +39,7 @@ export default function Footer({ pageName }: HeaderProps) {
   ) => {
     if (requiresAuth && !requireLogin()) {
       e.preventDefault(); // ページ遷移を阻止
-      setLoginDialogOpen(true);
+      setLoginDialogSource("footer");
     }
   };
 

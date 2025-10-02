@@ -11,7 +11,6 @@ import {
   createChildAllergens,
   createProfile,
   getAllergens,
-  getChild,
 } from "@/lib/supabase";
 import { Allergen, FormData } from "@/types/types";
 import { step1Schema, step2Schema } from "@/types/schemas";
@@ -22,7 +21,9 @@ type ValidationErrors = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
+  const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     avatar_url: null as string | null,
@@ -34,15 +35,13 @@ export default function ProfilePage() {
   const [allergenExclusions, setAllergenExclusions] = useState<
     Record<string, boolean>
   >({});
-  const inputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
-  const [errors, setErrors] = useState<ValidationErrors | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [fileMessage, setFileMessage] = useState("");
-  const [avatar, setAvatar] = useState<File | null>(null);
   const [today, setToday] = useState("");
-  const userId = useAtomValue(userIdAtom);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -97,12 +96,12 @@ export default function ProfilePage() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
 
     const result = step2Schema.safeParse(formData);
     if (!result.success) {
       setErrors(result.error.flatten().fieldErrors);
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
     setErrors(null);
@@ -137,7 +136,7 @@ export default function ProfilePage() {
         setErrors({ general: ["不明なエラーが発生しました。"] });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 

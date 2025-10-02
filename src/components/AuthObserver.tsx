@@ -2,12 +2,11 @@
 
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { childIdAtom, userIdAtom } from "@/lib/atoms";
-import { getChild, supabase } from "@/lib/supabase";
+import { userIdAtom } from "@/lib/atoms";
+import { supabase } from "@/lib/supabase";
 
 export const AuthObserver = () => {
   const setUserId = useSetAtom(userIdAtom);
-  const setChildId = useSetAtom(childIdAtom);
 
   useEffect(() => {
     // 認証状態の変化を監視
@@ -20,11 +19,6 @@ export const AuthObserver = () => {
       if (session) {
         const userId = session.user.id;
         setUserId(userId);
-        getChild(userId).then((data) => {
-          if (data) {
-            setChildId(data.id);
-          }
-        });
       } else {
         // セッションがなければユーザーIDをnullにリセット
         setUserId(null);

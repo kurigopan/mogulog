@@ -9,7 +9,7 @@ import {
 } from "@/types/types";
 
 export const sessionAtom = atom<Session | null>(null);
-export const loginDialogAtom = atom(false);
+export const loginDialogSourceAtom = atom<string | null>(null);
 
 export const loadingAtom = atom<boolean>(true);
 

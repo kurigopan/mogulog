@@ -1,13 +1,11 @@
-import { useAtomValue, useSetAtom } from "jotai";
-import { userIdAtom, loginDialogAtom } from "@/lib/atoms";
+import { useAtomValue } from "jotai";
+import { userIdAtom } from "@/lib/atoms";
 
 export const useRequireLogin = () => {
   const userId = useAtomValue(userIdAtom);
-  const setLoginDialogOpen = useSetAtom(loginDialogAtom);
 
   const requireLogin = () => {
     if (!userId) {
-      setLoginDialogOpen(true);
       return false;
     }
     return true;

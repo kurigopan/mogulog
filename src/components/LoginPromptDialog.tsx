@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
-import { loginDialogAtom } from "@/lib/atoms";
+import { loginDialogSourceAtom } from "@/lib/atoms";
 import {
   Dialog,
   DialogTitle,
@@ -13,11 +13,20 @@ import {
 } from "@mui/material";
 
 export default function LoginPromptDialog() {
-  const [open, setOpen] = useAtom(loginDialogAtom);
+  const [source, setSource] = useAtom(loginDialogSourceAtom);
   const router = useRouter();
 
+  const handleClose = () => {
+    if (source == "ingredientStatusToggle") {
+      setSource(null);
+    } else {
+      setSource(null);
+      router.push("/");
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={() => setOpen(false)}>
+    <Dialog open={source !== null} onClose={handleClose}>
       <DialogTitle>ログインが必要です</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -25,13 +34,12 @@ export default function LoginPromptDialog() {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setOpen(false)}>閉じる</Button>
+        <Button onClick={handleClose}>閉じる</Button>
         <Button
           onClick={() => {
-            setOpen(false);
+            setSource(null);
             router.push("/authform");
           }}
-          autoFocus
         >
           ログイン・新規登録へ
         </Button>

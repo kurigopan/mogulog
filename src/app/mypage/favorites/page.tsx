@@ -1,27 +1,37 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FavoriteBorderIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import { useAtomValue, useSetAtom } from "jotai";
-import { favoriteUpdateAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  favoriteUpdateAtom,
+  loadingAtom,
+  loginDialogSourceAtom,
+  userIdAtom,
+} from "@/lib/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
 import { ListCardItem } from "@/types/types";
 
 export default function Favorites() {
-  const router = useRouter();
-  const setIsLoading = useSetAtom(loadingAtom);
+  const [isLoading, setIsLoading] = useAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const favoriteUpdate = useAtomValue(favoriteUpdateAtom);
   const [favoriteRecipes, setFavoriteRecipes] = useState<ListCardItem[]>([]);
   const [favoriteIngredients, setFavoriteIngredients] = useState<
     ListCardItem[]
   >([]);
   // const [removedItemKeys, setRemovedItemKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!isLoading && !userId) {
+      setLoginDialogSource("favorites");
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (userId) {
@@ -36,8 +46,6 @@ export default function Favorites() {
       };
       fetchFavorites();
       setIsLoading(false);
-    } else {
-      router.push("/");
     }
   }, [userId]);
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useAtomValue } from "jotai";
-import { userIdAtom, childIdAtom } from "@/lib/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { userIdAtom, childIdAtom, loginDialogSourceAtom } from "@/lib/atoms";
 import { upsertIngredientStatus, deleteIngredientStatus } from "@/lib/supabase";
 import { Ingredient } from "@/types/types";
 import { useRequireLogin } from "@/hooks/useRequireLogin";
@@ -12,6 +12,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   const childId = useAtomValue(childIdAtom);
   const ingredientId = ingredient.id;
   const requireLogin = useRequireLogin();
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
 
   useEffect(() => {
     setEaten(ingredient.eaten);
@@ -19,7 +20,10 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   }, [ingredient]);
 
   const toggleEaten = async () => {
-    if (!requireLogin() || !childId) return;
+    if (!requireLogin() || !childId) {
+      setLoginDialogSource("ingredientStatusToggle");
+      return;
+    }
 
     // 1. ローカル変数に確定
     const newEatenStatus = !eaten;
@@ -49,7 +53,10 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   };
 
   const toggleNG = async () => {
-    if (!requireLogin() || !childId) return;
+    if (!requireLogin() || !childId) {
+      setLoginDialogSource("ingredientStatusToggle");
+      return;
+    }
 
     // 1. ローカル変数に確定
     const newNGStatus = !ng;

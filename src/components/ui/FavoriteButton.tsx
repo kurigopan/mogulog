@@ -6,7 +6,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   favoriteUpdateAtom,
   loadingAtom,
-  loginDialogAtom,
+  loginDialogSourceAtom,
   userIdAtom,
 } from "@/lib/atoms";
 import { toggleFavoriteItem } from "@/lib/supabase";
@@ -25,13 +25,13 @@ export default function FavoriteButton({
 }: FavoriteButtonProps) {
   const [isLoading, setIsLoading] = useAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
-  const setLoginDialogOpen = useSetAtom(loginDialogAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const setFavoriteUpdate = useSetAtom(favoriteUpdateAtom);
   const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
 
   const handleToggleFavorite = useCallback(async () => {
     if (!userId) {
-      setLoginDialogOpen(true);
+      setLoginDialogSource("favoriteButton");
       return;
     }
 

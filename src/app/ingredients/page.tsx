@@ -23,6 +23,7 @@ import {
   childIdAtom,
   childInfoAtom,
   loadingAtom,
+  loginDialogSourceAtom,
   userIdAtom,
 } from "@/lib/atoms";
 import { getAgeStageDisplay } from "@/lib/utils";
@@ -39,9 +40,13 @@ export default function IngredientsList() {
   const [selectedStageFilter, setSelectedStageFilter] = useState("all");
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
 
   const toggleEaten = async (ingredient: Ingredient) => {
-    if (!requireLogin() || !childId) return;
+    if (!requireLogin() || !childId) {
+      setLoginDialogSource("ingredientStatusToggle");
+      return;
+    }
 
     // 1. **必要なステータスを事前に計算し、ローカル変数に確定させる**
     const originalEatenStatus = ingredient.eaten;
@@ -85,7 +90,10 @@ export default function IngredientsList() {
   };
 
   const toggleNG = async (ingredient: Ingredient) => {
-    if (!requireLogin() || !childId) return;
+    if (!requireLogin() || !childId) {
+      setLoginDialogSource("ingredientStatusToggle");
+      return;
+    }
     // 1. **必要なステータスを事前に計算し、ローカル変数に確定させる**
     const originalEatenStatus = ingredient.eaten;
     const originalNgStatus = ingredient.ng;

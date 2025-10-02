@@ -67,7 +67,6 @@ export default function MyPage() {
       } else {
         // 画像URLを生成してparentInfoにセット
         const imageUrl = URL.createObjectURL(files[0]);
-        console.log("Generated image URL:", imageUrl);
         setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
         // 画像をセット
         setAvatar(files[0]);

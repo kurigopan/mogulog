@@ -112,7 +112,7 @@ export default function RecipeDetail({
       </div>
     );
   } else {
-    tools = <div></div>;
+    tools = <></>;
   }
 
   return (

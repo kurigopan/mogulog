@@ -14,6 +14,7 @@ import { useAtomValue } from "jotai";
 import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/atoms";
 import { CardItem, Ingredient } from "@/types/types";
 import IngredientStatusButtons from "@/components/ui/IngredientStatusButtons";
+import FavoriteButton from "@/components/ui/FavoriteButton";
 
 export default function IngredientDetail({
   params,
@@ -79,7 +80,16 @@ export default function IngredientDetail({
 
   let tools;
   if (ingredient) {
-    tools = <ShareButton title={ingredient.name} />;
+    tools = (
+      <div className="flex items-center space-x-2">
+        <ShareButton title={ingredient.name} />
+        <FavoriteButton
+          itemId={id}
+          itemType="ingredient"
+          initialIsFavorited={ingredient.isFavorite}
+        />
+      </div>
+    );
   } else {
     tools = <></>;
   }

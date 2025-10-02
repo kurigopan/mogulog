@@ -39,29 +39,28 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // if (
-  //   !user &&
-  //   !request.nextUrl.pathname.startsWith("/login") &&
-  //   !request.nextUrl.pathname.startsWith("/auth")
-  // ) {
-  //   // no user, potentially respond by redirecting the user to the login page
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/login";
-  //   return NextResponse.redirect(url);
-  // }
+  if (request.nextUrl.pathname === "/") {
+    const hasVisited = request.cookies.get("hasVisited");
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+    if (!hasVisited) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/introduction";
+
+      const res = NextResponse.redirect(url);
+      res.cookies.set("hasVisited", "true", { maxAge: 60 * 60 * 24 * 365 }); // 1年有効
+      // supabaseのcookieも引き継ぐ
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        res.cookies.set(cookie.name, cookie.value, {
+          httpOnly: cookie.httpOnly,
+          maxAge: cookie.maxAge,
+          path: "/", // 必要に応じて
+          sameSite: "lax", // 必要に応じて
+          secure: true, // 必要に応じて
+        });
+      });
+      return res;
+    }
+  }
 
   return supabaseResponse;
 }

@@ -1,3 +1,4 @@
+import HomeClientWrapper from "@/components/HomeClientWrapper";
 import Footer from "@/components/layout/Footer";
 import {
   getUser,
@@ -11,8 +12,6 @@ import {
   getAgeStage,
   getCardContents,
 } from "@/lib/utils";
-import HomeClientWrapper from "@/components/HomeClientWrapper";
-import { CardItem } from "@/types/types";
 
 export default async function Home() {
   const user = await getUser();

@@ -14,7 +14,7 @@ export default function ShareButton({ title }: Props) {
     const shareData = {
       title,
       text: `${title} をシェアします！`,
-      url: window.location.href, // ✅ 現在のページのURLを共有
+      url: window.location.href,
     };
 
     if (navigator.share) {

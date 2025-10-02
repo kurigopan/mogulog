@@ -43,6 +43,7 @@ interface ingredientStageInfo {
   cooking: string;
   description: string;
 }
+
 interface ingredientNutrition {
   calories: string;
   nutrients: string[];
@@ -72,6 +73,7 @@ export type Category =
   | "副菜"
   | "汁物"
   | "おやつ"
+  | "穀類"
   | "肉・魚"
   | "野菜・きのこ・海藻"
   | "果物"

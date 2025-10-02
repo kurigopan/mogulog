@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CreateIcon } from "@/icons";
-import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
@@ -13,20 +13,20 @@ import { getRecipesCreatedByUser } from "@/lib/supabase";
 import { ListCardItem } from "@/types/types";
 
 export default function CreatedRecipes() {
-  const setLoading = useSetAtom(loadingAtom);
-  const [createdRecipes, setCreatedRecipes] = useState<ListCardItem[]>([]);
-  const userId = useAtomValue(userIdAtom);
   const router = useRouter();
+  const setIsLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
+  const [createdRecipes, setCreatedRecipes] = useState<ListCardItem[]>([]);
 
   useEffect(() => {
     if (userId) {
-      setLoading(true);
+      setIsLoading(true);
       const fetchRecipes = async () => {
         const recipes = await getRecipesCreatedByUser(userId);
         setCreatedRecipes(recipes);
       };
       fetchRecipes();
-      setLoading(false);
+      setIsLoading(false);
     } else {
       router.push("/");
     }

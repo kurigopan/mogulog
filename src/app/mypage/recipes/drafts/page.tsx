@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
 import { DraftsIcon } from "@/icons";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import { Recipe } from "@/types/types";
-import { mockRecipes } from "@/mocks/recipes";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
+import { Recipe } from "@/types/types";
+import { mockRecipes } from "@/mocks/recipes";
 
 export default function DraftRecipes() {
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const [draftRecipes, setDraftRecipes] = useState<Recipe[]>([]);
   const [sortBy, setSortBy] = useState("newest"); // newest, oldest, name, subtitle
 
@@ -31,36 +31,18 @@ export default function DraftRecipes() {
     }
   });
 
-  // ソート選択
-  const tools = (
-    <>
-      {draftRecipes.length > 0 && (
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="text-sm text-stone-600 bg-white border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300"
-        >
-          <option value="newest">新しい順</option>
-          <option value="oldest">古い順</option>
-          <option value="name">名前順</option>
-          <option value="subtitle">離乳食段階順</option>
-        </select>
-      )}
-    </>
-  );
-
   useEffect(() => {
     // Simulate API call to fetch draft recipes
-    setLoading(true);
+    setIsLoading(true);
     setTimeout(() => {
       setDraftRecipes(mockRecipes);
-      setLoading(false);
+      setIsLoading(false);
     }, 800);
   }, []);
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header title="下書きレシピ" tools={tools} />
+      <Header title="下書きレシピ" />
 
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}

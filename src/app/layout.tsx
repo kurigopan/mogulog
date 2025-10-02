@@ -1,12 +1,12 @@
-import "./globals.css";
+import "@/globals.css";
 import type { Metadata } from "next";
 import { Provider } from "jotai";
 import { AuthObserver } from "@/components/AuthObserver";
-import LoadingOverlay from "@/components/LoadingOverlay";
-import LoadingResetter from "@/components/LoadingResetter";
-import { getUser } from "@/lib/supabase";
-import UserInitializer from "@/components/UserInitializer";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { LoadingResetter } from "@/components/LoadingResetter";
+import { UserInitializer } from "@/components/UserInitializer";
 import LoginPromptDialog from "@/components/LoginPromptDialog";
+import { getUser } from "@/lib/supabase";
 
 export const metadata: Metadata = {
   title: "もぐログ",

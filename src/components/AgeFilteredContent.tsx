@@ -1,37 +1,29 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-// import { StarIcon, LocalFloristIcon, RecommendIcon } from "@/icons";
 import Card from "@/components/ui/Card";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { CardContent } from "@/types/types";
 import {
   getPopularRecipes,
   getRecommendedRecipes,
   getSeasonalIngredients,
 } from "@/lib/supabase";
 import { getCardContents } from "@/lib/utils";
+import { CardContent } from "@/types/types";
 
 type AgeFilteredContentProps = {
-  currentActiveAgeStage: string; // Homeから渡される、現在アクティブな月齢
+  currentActiveAgeStage: string;
   initialCardContents: CardContent[];
 };
-
-// // アイコンをマッピングするためのオブジェクト (API Routeの変更に対応)
-// const iconMap: { [key: string]: JSX.Element } = {
-//   StarIcon: <StarIcon />,
-//   LocalFloristIcon: <LocalFloristIcon />,
-//   RecommendIcon: <RecommendIcon />,
-// };
 
 export default function AgeFilteredContent({
   currentActiveAgeStage,
   initialCardContents,
 }: AgeFilteredContentProps) {
+  const setIsLoading = useSetAtom(loadingAtom);
   const [cardContents, setCardContents] =
     useState<CardContent[]>(initialCardContents);
-  const setIsLoading = useSetAtom(loadingAtom);
 
   // currentActiveAgeStageの変更を監視し、データフェッチを行う
   useEffect(() => {

@@ -19,21 +19,21 @@ import {
 } from "@/lib/supabase";
 import { calculateAgeInMonths, getAgeStage } from "@/lib/utils";
 
-const UserInitializer = ({ userId }: { userId: string | null }) => {
-  const setParentInfo = useSetAtom(parentInfoAtom);
+export const UserInitializer = ({ userId }: { userId: string | null }) => {
+  const setIsLoading = useSetAtom(loadingAtom);
   const setUserId = useSetAtom(userIdAtom);
-  const setChildInfo = useSetAtom(childInfoAtom);
+  const setParentInfo = useSetAtom(parentInfoAtom);
   const setChildId = useSetAtom(childIdAtom);
+  const setChildInfo = useSetAtom(childInfoAtom);
   const setAllergens = useSetAtom(allergensAtom);
-  const setLoading = useSetAtom(loadingAtom);
 
   useEffect(() => {
     const setUserData = async () => {
       if (!userId) {
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
-      setLoading(true);
+      setIsLoading(true);
 
       const [userData, profileData, childData, allergensResponse] =
         await Promise.all([
@@ -80,13 +80,11 @@ const UserInitializer = ({ userId }: { userId: string | null }) => {
         setChildId(childData.id);
       }
 
-      setLoading(false);
+      setIsLoading(false);
     };
 
     setUserData();
-  }, [userId, setParentInfo, setChildInfo, setAllergens, setLoading]);
+  }, [userId, setParentInfo, setChildInfo, setAllergens, setIsLoading]);
 
   return null;
 };
-
-export default UserInitializer;

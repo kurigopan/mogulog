@@ -2,8 +2,13 @@
 
 import { useState, useCallback } from "react";
 import { FavoriteBorderIcon, FavoriteIcon } from "@/icons";
-import { useAtomValue, useSetAtom } from "jotai";
-import { favoriteUpdateAtom, loginDialogAtom, userIdAtom } from "@/lib/atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  favoriteUpdateAtom,
+  loadingAtom,
+  loginDialogAtom,
+  userIdAtom,
+} from "@/lib/atoms";
 import { toggleFavoriteItem } from "@/lib/supabase";
 import { Type } from "@/types/types";
 
@@ -18,11 +23,11 @@ export default function FavoriteButton({
   itemType,
   initialIsFavorited,
 }: FavoriteButtonProps) {
-  const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const setLoginDialogOpen = useSetAtom(loginDialogAtom);
   const setFavoriteUpdate = useSetAtom(favoriteUpdateAtom);
+  const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
 
   const handleToggleFavorite = useCallback(async () => {
     if (!userId) {

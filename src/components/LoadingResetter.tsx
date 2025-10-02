@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { usePathname, useSearchParams } from "next/navigation";
 
-const LoadingResetter = () => {
-  const setLoading = useSetAtom(loadingAtom);
+export const LoadingResetter = () => {
+  const setIsLoading = useSetAtom(loadingAtom);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     // ページ遷移が完了した時点でローディングを終了
-    setLoading(false);
-  }, [pathname, searchParams, setLoading]);
+    setIsLoading(false);
+  }, [pathname, searchParams, setIsLoading]);
 
   return null;
 };
-
-export default LoadingResetter;

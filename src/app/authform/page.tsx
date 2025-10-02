@@ -15,7 +15,7 @@ type ValidationErrors = {
 
 export default function AuthForm() {
   const router = useRouter();
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const [userData, setUserData] = useState<User>({
     email: "",
     password: "",
@@ -38,7 +38,7 @@ export default function AuthForm() {
       return;
     }
     setErrors(null);
-    setLoading(true);
+    setIsLoading(true);
 
     const { error: loginError } = await login(
       userData.email,
@@ -63,7 +63,7 @@ export default function AuthForm() {
     } else {
       router.push("/");
     }
-    setLoading(false);
+    setIsLoading(false);
   };
 
   return (

@@ -1,10 +1,10 @@
 "use client";
 
+import { CircularProgress } from "@mui/material";
 import { useAtomValue } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { CircularProgress } from "@mui/material";
 
-const LoadingOverlay = () => {
+export const LoadingOverlay = () => {
   const isLoading = useAtomValue(loadingAtom);
 
   if (!isLoading) {
@@ -32,5 +32,3 @@ const LoadingOverlay = () => {
     </div>
   );
 };
-
-export default LoadingOverlay;

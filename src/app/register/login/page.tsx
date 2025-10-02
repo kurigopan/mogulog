@@ -14,7 +14,7 @@ type ValidationErrors = {
 
 export default function Login() {
   const router = useRouter();
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const [userData, setUserData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,9 +32,9 @@ export default function Login() {
       return;
     }
     setErrors(null);
-    setLoading(true);
+    setIsLoading(true);
     await login(userData.email, userData.password);
-    setLoading(false);
+    setIsLoading(false);
     router.push("/"); // ログイン成功後にホームへ
   };
 

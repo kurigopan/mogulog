@@ -4,10 +4,10 @@ import { use, useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RecipeForm from "@/components/RecipeForm";
-import { getRecipeById } from "@/lib/supabase";
-import { Recipe } from "@/types/types";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
+import { getRecipeById } from "@/lib/supabase";
+import { Recipe } from "@/types/types";
 
 export default function RecipeEditPage({
   params,
@@ -15,14 +15,14 @@ export default function RecipeEditPage({
   params: Promise<{ id: string }>;
 }) {
   const unwrapParams = use(params);
+  const setIsLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
   const recipeId = Number(unwrapParams.id);
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
-  const setLoading = useSetAtom(loadingAtom);
-  const userId = useAtomValue(userIdAtom);
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      setLoading(true);
+      setIsLoading(true);
       const data = await getRecipeById(userId, recipeId);
       if (!data) {
         console.error("レシピの取得に失敗しました:");
@@ -30,7 +30,7 @@ export default function RecipeEditPage({
       } else if (data) {
         setRecipeData(data);
       }
-      setLoading(false);
+      setIsLoading(false);
     };
     fetchRecipe();
   }, [recipeId]);

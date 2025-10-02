@@ -20,21 +20,20 @@ import {
 import { Allergen, ListCardItem } from "@/types/types";
 
 export default function SearchResults() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [results, setResults] = useState<ListCardItem[]>([]);
-  const setLoading = useSetAtom(loadingAtom);
-  // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
-  const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
-  const [showAllergens, setShowAllergens] = useState(false);
+  const setIsLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
+  const childId = useAtomValue(childIdAtom);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
   const [allergenExclusions, setAllergenExclusions] = useState<
     Record<string, boolean>
   >({});
-  const userId = useAtomValue(userIdAtom);
-  const childId = useAtomValue(childIdAtom);
+  const [showAllergens, setShowAllergens] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [results, setResults] = useState<ListCardItem[]>([]);
+  const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
+  // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
 
-  // 検索処理
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const currentQuery = inputRef.current?.value || "";
@@ -44,7 +43,7 @@ export default function SearchResults() {
         setSearchQuery("");
         return;
       }
-      setLoading(true);
+      setIsLoading(true);
 
       // Enterが押されたタイミングで検索クエリをStateに設定
       setSearchQuery(currentQuery);
@@ -87,7 +86,7 @@ export default function SearchResults() {
         combinedResults.push(...recipesData);
       }
       setResults(combinedResults);
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FavoriteBorderIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -14,18 +14,18 @@ import { ListCardItem } from "@/types/types";
 
 export default function Favorites() {
   const router = useRouter();
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
+  const favoriteUpdate = useAtomValue(favoriteUpdateAtom);
   const [favoriteRecipes, setFavoriteRecipes] = useState<ListCardItem[]>([]);
   const [favoriteIngredients, setFavoriteIngredients] = useState<
     ListCardItem[]
   >([]);
-  const userId = useAtomValue(userIdAtom);
-  const favoriteUpdate = useAtomValue(favoriteUpdateAtom);
   // const [removedItemKeys, setRemovedItemKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (userId) {
-      setLoading(true);
+      setIsLoading(true);
       const fetchFavorites = async () => {
         const recipes = await getFavoriteRecipes(userId);
         setFavoriteRecipes(recipes.map((r) => ({ ...r, isFavorite: true })));
@@ -35,7 +35,7 @@ export default function Favorites() {
         );
       };
       fetchFavorites();
-      setLoading(false);
+      setIsLoading(false);
     } else {
       router.push("/");
     }

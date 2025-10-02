@@ -18,10 +18,10 @@ type ValidationErrors = {
 
 export default function ResetPassword() {
   const router = useRouter();
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
+  const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
@@ -32,9 +32,9 @@ export default function ResetPassword() {
       return;
     }
     setErrors(null);
-    setLoading(true);
+    setIsLoading(true);
     await updatePassword(newPassword);
-    setLoading(false);
+    setIsLoading(false);
     setIsSuccess(true);
     router.push("/authform");
   };

@@ -15,7 +15,7 @@ type ValidationErrors = {
 
 export default function AuthForm() {
   const router = useRouter();
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const [userData, setUserData] = useState<User>({
     email: "",
     password: "",
@@ -43,9 +43,9 @@ export default function AuthForm() {
       return;
     }
     setErrors(null);
-    setLoading(true);
+    setIsLoading(true);
     await signup(userData.email, userData.password);
-    setLoading(false);
+    setIsLoading(false);
     router.push("/createProfile");
   };
 

@@ -29,7 +29,7 @@ import { getAgeStageDisplay } from "@/lib/utils";
 import { Ingredient } from "@/types/types";
 
 export default function IngredientsList() {
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
@@ -165,7 +165,7 @@ export default function IngredientsList() {
     "初：初期（5-6ヶ月）、中：中期（7-8ヶ月）、後：後期（9-11ヶ月）、完：完了期（12-18ヶ月）";
 
   useEffect(() => {
-    setLoading(true);
+    setIsLoading(true);
     const fetchIngredients = async () => {
       let ingredientsData;
       if (userId && childId) {
@@ -178,7 +178,7 @@ export default function IngredientsList() {
       }
     };
     fetchIngredients();
-    setLoading(false);
+    setIsLoading(false);
   }, [userId, childId]);
 
   return (

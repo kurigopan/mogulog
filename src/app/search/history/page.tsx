@@ -13,15 +13,15 @@ import { getBrowsingHistory } from "@/lib/localstorage";
 import { ListCardItem } from "@/types/types";
 
 export default function BrowsingHistoryPage() {
-  const setLoading = useSetAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const [browsingHistory, setBrowsingHistory] = useState<ListCardItem[]>([]);
 
   useEffect(() => {
-    setLoading(true);
+    setIsLoading(true);
     const history = getBrowsingHistory();
     setBrowsingHistory(history);
-    setLoading(false);
-  }, [setLoading]);
+    setIsLoading(false);
+  }, [setIsLoading]);
 
   return (
     <div className="min-h-screen bg-stone-50">

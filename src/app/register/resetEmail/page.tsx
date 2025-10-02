@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useSetAtom } from "jotai";
 import { ChildCareIcon, MailOutlineIcon } from "@/icons";
-import { updateEmail } from "@/lib/supabase";
+import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
+import { updateEmail } from "@/lib/supabase";
 
 type ValidationErrors = {
   [key: string]: string[];
 };
 
 export default function UpdateEmail() {
-  const setLoading = useSetAtom(loadingAtom);
-  const [newEmail, setNewEmail] = useState("");
+  const setIsLoading = useSetAtom(loadingAtom);
   const [errors, setErrors] = useState<ValidationErrors | null>(null);
+  const [newEmail, setNewEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
@@ -24,9 +24,9 @@ export default function UpdateEmail() {
       return;
     }
     setErrors(null);
-    setLoading(true);
+    setIsLoading(true);
     await updateEmail(newEmail);
-    setLoading(false);
+    setIsLoading(false);
     setIsSuccess(true);
   };
 

@@ -38,7 +38,7 @@ export default function LoginPromptDialog() {
         <Button
           onClick={() => {
             setSource(null);
-            router.push("/authform");
+            router.push("/register/authform");
           }}
         >
           ログイン・新規登録へ

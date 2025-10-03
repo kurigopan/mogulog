@@ -51,20 +51,6 @@ export default function MyPage() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
 
-  // if (!userId || !childId || !parentInfo.id || !childInfo.id) {
-  //   // データが完全にロードされていない場合は、ローディング中と見なす
-  //   // UserInitializerでisLoadingがfalseになるまで待機
-  //   return (
-  //     <div className="min-h-screen bg-stone-50">
-  //       <Header title="マイページ" />
-  //       {/* ローディング中は何も表示しないか、ローディングスピナーを表示 */}
-  //       {/* LoadingOverlayが全体を覆うので、ここは空でも問題ない */}
-  //       <Footer />
-  //     </div>
-  //   );
-  //   setLoginDialogSource(true);
-  // }
-
   useEffect(() => {
     if (
       !isLoading &&

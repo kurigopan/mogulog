@@ -60,7 +60,6 @@ export default function RecipeForm({
   const [isSaving, setIsSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [allergenInclusions, setAllergenInclusions] = useState<
     Record<string, boolean>
   >({});
@@ -77,32 +76,6 @@ export default function RecipeForm({
     router.push("/");
   }
 
-  // //　画像の取得
-  // useEffect(() => {
-  //   if (formData && formData.image) {
-  //     setImage(formData.image);
-  //   }
-  // }, [formData]);
-
-  // // 画像の変更処理
-  // const onUpLoadImage = useCallback(
-  //   (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const files = e.target.files;
-
-  //     // ファイルが選択されていない場合
-  //     if (!files || files.length === 0) {
-  //       setFormData((prev) => ({ ...prev, image: null }));
-  //       return;
-  //     }
-
-  //     // 画像URLを生成してformDataにセット
-  //     const imageUrl = URL.createObjectURL(files[0]);
-  //     setFormData((prev) => ({ ...prev, image: imageUrl }));
-  //     // 画像をセット
-  //     setImage(files[0].name);
-  //   },
-  //   []
-  // );
   // 画像の変更処理
   const onUpLoadImage = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

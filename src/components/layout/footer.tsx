@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { HomeIcon, FavoriteIcon, ListIcon, PersonIcon, AddIcon } from "@/icons";
-import { useSetAtom } from "jotai";
-import { loginDialogSourceAtom } from "@/lib/atoms";
-import { useRequireLogin } from "@/hooks/useRequireLogin";
+import { useAtomValue, useSetAtom } from "jotai";
+import { loginDialogSourceAtom, userIdAtom } from "@/lib/atoms";
 
 type HeaderProps = {
   pageName?: pageType;
@@ -14,7 +13,7 @@ type pageType = "create" | "edit";
 
 export default function Footer({ pageName }: HeaderProps) {
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
-  const requireLogin = useRequireLogin();
+  const userId = useAtomValue(userIdAtom);
 
   const navigationButtons = [
     { href: "/", icon: <HomeIcon />, label: "ホーム" },
@@ -37,7 +36,7 @@ export default function Footer({ pageName }: HeaderProps) {
     e: React.MouseEvent<HTMLAnchorElement>,
     requiresAuth: boolean
   ) => {
-    if (requiresAuth && !requireLogin()) {
+    if (requiresAuth && !userId) {
       e.preventDefault(); // ページ遷移を阻止
       setLoginDialogSource("footer");
     }

@@ -3,16 +3,14 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { userIdAtom, childIdAtom, loginDialogSourceAtom } from "@/lib/atoms";
 import { upsertIngredientStatus, deleteIngredientStatus } from "@/lib/supabase";
 import { Ingredient } from "@/types/types";
-import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 export const useIngredientStatusToggle = (ingredient: Ingredient) => {
-  const [eaten, setEaten] = useState(ingredient.eaten);
-  const [ng, setNG] = useState(ingredient.ng);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
+  const [eaten, setEaten] = useState(ingredient.eaten);
+  const [ng, setNG] = useState(ingredient.ng);
   const ingredientId = ingredient.id;
-  const requireLogin = useRequireLogin();
-  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
 
   useEffect(() => {
     setEaten(ingredient.eaten);
@@ -20,7 +18,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   }, [ingredient]);
 
   const toggleEaten = async () => {
-    if (!requireLogin() || !childId) {
+    if (!userId || !childId) {
       setLoginDialogSource("ingredientStatusToggle");
       return;
     }
@@ -53,7 +51,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   };
 
   const toggleNG = async () => {
-    if (!requireLogin() || !childId) {
+    if (!userId || !childId) {
       setLoginDialogSource("ingredientStatusToggle");
       return;
     }

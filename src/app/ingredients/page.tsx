@@ -12,7 +12,6 @@ import {
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import IngredientsFilter from "@/components/ui/IngredientsFilter";
-import { useRequireLogin } from "@/hooks/useRequireLogin";
 import {
   deleteIngredientStatus,
   getIngredientsWithStatus,
@@ -34,16 +33,15 @@ export default function IngredientsList() {
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
-  const requireLogin = useRequireLogin();
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStageFilter, setSelectedStageFilter] = useState("all");
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
 
   const toggleEaten = async (ingredient: Ingredient) => {
-    if (!requireLogin() || !childId) {
+    if (!userId || !childId) {
       setLoginDialogSource("ingredientStatusToggle");
       return;
     }
@@ -90,7 +88,7 @@ export default function IngredientsList() {
   };
 
   const toggleNG = async (ingredient: Ingredient) => {
-    if (!requireLogin() || !childId) {
+    if (!userId || !childId) {
       setLoginDialogSource("ingredientStatusToggle");
       return;
     }

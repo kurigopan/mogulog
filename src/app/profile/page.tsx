@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { AccountBoxIcon } from "@/icons";
+import CenteredCard from "@/components/ui/CenteredCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import {
@@ -11,6 +12,7 @@ import {
   createChildAllergens,
   createProfile,
   getAllergens,
+  uploadAvatar,
 } from "@/lib/supabase";
 import { Allergen, FormData } from "@/types/types";
 import { step1Schema, step2Schema } from "@/types/schemas";
@@ -37,10 +39,8 @@ export default function ProfilePage() {
   >({});
   const [step, setStep] = useState(1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [fileMessage, setFileMessage] = useState("");
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [today, setToday] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,23 +48,15 @@ export default function ProfilePage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  //　アバター画像の取得
-  useEffect(() => {
-    if (formData && formData.avatar_url) {
-      setAvatarUrl(formData.avatar_url);
-    }
-  }, [formData]);
-
   // アバター画像の変更処理
   const onUpLoadImage = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
-      setFileMessage("");
 
       // ファイルが選択されていない場合
       if (!files || files.length === 0) {
-        setFileMessage("画像をアップロードしてください。");
         setFormData((prev) => ({ ...prev, avatar_url: null }));
+        setAvatar(null);
         return;
       }
 
@@ -111,9 +103,16 @@ export default function ProfilePage() {
       .filter((key) => allergenExclusions[parseInt(key, 10)])
       .map((key) => parseInt(key, 10));
 
+    let newAvatarUrl = formData.avatar_url;
+
+    // avatarファイルが存在する場合のみ、画像をアップロードする
+    if (avatar) {
+      newAvatarUrl = await uploadAvatar(avatar, userId!);
+    }
+
     try {
       // プロフィールと子どもの情報を登録
-      await createProfile(formData, userId!);
+      await createProfile({ ...formData, avatar_url: newAvatarUrl }, userId!);
       const childId = await createChild(formData, userId!);
 
       // アレルゲン情報を登録
@@ -166,158 +165,142 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-violet-50 flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md">
-          <h2 className="text-2xl font-bold text-stone-700 text-center mb-2">
-            プロフィール設定
-          </h2>
-          <p className="text-stone-500 text-sm text-center mb-6">
-            ステップ {step}/2
-          </p>
-          {errors?.general && (
-            <div className="text-red-500 text-sm text-center mb-4">
-              {errors.general[0]}
-            </div>
-          )}
-          {step === 1 && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-stone-600 mb-2">
-                  ユーザー名
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
-                />
-                {errors?.name && (
-                  <p className="mt-2 text-sm text-red-500">{errors.name[0]}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-600 mb-2">
-                  プロフィール画像
-                </label>
-                <div
-                  className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer hover:bg-stone-200 transition-colors group relative"
-                  onClick={() => avatarInputRef.current?.click()}
-                >
-                  {formData.avatar_url ? (
-                    <>
-                      <Image
-                        src={formData.avatar_url}
-                        alt="プロフィール画像"
-                        width={200}
-                        height={200}
-                        className="object-cover w-full h-full"
-                        unoptimized
-                      />
-                      {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <AccountBoxIcon className="text-white text-3xl" />
-                      </div> */}
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center space-y-2 text-stone-400 group-hover:text-stone-500">
-                      <AccountBoxIcon style={{ fontSize: 48 }} />
-                      <span className="text-sm font-medium">画像を追加</span>
-                      <span className="text-xs">タップして選択</span>
-                    </div>
-                  )}
-                </div>
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={onUpLoadImage}
-                  className="hidden"
-                />
-                {fileMessage && (
-                  <p className="mt-2 text-sm text-red-500">{fileMessage}</p>
-                )}
-              </div>
-              <button
-                onClick={handleNext}
-                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
-              >
-                つぎへ
-              </button>
-            </div>
-          )}
-          {step === 2 && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-stone-600 mb-2">
-                  お子様の名前
-                </label>
-                <input
-                  type="text"
-                  name="childName"
-                  value={formData.childName}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
-                />
-                {errors?.childName && (
-                  <p className="mt-2 text-sm text-red-500">
-                    {errors.childName[0]}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-600 mb-2">
-                  お子様の誕生日
-                </label>
-                <input
-                  type="date"
-                  max={today}
-                  name="childBirthday"
-                  value={formData.childBirthday}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
-                />
-                {errors?.childBirthday && (
-                  <p className="mt-2 text-sm text-red-500">
-                    {errors.childBirthday[0]}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-600 mb-2">
-                  アレルギー情報（複数選択可）
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {allergens.map((allergen) => (
-                    <button
-                      key={allergen.id}
-                      onClick={() => toggleAllergen(allergen.id)}
-                      className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                        allergenExclusions[allergen.id]
-                          ? "bg-violet-400 text-white"
-                          : "bg-stone-200 text-stone-600 hover:bg-stone-300"
-                      }`}
-                    >
-                      <div className="text-xs leading-tight">
-                        {allergen.name}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button
-                onClick={handleSaveProfile}
-                className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
-              >
-                保存してはじめる
-              </button>
-            </div>
-          )}
+    <CenteredCard>
+      {" "}
+      <h2 className="text-2xl font-bold text-stone-700 text-center mb-2">
+        プロフィール設定
+      </h2>
+      <p className="text-stone-500 text-sm text-center mb-6">
+        ステップ {step}/2
+      </p>
+      {errors?.general && (
+        <div className="text-red-500 text-sm text-center mb-4">
+          {errors.general[0]}
         </div>
-      </div>
-      <div className="p-4 text-center">
-        <p className="text-xs text-stone-400">© 2025 もぐログ</p>
-      </div>
-    </div>
+      )}
+      {step === 1 && (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-stone-600 mb-2">
+              ユーザー名
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+            />
+            {errors?.name && (
+              <p className="mt-2 text-sm text-red-500">{errors.name[0]}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-600 mb-2">
+              プロフィール画像
+            </label>
+            <div
+              className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer hover:bg-stone-200 transition-colors group relative"
+              onClick={() => avatarInputRef.current?.click()}
+            >
+              {formData.avatar_url ? (
+                <>
+                  <Image
+                    src={formData.avatar_url}
+                    alt="プロフィール画像"
+                    width={200}
+                    height={200}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </>
+              ) : (
+                <div className="flex flex-col items-center space-y-2 text-stone-400 group-hover:text-stone-500">
+                  <AccountBoxIcon style={{ fontSize: 48 }} />
+                  <span className="text-sm font-medium">画像を追加</span>
+                  <span className="text-xs">タップして選択</span>
+                </div>
+              )}
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onUpLoadImage}
+              className="hidden"
+            />
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+          >
+            つぎへ
+          </button>
+        </div>
+      )}
+      {step === 2 && (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-stone-600 mb-2">
+              お子様の名前
+            </label>
+            <input
+              type="text"
+              name="childName"
+              value={formData.childName}
+              onChange={handleChange}
+              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+            />
+            {errors?.childName && (
+              <p className="mt-2 text-sm text-red-500">{errors.childName[0]}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-600 mb-2">
+              お子様の誕生日
+            </label>
+            <input
+              type="date"
+              max={today}
+              name="childBirthday"
+              value={formData.childBirthday}
+              onChange={handleChange}
+              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+            />
+            {errors?.childBirthday && (
+              <p className="mt-2 text-sm text-red-500">
+                {errors.childBirthday[0]}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-600 mb-2">
+              アレルギー情報（複数選択可）
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {allergens.map((allergen) => (
+                <button
+                  key={allergen.id}
+                  onClick={() => toggleAllergen(allergen.id)}
+                  className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                    allergenExclusions[allergen.id]
+                      ? "bg-violet-400 text-white"
+                      : "bg-stone-200 text-stone-600 hover:bg-stone-300"
+                  }`}
+                >
+                  <div className="text-xs leading-tight">{allergen.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={handleSaveProfile}
+            className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+          >
+            保存してはじめる
+          </button>
+        </div>
+      )}
+    </CenteredCard>
   );
 }

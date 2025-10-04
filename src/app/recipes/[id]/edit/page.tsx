@@ -6,7 +6,7 @@ import Footer from "@/components/layout/Footer";
 import RecipeForm from "@/components/features/RecipeForm";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
-import { getRecipeById } from "@/lib/supabase/supabase";
+import { getRecipeById } from "@/lib/supabase";
 import { Recipe } from "@/types/types";
 
 export default function RecipeEditPage({

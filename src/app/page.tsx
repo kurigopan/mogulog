@@ -6,7 +6,7 @@ import {
   getSeasonalIngredients,
   getPopularRecipes,
   getRecommendedRecipes,
-} from "@/lib/supabase/supabase";
+} from "@/lib/supabase";
 import {
   calculateAgeInMonths,
   getAgeStage,

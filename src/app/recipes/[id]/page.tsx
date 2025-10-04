@@ -23,7 +23,7 @@ import {
   deleteRecipe,
   getRecipeAllergens,
   getRecipeById,
-} from "@/lib/supabase/supabase";
+} from "@/lib/supabase";
 import { Allergen, Recipe } from "@/types/types";
 
 export default function RecipeDetail({

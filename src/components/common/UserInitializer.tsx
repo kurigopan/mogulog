@@ -16,7 +16,7 @@ import {
   getAllergens,
   getChildAllergens,
   supabase,
-} from "@/lib/supabase/supabase";
+} from "@/lib/supabase";
 import { calculateAgeInMonths, getAgeStage } from "@/utils/utils";
 
 export const UserInitializer = () => {

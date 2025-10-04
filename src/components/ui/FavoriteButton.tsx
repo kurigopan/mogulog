@@ -9,7 +9,7 @@ import {
   loginDialogSourceAtom,
   userIdAtom,
 } from "@/lib/atoms";
-import { toggleFavoriteItem } from "@/lib/supabase/supabase";
+import { toggleFavoriteItem } from "@/lib/supabase";
 import { Type } from "@/types/types";
 
 type FavoriteButtonProps = {

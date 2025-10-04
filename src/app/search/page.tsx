@@ -16,7 +16,7 @@ import {
   getAllergens,
   searchIngredientsWithAllergens,
   searchRecipesWithAllergens,
-} from "@/lib/supabase/supabase";
+} from "@/lib/supabase";
 import { Allergen, ListCardItem } from "@/types/types";
 
 export default function SearchResults() {

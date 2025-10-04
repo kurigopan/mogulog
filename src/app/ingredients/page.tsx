@@ -16,7 +16,7 @@ import {
   deleteIngredientStatus,
   getIngredientsWithStatus,
   upsertIngredientStatus,
-} from "@/lib/supabase/supabase";
+} from "@/lib/supabase";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
   childIdAtom,

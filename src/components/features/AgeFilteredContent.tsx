@@ -8,7 +8,7 @@ import {
   getPopularRecipes,
   getRecommendedRecipes,
   getSeasonalIngredients,
-} from "@/lib/supabase/supabase";
+} from "@/lib/supabase";
 import { getCardContents } from "@/utils/utils";
 import { CardContent } from "@/types/types";
 

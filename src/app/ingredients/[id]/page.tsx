@@ -7,9 +7,12 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Card from "@/components/ui/Card";
 import ShareButton from "@/components/ui/ShareButton";
-import NotFoundPage from "@/components/NotFound";
-import { getIngredientById, searchRecipesByIngredient } from "@/lib/supabase";
-import { savedBrowsingHistory } from "@/lib/localstorage";
+import NotFoundPage from "@/components/common/NotFound";
+import {
+  getIngredientById,
+  searchRecipesByIngredient,
+} from "@/lib/supabase/supabase";
+import { savedBrowsingHistory } from "@/utils/localstorage";
 import { useAtomValue } from "jotai";
 import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/atoms";
 import { CardItem, Ingredient } from "@/types/types";

@@ -5,7 +5,7 @@ import { MailOutlineIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { updateEmail } from "@/lib/supabase";
+import { updateEmail } from "@/lib/supabase/supabase";
 
 type ValidationErrors = {
   [key: string]: string[];

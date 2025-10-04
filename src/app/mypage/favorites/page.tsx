@@ -13,7 +13,10 @@ import {
   loginDialogSourceAtom,
   userIdAtom,
 } from "@/lib/atoms";
-import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
+import {
+  getFavoriteIngredients,
+  getFavoriteRecipes,
+} from "@/lib/supabase/supabase";
 import { ListCardItem } from "@/types/types";
 
 export default function Favorites() {

@@ -6,7 +6,7 @@ import { HistoryIcon } from "@/icons";
 import Card from "@/components/ui/Card";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { getBrowsingHistory } from "@/lib/localstorage";
+import { getBrowsingHistory } from "@/utils/localstorage";
 import { ListCardItem } from "@/types/types";
 
 export default function BrowsingHistory() {

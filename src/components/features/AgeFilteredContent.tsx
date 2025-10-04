@@ -8,8 +8,8 @@ import {
   getPopularRecipes,
   getRecommendedRecipes,
   getSeasonalIngredients,
-} from "@/lib/supabase";
-import { getCardContents } from "@/lib/utils";
+} from "@/lib/supabase/supabase";
+import { getCardContents } from "@/utils/utils";
 import { CardContent } from "@/types/types";
 
 type AgeFilteredContentProps = {

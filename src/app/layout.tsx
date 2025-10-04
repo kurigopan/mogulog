@@ -1,11 +1,11 @@
 import "@/app/globals.css";
 import type { Metadata } from "next";
 import { Provider } from "jotai";
-import { AuthObserver } from "@/components/AuthObserver";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { LoadingResetter } from "@/components/LoadingResetter";
-import { UserInitializer } from "@/components/UserInitializer";
-import LoginPromptDialog from "@/components/LoginPromptDialog";
+import { AuthObserver } from "@/components/common/AuthObserver";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { LoadingResetter } from "@/components/common/LoadingResetter";
+import { UserInitializer } from "@/components/common/UserInitializer";
+import LoginPromptDialog from "@/components/common/LoginPromptDialog";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 
 const mPlus = M_PLUS_Rounded_1c({

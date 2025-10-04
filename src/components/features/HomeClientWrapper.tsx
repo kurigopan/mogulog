@@ -2,9 +2,9 @@
 
 import { useState, useCallback } from "react";
 import Header from "@/components/layout/Header";
-import AgeOptionsFilter from "@/components/AgeOptionsFilter";
-import AgeFilteredContent from "@/components/AgeFilteredContent";
-import BrowsingHistory from "@/components/BrowsingHistory";
+import AgeOptionsFilter from "@/components/features/AgeOptionsFilter";
+import AgeFilteredContent from "@/components/features/AgeFilteredContent";
+import BrowsingHistory from "@/components/common/BrowsingHistory";
 import { CardContent } from "@/types/types";
 import Link from "next/link";
 import { SearchIcon } from "@/icons";

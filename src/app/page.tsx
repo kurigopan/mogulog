@@ -1,4 +1,4 @@
-import HomeClientWrapper from "@/components/HomeClientWrapper";
+import HomeClientWrapper from "@/components/features/HomeClientWrapper";
 import Footer from "@/components/layout/Footer";
 import {
   getUser,
@@ -6,12 +6,12 @@ import {
   getSeasonalIngredients,
   getPopularRecipes,
   getRecommendedRecipes,
-} from "@/lib/supabase";
+} from "@/lib/supabase/supabase";
 import {
   calculateAgeInMonths,
   getAgeStage,
   getCardContents,
-} from "@/lib/utils";
+} from "@/utils/utils";
 
 export default async function Home() {
   const user = await getUser();

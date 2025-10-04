@@ -13,17 +13,17 @@ import {
 // import { Tooltip, IconButton } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import NotFoundPage from "@/components/NotFound";
+import NotFoundPage from "@/components/common/NotFound";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/lib/atoms";
-import { savedBrowsingHistory } from "@/lib/localstorage";
+import { savedBrowsingHistory } from "@/utils/localstorage";
 import {
   deleteRecipe,
   getRecipeAllergens,
   getRecipeById,
-} from "@/lib/supabase";
+} from "@/lib/supabase/supabase";
 import { Allergen, Recipe } from "@/types/types";
 
 export default function RecipeDetail({

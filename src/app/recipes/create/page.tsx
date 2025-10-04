@@ -2,7 +2,7 @@
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import RecipeForm from "@/components/RecipeForm";
+import RecipeForm from "@/components/features/RecipeForm";
 
 // レシピ作成ページのコンポーネント
 export default function RecipeCreatePage() {

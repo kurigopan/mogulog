@@ -33,7 +33,7 @@ import {
   updateProfile,
   uploadAvatar,
   upsertChildAllergens,
-} from "@/lib/supabase";
+} from "@/lib/supabase/supabase";
 
 export default function MyPage() {
   const router = useRouter();

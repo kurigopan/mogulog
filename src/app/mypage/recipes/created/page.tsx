@@ -9,7 +9,7 @@ import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
-import { getRecipesCreatedByUser } from "@/lib/supabase";
+import { getRecipesCreatedByUser } from "@/lib/supabase/supabase";
 import { ListCardItem } from "@/types/types";
 
 export default function CreatedRecipes() {

@@ -24,7 +24,7 @@ import {
   getRecipeAllergensById,
   updateRecipe,
   uploadImage,
-} from "@/lib/supabase";
+} from "@/lib/supabase/supabase";
 import { Allergen, Category, Recipe, Stage } from "@/types/types";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];

@@ -16,7 +16,7 @@ import {
   deleteIngredientStatus,
   getIngredientsWithStatus,
   upsertIngredientStatus,
-} from "@/lib/supabase";
+} from "@/lib/supabase/supabase";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
   childIdAtom,
@@ -25,7 +25,7 @@ import {
   loginDialogSourceAtom,
   userIdAtom,
 } from "@/lib/atoms";
-import { getAgeStageDisplay } from "@/lib/utils";
+import { getAgeStageDisplay } from "@/utils/utils";
 import { Ingredient } from "@/types/types";
 
 export default function IngredientsList() {

@@ -7,7 +7,7 @@ import { VisibilityIcon, VisibilityOffIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { login, signup } from "@/lib/supabase";
+import { login, signup } from "@/lib/supabase/supabase";
 import { registerSchema } from "@/types/schemas";
 import { User } from "@/types/types";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Recipe, Season, ingredientNutrition } from "./types";
-import { convertUtcToJst } from "@/lib/utils";
+import { convertUtcToJst } from "@/utils/utils";
 
 export const registerSchema = z.object({
   email: z

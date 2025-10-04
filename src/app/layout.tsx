@@ -6,6 +6,13 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { LoadingResetter } from "@/components/LoadingResetter";
 import { UserInitializer } from "@/components/UserInitializer";
 import LoginPromptDialog from "@/components/LoginPromptDialog";
+import { M_PLUS_Rounded_1c } from "next/font/google";
+
+const mPlus = M_PLUS_Rounded_1c({
+  weight: ["300", "400", "500", "700"], // 使用するウェイト
+  display: "swap",
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: "もぐログ",
@@ -18,7 +25,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" className={mPlus.className}>
       <body>
         <Provider>
           <AuthObserver />

@@ -4,8 +4,7 @@
 @tailwind components;
 @tailwind utilities; */
 
-/* Custom scrollbar for a softer look */
-/* スクロールバー全体に適用 */
+/* スクロールバー（柔らかい雰囲気） */
 ::-webkit-scrollbar {
   height: 4px; /* 横スクロール時の高さ */
   width: 4px; /* 縦スクロール時の幅 */

@@ -52,7 +52,6 @@ interface ingredientNutrition {
 interface recipeStep {
   step: number;
   description: string;
-  image: string | null;
 }
 
 interface recipeIngredient {

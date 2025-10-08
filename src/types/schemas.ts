@@ -148,7 +148,6 @@ export const recipeIngredientSchema = z.object({
 export const recipeStepSchema = z.object({
   step: z.number(),
   description: z.string(),
-  image: z.string().nullable(),
 });
 
 // 1.データベースから直接取得するレシピデータのスキーマを定義

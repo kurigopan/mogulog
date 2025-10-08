@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { SearchIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import AgeOptionsFilter from "@/components/features/AgeOptionsFilter";
@@ -18,6 +18,7 @@ export default function HomeClientWrapper({
   initialChildAgeStage,
   initialCardContents,
 }: HomeClientWrapperProps) {
+  const router = useRouter();
   const [activeChildAgeStage, setActiveChildAgeStage] =
     useState(initialChildAgeStage);
 

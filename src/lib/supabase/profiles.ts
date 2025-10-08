@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { Profile, Child } from "@/types/types";
+import { Profile, Child } from "@/types";
 
 // プロフィールデータを取得する関数
 export async function getProfile(userId: string) {

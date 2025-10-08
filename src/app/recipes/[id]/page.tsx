@@ -24,7 +24,7 @@ import {
   getRecipeAllergens,
   getRecipeById,
 } from "@/lib/supabase";
-import { Allergen, Recipe } from "@/types/types";
+import { Allergen, Recipe } from "@/types";
 
 export default function RecipeDetail({
   params,

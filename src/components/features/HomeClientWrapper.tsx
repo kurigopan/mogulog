@@ -7,7 +7,7 @@ import Header from "@/components/layout/Header";
 import AgeOptionsFilter from "@/components/features/AgeOptionsFilter";
 import AgeFilteredContent from "@/components/features/AgeFilteredContent";
 import BrowsingHistory from "@/components/common/BrowsingHistory";
-import { CardContent } from "@/types/types";
+import { CardContent } from "@/types";
 
 interface HomeClientWrapperProps {
   initialChildAgeStage: string;

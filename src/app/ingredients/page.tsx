@@ -26,7 +26,7 @@ import {
   userIdAtom,
 } from "@/lib/atoms";
 import { getAgeStageDisplay } from "@/lib/utils";
-import { Ingredient } from "@/types/types";
+import { Ingredient } from "@/types";
 
 export default function IngredientsList() {
   const setIsLoading = useSetAtom(loadingAtom);

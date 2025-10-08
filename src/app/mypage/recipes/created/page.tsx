@@ -10,7 +10,7 @@ import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import { getRecipesCreatedByUser } from "@/lib/supabase";
-import { ListCardItem } from "@/types/types";
+import { ListCardItem } from "@/types";
 
 export default function CreatedRecipes() {
   const router = useRouter();

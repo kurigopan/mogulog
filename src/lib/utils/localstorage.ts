@@ -1,4 +1,4 @@
-import { ListCardItem } from "@/types/types";
+import { ListCardItem } from "@/types";
 
 // ローカルストレージに保存するキー
 const VIEWED_KEY = "viewedItems";

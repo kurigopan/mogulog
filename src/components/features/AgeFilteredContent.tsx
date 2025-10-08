@@ -10,7 +10,7 @@ import {
   getSeasonalIngredients,
 } from "@/lib/supabase";
 import { getCardContents } from "@/lib/utils";
-import { CardContent } from "@/types/types";
+import { CardContent } from "@/types";
 
 type AgeFilteredContentProps = {
   currentActiveAgeStage: string;

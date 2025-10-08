@@ -14,7 +14,7 @@ import {
   userIdAtom,
 } from "@/lib/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
-import { ListCardItem } from "@/types/types";
+import { ListCardItem } from "@/types";
 
 export default function Favorites() {
   const [isLoading, setIsLoading] = useAtom(loadingAtom);

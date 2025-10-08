@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ImageIcon } from "@/icons";
-import { CardItem } from "@/types/types";
+import { CardItem } from "@/types";
 
 interface CardProps {
   cardItems: CardItem[];

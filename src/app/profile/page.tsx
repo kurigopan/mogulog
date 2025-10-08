@@ -14,7 +14,7 @@ import {
   getAllergens,
   uploadAvatar,
 } from "@/lib/supabase";
-import { Allergen, FormData } from "@/types/types";
+import { Allergen, FormData } from "@/types";
 import { step1Schema, step2Schema } from "@/types/schemas";
 
 type ValidationErrors = {

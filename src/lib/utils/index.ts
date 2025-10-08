@@ -1,5 +1,5 @@
 import React from "react";
-import { CardContent, CardItem, ingredientStageInfo } from "@/types/types";
+import { CardContent, CardItem, ingredientStageInfo } from "@/types";
 import { StarIcon, LocalFloristIcon, RecommendIcon } from "@/icons";
 
 /**

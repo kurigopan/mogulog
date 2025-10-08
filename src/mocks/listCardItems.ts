@@ -1,4 +1,4 @@
-import { CardItem } from "@/types/types";
+import { CardItem } from "@/types";
 
 export const mockListCardItems: CardItem[] = [
   {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { userIdAtom, childIdAtom, loginDialogSourceAtom } from "@/lib/atoms";
 import { upsertIngredientStatus, deleteIngredientStatus } from "@/lib/supabase";
-import { Ingredient } from "@/types/types";
+import { Ingredient } from "@/types";
 
 export const useIngredientStatusToggle = (ingredient: Ingredient) => {
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);

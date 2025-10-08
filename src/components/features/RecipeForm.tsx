@@ -25,7 +25,7 @@ import {
   updateRecipe,
   uploadImage,
 } from "@/lib/supabase";
-import { Allergen, Category, Recipe, Stage } from "@/types/types";
+import { Allergen, Category, Recipe, Stage } from "@/types";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
 const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];

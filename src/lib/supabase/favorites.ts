@@ -4,7 +4,7 @@ import {
   FavoritesRecipes,
   Type,
   TableName,
-} from "@/types/types";
+} from "@/types";
 
 // レシピのお気に入り登録・解除を切り替える関数
 export async function toggleFavoriteItem(

@@ -9,7 +9,7 @@ import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
 import { login, signup } from "@/lib/supabase";
 import { registerSchema } from "@/types/schemas";
-import { User } from "@/types/types";
+import { User } from "@/types";
 
 type ValidationErrors = {
   [key: string]: string[];

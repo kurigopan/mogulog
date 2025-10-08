@@ -10,7 +10,7 @@ import RemoveButton from "@/components/ui/RemoveButton";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
 import { getBrowsingHistory } from "@/lib/utils/localstorage";
-import { ListCardItem } from "@/types/types";
+import { ListCardItem } from "@/types";
 
 export default function BrowsingHistoryPage() {
   const setIsLoading = useSetAtom(loadingAtom);

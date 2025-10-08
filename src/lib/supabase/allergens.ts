@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { ChildAllergens } from "@/types/types";
+import { ChildAllergens } from "@/types";
 
 // 子どものアレルゲンデータを取得する関数
 export async function getChildAllergens(childId: number) {

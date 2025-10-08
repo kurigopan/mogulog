@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { ChildCareIcon } from "@/icons";
 import BackButton from "@/components/ui/BackButton";
-import { PageName } from "@/types/types";
+import { PageName } from "@/types";
 
 type HeaderProps = {
   pageName?: PageName;

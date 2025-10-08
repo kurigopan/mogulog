@@ -7,7 +7,7 @@ import RecipeForm from "@/components/features/RecipeForm";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/atoms";
 import { getRecipeById } from "@/lib/supabase";
-import { Recipe } from "@/types/types";
+import { Recipe } from "@/types";
 
 export default function RecipeEditPage({
   params,

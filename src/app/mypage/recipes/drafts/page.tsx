@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { Recipe } from "@/types/types";
+import { Recipe } from "@/types";
 import { mockRecipes } from "@/mocks/recipes";
 
 export default function DraftRecipes() {

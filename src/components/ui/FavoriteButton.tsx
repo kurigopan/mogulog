@@ -10,7 +10,7 @@ import {
   userIdAtom,
 } from "@/lib/atoms";
 import { toggleFavoriteItem } from "@/lib/supabase";
-import { Type } from "@/types/types";
+import { Type } from "@/types";
 
 type FavoriteButtonProps = {
   itemId: number;

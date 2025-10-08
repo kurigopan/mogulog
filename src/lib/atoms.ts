@@ -1,12 +1,6 @@
 import { atom } from "jotai";
 import { Session } from "@supabase/supabase-js";
-import {
-  Allergen,
-  ChildInfo,
-  FavoriteUpdate,
-  ParentInfo,
-  User,
-} from "@/types/types";
+import { Allergen, ChildInfo, FavoriteUpdate, ParentInfo, User } from "@/types";
 
 export const sessionAtom = atom<Session | null>(null);
 export const loginDialogSourceAtom = atom<string | null>(null);

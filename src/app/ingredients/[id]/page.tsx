@@ -12,7 +12,7 @@ import { getIngredientById, searchRecipesByIngredient } from "@/lib/supabase";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
 import { useAtomValue } from "jotai";
 import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/atoms";
-import { CardItem, Ingredient } from "@/types/types";
+import { CardItem, Ingredient } from "@//types";
 import IngredientStatusButtons from "@/components/ui/IngredientStatusButtons";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 

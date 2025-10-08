@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircleIcon, CancelIcon } from "@/icons";
-import { Ingredient } from "@/types/types";
+import { Ingredient } from "@/types";
 import { useIngredientStatusToggle } from "@/hooks/useIngredientStatusToggle";
 
 type Props = {

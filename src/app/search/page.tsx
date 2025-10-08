@@ -17,7 +17,7 @@ import {
   searchIngredientsWithAllergens,
   searchRecipesWithAllergens,
 } from "@/lib/supabase";
-import { Allergen, ListCardItem } from "@/types/types";
+import { Allergen, ListCardItem } from "@/types";
 
 export default function SearchResults() {
   const setIsLoading = useSetAtom(loadingAtom);

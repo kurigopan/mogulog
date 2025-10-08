@@ -102,15 +102,15 @@ export default function SearchResults() {
   //   return result.type === filter;
   // });
 
-  const sortedResults = results.sort((a, b) => {
-    if (sortBy === "name") {
-      return a.name.localeCompare(b.name);
-    }
-    if (sortBy === "subtitle" && a.startStage && b.startStage) {
-      return a.startStage.localeCompare(b.startStage);
-    }
-    return 0; // relevance (default order)
-  });
+  // const sortedResults = results.sort((a, b) => {
+  //   if (sortBy === "name") {
+  //     return a.name.localeCompare(b.name);
+  //   }
+  //   if (sortBy === "subtitle" && a.startStage && b.startStage) {
+  //     return a.startStage.localeCompare(b.startStage);
+  //   }
+  //   return 0; // relevance (default order)
+  // });
 
   // ページロード時とアレルゲン項目がないときに実行
   useEffect(() => {
@@ -204,8 +204,8 @@ export default function SearchResults() {
         </div>
 
         {/* 検索結果一覧 */}
-        {sortedResults.length > 0 ? (
-          <ListCard cardItems={sortedResults} pageName="search" />
+        {results.length > 0 ? (
+          <ListCard cardItems={results} pageName="search" />
         ) : searchQuery ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">

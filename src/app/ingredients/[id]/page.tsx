@@ -95,7 +95,7 @@ export default function IngredientDetail({
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="食材詳細" tools={tools} />
       <div className="p-4 space-y-6">
         {ingredient ? (
@@ -295,6 +295,6 @@ export default function IngredientDetail({
         )}
       </div>
       <Footer />
-    </div>
+    </>
   );
 }

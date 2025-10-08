@@ -188,7 +188,7 @@ export default function IngredientsList() {
   }, [userId, childId]);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="食材一覧" />
       <div className="p-4 space-y-6">
         {/* フィルターボックス */}
@@ -365,6 +365,6 @@ export default function IngredientsList() {
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 }

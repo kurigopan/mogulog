@@ -24,7 +24,7 @@ export default function BrowsingHistoryPage() {
   }, [setIsLoading]);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="閲覧履歴" tools={<RemoveButton />} />
 
       <div className="p-4 space-y-6">
@@ -69,6 +69,6 @@ export default function BrowsingHistoryPage() {
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 }

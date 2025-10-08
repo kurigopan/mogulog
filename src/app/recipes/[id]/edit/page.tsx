@@ -36,7 +36,7 @@ export default function RecipeEditPage({
   }, [recipeId]);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="レシピ編集" />
       {/* ローディング中はメッセージを表示、データ取得後はフォームを表示 */}
       {recipeData ? (
@@ -47,6 +47,6 @@ export default function RecipeEditPage({
         </div>
       )}
       <Footer pageName="edit" />
-    </div>
+    </>
   );
 }

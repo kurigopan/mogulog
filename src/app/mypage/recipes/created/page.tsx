@@ -33,7 +33,7 @@ export default function CreatedRecipes() {
   }, [userId]);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="作成したレシピ" />
 
       <div className="p-4 space-y-6">
@@ -64,6 +64,6 @@ export default function CreatedRecipes() {
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 }

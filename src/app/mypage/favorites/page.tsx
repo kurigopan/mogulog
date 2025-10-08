@@ -75,7 +75,7 @@ export default function Favorites() {
   const displayItems = [...favoriteIngredients, ...favoriteRecipes];
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="お気に入り" />
       <div className="p-4 space-y-6">
         {/* レシピ一覧 */}
@@ -105,6 +105,6 @@ export default function Favorites() {
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 }

@@ -132,7 +132,7 @@ export default function SearchResults() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="検索結果" />
       <div className="p-4 space-y-6">
         {/* 検索窓 */}
@@ -244,6 +244,6 @@ export default function SearchResults() {
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 }

@@ -193,7 +193,7 @@ export default function MyPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="マイページ" />
       <div className="p-4 space-y-6">
         {/* 親プロフィール */}
@@ -497,6 +497,6 @@ export default function MyPage() {
         </div>
       )}
       <Footer />
-    </div>
+    </>
   );
 }

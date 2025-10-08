@@ -116,7 +116,7 @@ export default function RecipeDetail({
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="レシピ詳細" tools={tools} />
       <div className="p-4 space-y-6">
         {recipe ? (
@@ -369,6 +369,6 @@ export default function RecipeDetail({
         )}
       </div>
       <Footer />
-    </div>
+    </>
   );
 }

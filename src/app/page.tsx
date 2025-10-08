@@ -40,12 +40,12 @@ export default async function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <HomeClientWrapper
         initialChildAgeStage={initialChildAgeStage}
         initialCardContents={initialCardContents}
       />
       <Footer />
-    </div>
+    </>
   );
 }

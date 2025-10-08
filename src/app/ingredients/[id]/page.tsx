@@ -113,6 +113,7 @@ export default function IngredientDetail({
                       height={150}
                       className="rounded-3xl mb-4 mx-auto"
                       unoptimized // 画像がsvgの場合ブロックされてしまうため設定
+                      priority
                     />
                   )}
                   <h2 className="text-2xl font-bold text-stone-700 mb-4">

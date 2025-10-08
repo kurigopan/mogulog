@@ -133,6 +133,7 @@ export default function RecipeDetail({
                     height={300}
                     className="object-contain rounded-2xl"
                     unoptimized // 画像がsvgの場合ブロックされてしまうため設定
+                    priority
                   />
                 )}
               </div>

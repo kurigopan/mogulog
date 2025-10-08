@@ -18,7 +18,7 @@ import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/lib/atoms";
-import { savedBrowsingHistory } from "@/utils/localstorage";
+import { savedBrowsingHistory } from "@/lib/utils/localstorage";
 import {
   deleteRecipe,
   getRecipeAllergens,

@@ -11,7 +11,7 @@ import {
   calculateAgeInMonths,
   getAgeStage,
   getCardContents,
-} from "@/utils/utils";
+} from "@/lib/utils";
 
 export default async function Home() {
   const user = await getUser();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
@@ -9,7 +9,7 @@ import {
   getRecommendedRecipes,
   getSeasonalIngredients,
 } from "@/lib/supabase";
-import { getCardContents } from "@/utils/utils";
+import { getCardContents } from "@/lib/utils";
 import { CardContent } from "@/types/types";
 
 type AgeFilteredContentProps = {

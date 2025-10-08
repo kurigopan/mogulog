@@ -25,7 +25,7 @@ import {
   loginDialogSourceAtom,
   userIdAtom,
 } from "@/lib/atoms";
-import { getAgeStageDisplay } from "@/utils/utils";
+import { getAgeStageDisplay } from "@/lib/utils";
 import { Ingredient } from "@/types/types";
 
 export default function IngredientsList() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteIcon } from "@/icons";
-import { removeBrowsingHistory } from "@/utils/localstorage";
+import { removeBrowsingHistory } from "@/lib/utils/localstorage";
 
 export default function RemoveButton() {
   const handleRemove = (e: React.MouseEvent<HTMLElement>) => {

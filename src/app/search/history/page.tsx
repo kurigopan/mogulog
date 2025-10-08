@@ -9,7 +9,7 @@ import ListCard from "@/components/ui/ListCard";
 import RemoveButton from "@/components/ui/RemoveButton";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/atoms";
-import { getBrowsingHistory } from "@/utils/localstorage";
+import { getBrowsingHistory } from "@/lib/utils/localstorage";
 import { ListCardItem } from "@/types/types";
 
 export default function BrowsingHistoryPage() {

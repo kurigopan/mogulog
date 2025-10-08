@@ -17,7 +17,7 @@ import {
   getChildAllergens,
   supabase,
 } from "@/lib/supabase";
-import { calculateAgeInMonths, getAgeStage } from "@/utils/utils";
+import { calculateAgeInMonths, getAgeStage } from "@/lib/utils";
 
 export const UserInitializer = () => {
   const setIsLoading = useSetAtom(loadingAtom);

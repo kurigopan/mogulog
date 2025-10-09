@@ -55,20 +55,18 @@ export default function AgeOptionsFilter({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center p-1 rounded-full transition-colors"
-      >
-        <span className="text-sm text-stone-600 font-normal">月齢</span>
-        <div className="flex items-center px-2 py-1 bg-violet-50 rounded-full ml-1 hover:bg-violet-100">
-          <span className="text-sm text-violet-600 font-medium">
-            {currentAgeLabel}
-          </span>
+      <div className="flex items-center space-x-2">
+        <span className="text-sm text-stone-600">月齢</span>
+        <button
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className="flex items-center rounded-full transition-colors px-3 py-1 bg-violet-50 hover:bg-violet-100"
+        >
+          <span className="text-sm text-violet-600">{currentAgeLabel}</span>
           <ExpandMoreIcon />
-        </div>
-      </button>
+        </button>
+      </div>
       {isDropdownOpen && (
-        <div className="absolute right-0 top-full mt-2 w-32 bg-white rounded-lg shadow-lg border border-stone-200 z-20 overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 w-28 bg-white rounded-xl shadow-sm border border-stone-200 z-20 overflow-hidden">
           {ageOptions.map((option) => (
             <button
               key={option.value}

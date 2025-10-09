@@ -1,20 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
 
-// ユーザー情報（メールアドレス）を取得する関数
-export async function getUser() {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    console.error("Failed to fetch user:", error);
-    return null;
-  }
-
-  return user;
-}
-
 export async function signup(email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({
     email: email,

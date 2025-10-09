@@ -1,27 +1,15 @@
 import HomeClientWrapper from "@/components/features/HomeClientWrapper";
 import Footer from "@/components/layout/Footer";
 import {
-  getUser,
-  getChild,
-  getSeasonalIngredients,
   getPopularRecipes,
   getRecommendedRecipes,
+  getSeasonalIngredients,
 } from "@/lib/supabase";
-import {
-  calculateAgeInMonths,
-  getAgeStage,
-  getCardContents,
-} from "@/lib/utils";
+import { getChildAgeStageForCurrentUser } from "@/lib/supabase/profiles.server";
+import { getCardContents } from "@/lib/utils";
 
 export default async function Home() {
-  const user = await getUser();
-  let initialChildAgeStage: string = "初期";
-  if (user) {
-    const child = await getChild(user.id);
-    if (child) {
-      initialChildAgeStage = getAgeStage(calculateAgeInMonths(child.birthday));
-    }
-  }
+  const initialChildAgeStage = await getChildAgeStageForCurrentUser();
 
   const [
     initialPopularRecipes,

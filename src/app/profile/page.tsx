@@ -200,7 +200,7 @@ export default function ProfilePage() {
               プロフィール画像
             </label>
             <div
-              className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer hover:bg-stone-200 transition-colors group relative"
+              className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden hover:bg-stone-200 transition-colors group relative"
               onClick={() => avatarInputRef.current?.click()}
             >
               {formData.avatar_url ? (

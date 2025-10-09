@@ -41,10 +41,7 @@ export default function HomeClientWrapper({
       />
       <div className="p-4 space-y-6">
         {/* 検索窓 */}
-        <div
-          className="relative cursor-pointer mb-4"
-          onClick={() => router.push("/search")}
-        >
+        <div className="relative mb-4" onClick={() => router.push("/search")}>
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-400">
             <SearchIcon />
           </div>

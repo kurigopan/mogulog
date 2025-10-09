@@ -447,7 +447,7 @@ export default function RecipeForm({
           {/* 画像プレビュー */}
           <div className="flex flex-col items-center">
             <div
-              className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer hover:bg-stone-200 transition-colors group relative"
+              className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden hover:bg-stone-200 transition-colors group relative"
               onClick={() => imageInputRef.current?.click()}
             >
               {formData.image ? (

@@ -18,7 +18,13 @@ export default function ShareButton({ title }: Props) {
     };
 
     if (navigator.share) {
-      await navigator.share(shareData);
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as DOMException).name !== "AbortError") {
+          console.error("共有に失敗しました", err);
+        }
+      }
     } else {
       try {
         await navigator.clipboard.writeText(shareData.url);

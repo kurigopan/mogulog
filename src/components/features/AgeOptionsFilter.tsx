@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ExpandMoreIcon } from "@/icons";
+import { ExpandLessIcon, ExpandMoreIcon } from "@/icons";
 
 type AgeOptionsFilterProps = {
   initialChildAgeStage: string;
@@ -59,10 +59,10 @@ export default function AgeOptionsFilter({
         <span className="text-sm text-stone-600">月齢</span>
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center rounded-full transition-colors px-3 py-1 bg-violet-50 hover:bg-violet-100"
+          className="flex items-center rounded-full transition-colors space-x-2 px-4 py-2 bg-violet-100 shadow-sm hover:shadow-md hover:bg-violet-200"
         >
           <span className="text-sm text-violet-600">{currentAgeLabel}</span>
-          <ExpandMoreIcon />
+          {isDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </button>
       </div>
       {isDropdownOpen && (

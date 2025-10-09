@@ -108,7 +108,6 @@ export default function RecipeForm({
   const handleStageChange = (stage: Stage) => {
     setFormData((prev) => {
       const newStartStage = prev.startStage == stage ? prev.startStage : stage;
-      console.log(newStartStage);
       return { ...prev, startStage: newStartStage };
     });
   };
@@ -117,7 +116,6 @@ export default function RecipeForm({
   const handleCategoryChange = (category: Category) => {
     setFormData((prev) => {
       const newCategory = prev.category == category ? prev.category : category;
-      console.log(newCategory);
       return { ...prev, category: newCategory };
     });
   };
@@ -400,7 +398,7 @@ export default function RecipeForm({
           data.forEach((allergen) => {
             // 同義語をキー、アレルゲン名を値として保存
             if (allergen.variants) {
-              allergen.variants.forEach((variant) => {
+              allergen.variants.forEach((variant: string) => {
                 newMap.set(variant, allergen.name);
               });
             }

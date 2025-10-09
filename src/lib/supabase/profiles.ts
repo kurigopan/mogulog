@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import { Profile, Child } from "@/types";
 
-// プロフィールデータを取得する関数
 export async function getProfile(userId: string) {
   const { data, error } = await supabase
     .from("profiles")
@@ -15,7 +14,6 @@ export async function getProfile(userId: string) {
   }
   return data;
 }
-// 子どものデータを取得する関数
 export async function getChild(userId: string) {
   const { data, error } = await supabase
     .from("children")
@@ -70,14 +68,15 @@ export async function createChild(
   const { data, error } = await supabase
     .from("children")
     .insert(childData)
-    .select();
+    .select()
+    .single();
 
   if (error) {
     console.error("子どもの登録に失敗しました:", error);
     return null;
   }
 
-  return data[0].id;
+  return data.id;
 }
 
 export async function updateProfile(

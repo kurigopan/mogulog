@@ -13,8 +13,6 @@ export const AuthObserver = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Supabase Auth Event:", event);
-
       // セッションがあればユーザーIDをセット
       if (session) {
         const userId = session.user.id;

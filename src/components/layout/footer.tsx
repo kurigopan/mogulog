@@ -52,7 +52,7 @@ export default function Footer({ pageName }: HeaderProps) {
               key={index}
               href={button.href}
               onClick={(e) => handleClick(e, button.requiresAuth || false)}
-              className="flex flex-col items-center py-2 px-3 rounded-lg hover:bg-violet-50 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="flex flex-col items-center py-2 px-3 rounded-2xl hover:bg-violet-50 transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <div className="text-stone-400 mb-1">{button.icon}</div>
               <span className="text-xs text-stone-500 font-medium">

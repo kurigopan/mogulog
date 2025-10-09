@@ -93,7 +93,7 @@ export default function FavoriteButton({
       onClick={handleToggleFavorite}
       disabled={isLoading}
       aria-label={`${isFavorited ? "解除" : "登録"}: ${itemType}お気に入り`}
-      className={`p-2 rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${buttonStyle}`}
+      className={`p-2 rounded-2xl transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${buttonStyle}`}
     >
       {heartIcon}
     </button>

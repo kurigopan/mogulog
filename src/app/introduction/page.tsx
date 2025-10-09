@@ -97,7 +97,6 @@ export default function Introduction() {
   // Login Prompt Screen
   return (
     <CenteredCard>
-      {" "}
       <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-100 rounded-full mb-4">
           <LoginIcon className="text-violet-500 text-3xl" />

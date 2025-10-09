@@ -151,7 +151,7 @@ export default function SearchResults() {
             />
           </div>
           {/* アレルゲン除外設定 */}
-          <div className="bg-white rounded-2xl shadow-sm">
+          <div className="bg-white rounded-3xl shadow-sm">
             <button
               onClick={() => setShowAllergens(!showAllergens)}
               className="w-full flex items-center justify-between p-4 hover:bg-stone-50 rounded-2xl transition-colors"
@@ -208,34 +208,24 @@ export default function SearchResults() {
           <ListCard cardItems={results} pageName="search" />
         ) : searchQuery ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center">
               <SearchOffIcon className="text-violet-500 text-3xl" />
             </div>
-            <h3 className="text-lg font-semibold text-stone-700 mb-2">
+            <h3 className="text-lg font-semibold text-stone-700 mb-4">
               検索結果が見つかりませんでした
             </h3>
             <p className="text-stone-500 mb-6">
-              「{searchQuery}」に一致するレシピや食材が見つかりませんでした。
+              「{searchQuery}」に一致するレシピや食材が見つかりませんでした
               <br />
-              別のキーワードで検索してみてください。
+              別のキーワードで検索してみてください
             </p>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-stone-600">
-                検索のヒント:
-              </p>
-              <ul className="text-sm text-stone-500 space-y-1">
-                <li>・ひらがな、カタカナで検索してみる</li>
-                <li>・食材の名前で検索してみる</li>
-                <li>・月齢に合った食材を探してみる</li>
-              </ul>
-            </div>
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center">
               <SearchIcon className="text-violet-500 text-3xl" />
             </div>
-            <h3 className="text-lg font-semibold text-stone-700 mb-2">
+            <h3 className="text-lg font-semibold text-stone-700 mb-4">
               何をお探しですか？
             </h3>
             <p className="text-stone-500">レシピや食材を検索してみてください</p>

@@ -66,7 +66,7 @@ export default function UpdateEmail() {
               type="email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+              className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
             {errors?.email && (
               <p className="mt-2 text-sm text-red-500">{errors.email[0]}</p>

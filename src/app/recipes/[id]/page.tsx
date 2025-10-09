@@ -131,7 +131,7 @@ export default function RecipeDetail({
                     alt={`${recipe.name}の画像`}
                     width={300}
                     height={300}
-                    className="object-contain rounded-2xl"
+                    className="object-contain rounded-3xl"
                     unoptimized // 画像がsvgの場合ブロックされてしまうため設定
                     priority
                   />
@@ -174,7 +174,7 @@ export default function RecipeDetail({
                 <div className="flex items-center justify-center gap-4">
                   <button
                     onClick={() => router.push(`/recipes/${id}/edit`)}
-                    className=" py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600-600 hover:bg-violet-200 transition-colors"
+                    className=" py-2 px-3 rounded-2xl font-medium bg-stone-100 text-stone-600-600 hover:bg-violet-200 transition-colors"
                   >
                     <EditIcon />
                     <span className="ml-2">編集</span>
@@ -182,7 +182,7 @@ export default function RecipeDetail({
 
                   <button
                     onClick={handleDelete}
-                    className="py-2 px-3 rounded-full font-medium bg-stone-100 text-stone-600 hover:bg-violet-200 transition-colors"
+                    className="py-2 px-3 rounded-2xl font-medium bg-stone-100 text-stone-600 hover:bg-violet-200 transition-colors"
                   >
                     <DeleteIcon />
                     <span className="ml-2">削除</span>
@@ -196,7 +196,7 @@ export default function RecipeDetail({
               <h3 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
                 材料
               </h3>
-              <div className="bg-white rounded-2xl p-4 shadow-sm">
+              <div className="bg-white rounded-3xl p-4 shadow-sm">
                 <div className="space-y-3">
                   {recipe.ingredients.map((ingredient, index) => (
                     <div
@@ -231,7 +231,7 @@ export default function RecipeDetail({
                 {recipe.steps.map((step, index) => (
                   <div
                     key={index}
-                    className="bg-white rounded-2xl p-5 shadow-sm"
+                    className="bg-white rounded-3xl p-5 shadow-sm"
                   >
                     <div className="flex items-start">
                       <div className="flex-shrink-0 w-8 h-8 bg-violet-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
@@ -265,7 +265,7 @@ export default function RecipeDetail({
                 <h3 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
                   タグ
                 </h3>
-                <div className="bg-white rounded-2xl p-5 shadow-sm">
+                <div className="bg-white rounded-3xl p-5 shadow-sm">
                   <div className="flex flex-wrap gap-2">
                     {recipe.tags.map((tag, index) => (
                       <span
@@ -286,7 +286,7 @@ export default function RecipeDetail({
                 <h3 className="text-lg font-bold text-stone-700 mb-4 flex items-center">
                   アレルゲン
                 </h3>
-                <div className="bg-white rounded-2xl p-5 shadow-sm">
+                <div className="bg-white rounded-3xl p-5 shadow-sm">
                   <div className="flex flex-wrap gap-2">
                     {allergens.map((allergen) => (
                       <span

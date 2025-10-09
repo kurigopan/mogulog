@@ -49,14 +49,14 @@ export default function ListCard({ cardItems, pageName }: ListCardProps) {
         >
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              <div className="flex-shrink-0 w-[120px] h-[120px] flex items-center justify-center rounded-2xl overflow-hidden mx-auto transition-transform duration-300 group-hover:scale-110">
+              <div className="w-[120px] h-[120px] flex items-center justify-center rounded-3xl overflow-hidden mx-auto transition-transform duration-300 group-hover:scale-110">
                 {item.image ? (
                   <Image
                     src={item.image}
                     alt={item.name}
                     width={150}
                     height={150}
-                    className="rounded-2xl object-contain w-full h-full"
+                    className="rounded-3xl object-contain w-full h-full"
                     unoptimized
                   />
                 ) : (

@@ -96,7 +96,7 @@ export default function Favorites() {
             </p>
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 bg-violet-400 text-white rounded-full hover:bg-violet-600 transition-colors font-medium"
+              className="inline-flex items-center px-6 py-3 bg-violet-400 text-white rounded-2xl hover:bg-violet-600 transition-colors font-medium"
             >
               さがしにいく
             </Link>

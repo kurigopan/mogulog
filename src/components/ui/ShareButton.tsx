@@ -39,7 +39,7 @@ export default function ShareButton({ title }: Props) {
   return (
     <button
       onClick={handleShare}
-      className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+      className="p-2 hover:bg-stone-100 rounded-2xl transition-colors"
     >
       <ShareIcon />
     </button>

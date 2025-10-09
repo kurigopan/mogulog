@@ -189,7 +189,7 @@ export default function ProfilePage() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+              className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
             {errors?.name && (
               <p className="mt-2 text-sm text-red-500">{errors.name[0]}</p>
@@ -249,7 +249,7 @@ export default function ProfilePage() {
               name="childName"
               value={formData.childName}
               onChange={handleChange}
-              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+              className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
             {errors?.childName && (
               <p className="mt-2 text-sm text-red-500">{errors.childName[0]}</p>
@@ -265,7 +265,7 @@ export default function ProfilePage() {
               name="childBirthday"
               value={formData.childBirthday}
               onChange={handleChange}
-              className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+              className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
             {errors?.childBirthday && (
               <p className="mt-2 text-sm text-red-500">

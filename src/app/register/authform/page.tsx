@@ -147,7 +147,7 @@ export default function AuthForm() {
             name="email"
             value={userData.email}
             onChange={handleChange}
-            className="w-full p-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+            className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
           />
           {errors?.email && (
             <p className="mt-2 text-sm text-red-500">{errors.email[0]}</p>
@@ -162,7 +162,7 @@ export default function AuthForm() {
             name="password"
             value={userData.password}
             onChange={handleChange}
-            className="w-full p-4 rounded-xl border border-stone-300 pr-12 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all mb-2"
+            className="w-full p-4 rounded-2xl border border-stone-300 pr-12 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all mb-2"
           />
           <button
             type="button"

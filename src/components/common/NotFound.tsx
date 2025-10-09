@@ -27,13 +27,13 @@ export default function NotFoundPage() {
       <div className="space-y-3 mx-auto">
         <button
           onClick={handleBack}
-          className="block w-full bg-violet-500 hover:bg-violet-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-200"
+          className="block w-full bg-violet-500 hover:bg-violet-600 text-white font-medium py-3 px-6 rounded-2xl transition-colors duration-200"
         >
           前のページに戻る
         </button>
         <Link
           href="/"
-          className="block w-full bg-stone-200 hover:text-stone-600 font-medium py-3 px-6 rounded-full transition-colors duration-200"
+          className="block w-full bg-stone-200 hover:text-stone-600 font-medium py-3 px-6 rounded-2xl transition-colors duration-200"
         >
           ホームに戻る
         </Link>

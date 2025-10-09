@@ -8,6 +8,7 @@ import {
   CancelIcon,
   RadioButtonUncheckedIcon,
   HelpOutlineIcon,
+  SearchOffIcon,
 } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -340,13 +341,13 @@ export default function IngredientsList() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center text-3xl">
-                🤷‍♀️
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-3xl">
+                <SearchOffIcon className="text-violet-500 text-3xl" />
               </div>
-              <h3 className="text-lg font-semibold text-stone-700 mb-2">
+              <h3 className="text-lg font-semibold text-stone-700 mb-4">
                 条件に合う食材が見つかりませんでした
               </h3>
-              <p className="text-stone-500 mb-4">
+              <p className="text-stone-500 mb-6">
                 フィルター条件を変更して再度お試しください
               </p>
               <button
@@ -355,7 +356,7 @@ export default function IngredientsList() {
                   setSelectedStageFilter("all");
                   setSelectedStatusFilter("all");
                 }}
-                className="px-6 py-2 bg-violet-100 text-violet-600 rounded-full text-sm font-medium hover:bg-violet-200 transition-colors"
+                className="px-6 py-2 bg-violet-100 text-violet-600 rounded-2xl text-sm font-medium hover:bg-violet-200 transition-colors"
               >
                 フィルターをリセット
               </button>

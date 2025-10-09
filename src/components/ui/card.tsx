@@ -25,7 +25,7 @@ export default function Card({ cardItems, className }: CardProps) {
                   alt={item.name}
                   width={150}
                   height={150}
-                  className="rounded-2xl object-contain w-full h-full"
+                  className="rounded-3xl object-contain w-full h-full"
                   unoptimized // 画像がsvgの場合ブロックされてしまうため設定
                 />
               ) : (

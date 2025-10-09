@@ -17,7 +17,7 @@ export default function RemoveButton() {
   return (
     <button
       onClick={(e) => handleRemove(e)}
-      className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+      className="p-2 hover:bg-stone-100 rounded-2xl transition-colors"
     >
       <DeleteIcon />
     </button>

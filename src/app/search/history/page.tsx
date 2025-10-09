@@ -46,7 +46,7 @@ export default function BrowsingHistoryPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center px-6 py-3 bg-violet-500 text-white rounded-full hover:bg-violet-600 transition-colors font-medium"
+              className="inline-flex items-center px-6 py-3 bg-violet-500 text-white rounded-2xl hover:bg-violet-600 transition-colors font-medium"
             >
               ホームに戻る
             </Link>

@@ -341,20 +341,6 @@ export default function RecipeForm({
   //   }, 1000);
   // };
 
-  // レシピ削除処理
-  // const handleDelete = async () => {
-  //   if (!initialData?.id) return;
-  //   setIsSaving(true);
-  //   try {
-  //     await deleteRecipe(initialData.id);
-  //     router.push("/");
-  //   } catch {
-  //   } finally {
-  //     setIsSaving(false);
-  //     setShowConfirm(false);
-  //   }
-  // };
-
   // 編集モードの場合、初期データでフォームを初期化
   useEffect(() => {
     if (initialData) {
@@ -447,7 +433,7 @@ export default function RecipeForm({
           {/* 画像プレビュー */}
           <div className="flex flex-col items-center">
             <div
-              className="w-[200px] h-[200px] bg-stone-100 rounded-2xl flex items-center justify-center overflow-hidden hover:bg-stone-200 transition-colors group relative"
+              className="w-[200px] h-[200px] bg-stone-100 rounded-3xl flex items-center justify-center overflow-hidden hover:bg-stone-200 transition-colors group relative"
               onClick={() => imageInputRef.current?.click()}
             >
               {formData.image ? (
@@ -489,7 +475,7 @@ export default function RecipeForm({
               value={formData.name}
               onChange={handleChange}
               placeholder="にんじんとかぼちゃの煮物"
-              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all font-medium text-lg"
+              className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all font-medium text-lg"
               required
             />
 
@@ -549,7 +535,7 @@ export default function RecipeForm({
                   value={formData.cookingTime || ""}
                   onChange={handleChange}
                   placeholder="15分"
-                  className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all ml-2"
+                  className="w-30 bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all ml-2"
                 />
               </div>
               <div className="flex items-center">
@@ -560,7 +546,7 @@ export default function RecipeForm({
                   value={formData.servings || ""}
                   onChange={handleChange}
                   placeholder="1食分"
-                  className="w-30 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all ml-2"
+                  className="w-30 bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all ml-2"
                 />
               </div>
             </div>
@@ -572,7 +558,7 @@ export default function RecipeForm({
               onChange={handleChange}
               placeholder="甘くて栄養満点！赤ちゃんが大好きな定番メニューです。自然の甘みで食べやすく、冷凍保存も可能です。"
               rows={4}
-              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
+              className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
             />
 
             {/* 非公開設定 */}
@@ -638,7 +624,7 @@ export default function RecipeForm({
                       <button
                         type="button"
                         onClick={() => handleRemoveIngredient(index)}
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors ml-2"
+                        className="p-2 hover:bg-red-50 rounded-2xl transition-colors ml-2"
                         title="材料を削除"
                       >
                         <ClearIcon className="w-5 h-5" />
@@ -652,7 +638,7 @@ export default function RecipeForm({
                       value={ingredient.name}
                       onChange={(e) => handleIngredientChange(e, index)}
                       placeholder="にんじん"
-                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
+                      className="flex-1 bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                     <input
                       type="text"
@@ -660,7 +646,7 @@ export default function RecipeForm({
                       value={ingredient.amount}
                       onChange={(e) => handleIngredientChange(e, index)}
                       placeholder="30g"
-                      className="w-24 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
+                      className="w-24 bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                   </div>
                   <div className="flex justify-between mb-4">
@@ -670,7 +656,7 @@ export default function RecipeForm({
                       value={ingredient.note || ""}
                       onChange={(e) => handleIngredientChange(e, index)}
                       placeholder="皮を厚めに剥く"
-                      className="flex-1 bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
+                      className="flex-1 bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                   </div>
                 </div>
@@ -706,7 +692,7 @@ export default function RecipeForm({
                     <button
                       type="button"
                       onClick={() => handleRemoveStep(index)}
-                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 hover:bg-red-50 rounded-2xl transition-colors"
                       title="ステップを削除"
                     >
                       <ClearIcon className="w-5 h-5" />
@@ -720,46 +706,8 @@ export default function RecipeForm({
                   onChange={(e) => handleStepChange(e, index)}
                   placeholder="にんじんとかぼちゃを月齢に適した大きさに切る。にんじんは皮を厚めに剥き、かぼちゃは種とワタを取り除きます。"
                   rows={3}
-                  className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
+                  className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
                 />
-
-                {/* ステップ画像 */}
-                {/* <div className="flex items-center space-x-4">
-                  <div
-                    className="w-32 h-24 bg-stone-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-stone-200 transition-colors group relative overflow-hidden"
-                    onClick={() => stepImageInputRefs.current[index]?.click()}
-                  >
-                    {step.image ? (
-                      <>
-                        <Image
-                          src={step.image}
-                          alt={`ステップ${index + 1}の画像`}
-                          width={128}
-                          height={96}
-                          className="w-full h-full object-cover"
-                          unoptimized
-                        />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <PhotoCameraIcon className="text-white text-xl" />
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex flex-col items-center space-y-1 text-stone-400 group-hover:text-stone-500">
-                        <ImageIcon style={{ fontSize: 24 }} />
-                        <span className="text-xs">画像追加</span>
-                      </div>
-                    )}
-                  </div>
-                  <input
-                    ref={(el) => {
-                      stepImageInputRefs.current[index] = el;
-                    }}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleStepImageChange(e, index)}
-                    className="hidden"
-                  />
-                </div> */}
               </div>
             ))}
           </div>
@@ -775,7 +723,7 @@ export default function RecipeForm({
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}
               placeholder="作り置きOK"
-              className="w-full bg-stone-50 rounded-lg p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all mb-4"
+              className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all mb-4"
             />
             <div className="flex flex-wrap gap-2">
               {formData.tags.map((tag, index) => (
@@ -819,7 +767,7 @@ export default function RecipeForm({
             </div>
             {/* リアルタイムサジェストメッセージ */}
             {suggestedAllergenNames.length > 0 && (
-              <div className="flex items-center p-3 text-red-400 rounded-lg mt-4">
+              <div className="flex items-center p-3 text-red-400 mt-4">
                 <ErrorIcon />
                 <p className="text-sm font-medium text-stone-600 ml-2">
                   「{suggestedAllergenNames.join("」と「")}
@@ -854,7 +802,7 @@ export default function RecipeForm({
           </button> */}
           <button
             type="submit"
-            className="flex items-center px-6 py-3 bg-violet-500 text-white rounded-full font-medium hover:bg-violet-600 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center w-40 px-6 py-3 bg-violet-400 text-white rounded-2xl font-medium hover:bg-violet-600 transition-colors disabled:opacity-50"
             disabled={isSaving}
           >
             {isSaving ? (
@@ -867,34 +815,6 @@ export default function RecipeForm({
           </button>
         </div>
       </form>
-
-      {/* 削除確認ダイアログ（モーダル） */}
-      {/* {showConfirm && (
-        <div className="fixed inset-0 bg-stone-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 shadow-xl w-full max-w-sm text-center">
-            <h3 className="font-bold text-lg mb-2 text-stone-800">
-              このレシピを削除しますか？
-            </h3>
-            <p className="text-sm text-stone-600 mb-6">
-              一度削除すると元に戻せません。
-            </p>
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="px-6 py-2 rounded-full text-stone-600 border border-stone-300 hover:bg-stone-100 transition-colors"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-6 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-              >
-                削除
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

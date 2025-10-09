@@ -209,7 +209,7 @@ export default function MyPage() {
                     onChange={(e) =>
                       setParentInfo({ ...parentInfo, name: e.target.value })
                     }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
+                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
                   />
                 ) : (
                   parentInfo.name
@@ -220,14 +220,14 @@ export default function MyPage() {
               {isEditingParent ? (
                 <button
                   onClick={handleParentSave}
-                  className="flex items-center px-4 py-2 rounded-xl font-medium transition-colors bg-violet-500 text-white hover:bg-violet-600"
+                  className="flex items-center px-4 py-2 rounded-2xl font-medium transition-colors bg-violet-500 text-white hover:bg-violet-600"
                 >
                   保存
                 </button>
               ) : (
                 <button
                   onClick={handleParentEditToggle}
-                  className="flex items-center px-4 py-2 rounded-xl font-medium transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200"
+                  className="flex items-center px-4 py-2 rounded-2xl font-medium transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200"
                 >
                   <EditIcon />
                   <span className="ml-2">編集</span>
@@ -323,7 +323,7 @@ export default function MyPage() {
                     onChange={(e) =>
                       setChildInfo({ ...childInfo, name: e.target.value })
                     }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 ) : (
                   childInfo.name
@@ -334,7 +334,7 @@ export default function MyPage() {
                 onClick={
                   isEditingChild ? handleChildSave : handleChildEditToggle
                 }
-                className={`flex items-center px-4 py-2 rounded-xl font-medium transition-colors ${
+                className={`flex items-center px-4 py-2 rounded-2xl font-medium transition-colors ${
                   isEditingChild
                     ? "bg-violet-500 text-white hover:bg-violet-600"
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200"
@@ -365,7 +365,7 @@ export default function MyPage() {
                     onChange={(e) =>
                       setChildInfo({ ...childInfo, birthday: e.target.value })
                     }
-                    className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    className="text-stone-700 bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 ) : (
                   <span className="text-stone-700">{childInfo.birthday}</span>
@@ -435,7 +435,7 @@ export default function MyPage() {
           <div className="space-y-3 ">
             {menuItems.map((item) => (
               <Link href={item.link} key={item.id}>
-                <button className="w-full mb-4 bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                <button className="w-full mb-4 bg-white rounded-3xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <div className={`${item.color} mr-4`}>{item.icon}</div>
@@ -468,8 +468,8 @@ export default function MyPage() {
       </div>
       {/* ログアウト確認モーダル */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+        <div className="fixed inset-0 bg-black bg-opacity-300 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm">
             <div className="text-center mb-6">
               <h3 className="text-lg font-bold text-stone-700 mb-2">
                 ログアウトしますか？
@@ -481,14 +481,14 @@ export default function MyPage() {
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 py-3 px-4 bg-stone-100 text-stone-600 rounded-xl font-medium hover:bg-stone-200 transition-colors"
+                className="flex-1 py-3 px-4 bg-stone-100 text-stone-600 rounded-2xl font-medium hover:bg-stone-200 transition-colors"
               >
                 キャンセル
               </button>
               <Link
                 href="/"
                 onClick={handleLogout}
-                className="flex justify-center flex-1 py-3 px-4 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors"
+                className="flex justify-center flex-1 py-3 px-4 bg-red-500 text-white rounded-2xl font-medium hover:bg-red-600 transition-colors"
               >
                 ログアウト
               </Link>

@@ -15,9 +15,16 @@ export default function Header({ pageName, title, tools }: HeaderProps) {
       <div className="flex items-center justify-between">
         {/* 左側のコンテンツ */}
         <div className="flex items-center">
-          <div className="mr-3 p-2 hover:bg-stone-100 rounded-lg transition-colors">
-            {pageName === "home" ? <ChildCareIcon /> : <BackButton />}
-          </div>
+          {pageName === "home" ? (
+            <div className="mr-3 p-2">
+              <ChildCareIcon />
+            </div>
+          ) : (
+            <div className="mr-3 p-2 hover:bg-stone-100 rounded-2xl transition-colors">
+              <BackButton />
+            </div>
+          )}
+
           <h1 className="text-lg font-bold text-stone-700">{title}</h1>
         </div>
         {/* 右側のコンテンツ */}

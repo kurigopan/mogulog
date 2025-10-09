@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Recipe, Season, ingredientNutrition } from "./types";
+import { Recipe, Season, ingredientNutrition } from "@/types";
 import { convertUtcToJst } from "@/lib/utils";
 
 export const registerSchema = z.object({
@@ -36,10 +36,13 @@ export const categorySchema = z.enum([
   "副菜",
   "汁物",
   "おやつ",
-  "肉・魚",
-  "野菜・きのこ・海藻",
+  "肉",
+  "魚",
+  "野菜",
+  "きのこ",
+  "海藻",
   "果物",
-  "大豆・豆類",
+  "豆類",
   "乳製品",
   "卵",
   "その他",

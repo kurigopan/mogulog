@@ -1,39 +1,45 @@
+"use client";
+
 import { Tooltip, IconButton } from "@mui/material";
 import {
   FilterListIcon,
   ExpandMoreIcon,
   ExpandLessIcon,
   HelpOutlineIcon,
+  ClearIcon,
 } from "@/icons";
+import { useAtom } from "jotai";
+import {
+  filterCategoryAtom,
+  filterStageAtom,
+  filterStatusAtom,
+} from "@/lib/atoms";
 
 interface IngredientsFilterProps {
   showFilters: boolean;
   setShowFilters: (show: boolean) => void;
-  selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
-  selectedStageFilter: string;
-  setSelectedStageFilter: (stage: string) => void;
-  selectedStatusFilter: string;
-  setSelectedStatusFilter: (status: string) => void;
 }
 
 export default function IngredientsFilter({
   showFilters,
   setShowFilters,
-  selectedCategory,
-  setSelectedCategory,
-  selectedStageFilter,
-  setSelectedStageFilter,
-  selectedStatusFilter,
-  setSelectedStatusFilter,
 }: IngredientsFilterProps) {
+  const [selectedCategory, setSelectedCategory] = useAtom(filterCategoryAtom);
+  const [selectedStageFilter, setSelectedStageFilter] =
+    useAtom(filterStageAtom);
+  const [selectedStatusFilter, setSelectedStatusFilter] =
+    useAtom(filterStatusAtom);
+
   const categories = [
     { value: "all", label: "すべて" },
     { value: "穀類", label: "穀類" },
-    { value: "肉・魚", label: "肉・魚" },
-    { value: "野菜・きのこ・海藻", label: "野菜・きのこ・海藻" },
+    { value: "肉", label: "肉" },
+    { value: "魚", label: "魚" },
+    { value: "野菜", label: "野菜" },
+    { value: "きのこ", label: "きのこ" },
+    { value: "海藻", label: "海藻" },
     { value: "果物", label: "果物" },
-    { value: "大豆・豆類", label: "大豆・豆類" },
+    { value: "豆類", label: "豆類" },
     { value: "乳製品", label: "乳製品" },
     { value: "卵", label: "卵" },
     { value: "その他", label: "その他" },
@@ -54,21 +60,105 @@ export default function IngredientsFilter({
     { value: "ng", label: "NG" },
   ];
 
+  // 選択されているフィルターのタグを生成する関数
+  const getSelectedFilterTags = () => {
+    const tags = [];
+
+    if (selectedCategory !== "all") {
+      const label = categories.find(
+        (cat) => cat.value === selectedCategory
+      )?.label;
+      if (label) {
+        tags.push({
+          type: "category",
+          label: `${label}`,
+          reset: () => setSelectedCategory("all"),
+        });
+      }
+    }
+
+    if (selectedStageFilter !== "all") {
+      const label = stageFilters.find(
+        (stage) => stage.value === selectedStageFilter
+      )?.label;
+      if (label) {
+        tags.push({
+          type: "stage",
+          label: `${label}`,
+          reset: () => setSelectedStageFilter("all"),
+        });
+      }
+    }
+
+    if (selectedStatusFilter !== "all") {
+      const label = statusFilters.find(
+        (status) => status.value === selectedStatusFilter
+      )?.label;
+      if (label) {
+        tags.push({
+          type: "status",
+          label: `${label}`,
+          reset: () => setSelectedStatusFilter("all"),
+        });
+      }
+    }
+
+    return tags;
+  };
+
+  const activeFilterTags = getSelectedFilterTags();
+
   const helpText =
     "初期(5-6ヶ月)、中期(7-8ヶ月)、後期(9-11ヶ月)、完了期(12-18ヶ月)";
 
   return (
     <>
-      {/* フィルターボタン */}
-      <div className="flex items-center justify-end">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-2 px-4 py-2 bg-white border border-stone-200 rounded-full shadow-sm hover:shadow-md transition-all"
-        >
-          <FilterListIcon />
-          <span className="text-sm font-medium">フィルター</span>
-          {showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </button>
+      <div className="flex items-center justify-between">
+        {/* 選択中のタグ表示エリア */}
+        {activeFilterTags && (
+          <div className="flex flex-wrap gap-3 mr-4">
+            {activeFilterTags.map((tag) => (
+              <span
+                key={tag.type}
+                className={`flex items-center rounded-full px-4 py-2 text-sm font-medium ${
+                  tag.type === "category"
+                    ? "bg-violet-100"
+                    : tag.type === "stage"
+                    ? "bg-amber-100"
+                    : "bg-blue-100"
+                }`}
+              >
+                {tag.label}
+                <button
+                  type="button"
+                  onClick={tag.reset}
+                  className="ml-1 h-4 w-4 flex-shrink-0 rounded-full flex items-center justify-center"
+                >
+                  <ClearIcon
+                    className={`h-3 w-3 ${
+                      tag.type === "category"
+                        ? "text-violet-600"
+                        : tag.type === "stage"
+                        ? "text-amber-600"
+                        : "text-blue-600"
+                    }`}
+                  />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        {/* フィルターボタン */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2 px-4 py-2 bg-white border border-stone-200 rounded-full shadow-sm hover:shadow-md transition-all"
+          >
+            <FilterListIcon />
+            <span className="text-sm font-medium">フィルター</span>
+            {showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </button>
+        </div>
       </div>
 
       {/* フィルター */}

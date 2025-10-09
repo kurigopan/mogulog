@@ -30,6 +30,7 @@ export interface FavoritesRecipes {
   created_by: string;
   updated_by: string;
 }
+
 export interface FavoritesIngredients {
   parent_id: string;
   ingredient_id: number;

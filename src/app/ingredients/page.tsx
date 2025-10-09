@@ -18,10 +18,13 @@ import {
   getIngredientsWithStatus,
   upsertIngredientStatus,
 } from "@/lib/supabase";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   childIdAtom,
   childInfoAtom,
+  filterCategoryAtom,
+  filterStageAtom,
+  filterStatusAtom,
   loadingAtom,
   loginDialogSourceAtom,
   userIdAtom,
@@ -36,9 +39,11 @@ export default function IngredientsList() {
   const childInfo = useAtomValue(childInfoAtom);
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedStageFilter, setSelectedStageFilter] = useState("all");
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useAtom(filterCategoryAtom);
+  const [selectedStageFilter, setSelectedStageFilter] =
+    useAtom(filterStageAtom);
+  const [selectedStatusFilter, setSelectedStatusFilter] =
+    useAtom(filterStatusAtom);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
   const toggleEaten = async (ingredient: Ingredient) => {
@@ -196,12 +201,12 @@ export default function IngredientsList() {
         <IngredientsFilter
           showFilters={showFilters}
           setShowFilters={setShowFilters}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          selectedStageFilter={selectedStageFilter}
-          setSelectedStageFilter={setSelectedStageFilter}
-          selectedStatusFilter={selectedStatusFilter}
-          setSelectedStatusFilter={setSelectedStatusFilter}
+          // selectedCategory={selectedCategory}
+          // setSelectedCategory={setSelectedCategory}
+          // selectedStageFilter={selectedStageFilter}
+          // setSelectedStageFilter={setSelectedStageFilter}
+          // selectedStatusFilter={selectedStatusFilter}
+          // setSelectedStatusFilter={setSelectedStatusFilter}
         />
 
         {/* 食材一覧（テーブル表示） */}

@@ -15,10 +15,10 @@ export default function Card({ cardItems, className }: CardProps) {
         <Link
           key={item.id}
           href={`/${item.type}s/${item.id}`}
-          className="flex-shrink-0 w-40 bg-white rounded-3xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 cursor-pointer group"
+          className="flex-shrink-0 w-40 bg-white rounded-3xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
         >
           <div className="text-center">
-            <div className="mb-2 transition-transform duration-300 group-hover:scale-110 w-[120px] h-[120px] flex items-center justify-center rounded-2xl overflow-hidden mx-auto">
+            <div className="mb-2 transition-transform duration-300 w-[120px] h-[120px] flex items-center justify-center rounded-3xl overflow-hidden mx-auto">
               {item.image ? (
                 <Image
                   src={item.image}

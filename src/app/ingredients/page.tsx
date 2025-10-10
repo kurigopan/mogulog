@@ -201,12 +201,6 @@ export default function IngredientsList() {
         <IngredientsFilter
           showFilters={showFilters}
           setShowFilters={setShowFilters}
-          // selectedCategory={selectedCategory}
-          // setSelectedCategory={setSelectedCategory}
-          // selectedStageFilter={selectedStageFilter}
-          // setSelectedStageFilter={setSelectedStageFilter}
-          // selectedStatusFilter={selectedStatusFilter}
-          // setSelectedStatusFilter={setSelectedStatusFilter}
         />
 
         {/* 食材一覧（テーブル表示） */}

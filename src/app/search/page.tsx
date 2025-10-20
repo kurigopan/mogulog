@@ -31,8 +31,6 @@ export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState<ListCardItem[]>([]);
-  const [sortBy, setSortBy] = useState("relevance"); // relevance, name, age
-  // const [filter, setFilter] = useState("all"); // all, recipe, ingredient
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -44,8 +42,6 @@ export default function SearchResults() {
         return;
       }
       setIsLoading(true);
-
-      // Enterが押されたタイミングで検索クエリをStateに設定
       setSearchQuery(currentQuery);
 
       const excludedAllergenIds = Object.keys(allergenExclusions)
@@ -54,7 +50,7 @@ export default function SearchResults() {
 
       let ingredientsData: ListCardItem[] | null = [];
       let recipesData: ListCardItem[] | null = [];
-      // Promise.allを使ってレシピと食材の検索を同時に実行
+
       if (userId) {
         [ingredientsData, recipesData] = await Promise.all([
           searchIngredientsWithAllergens(
@@ -77,7 +73,6 @@ export default function SearchResults() {
         ]);
       }
 
-      // 結果を結合し、食材を上に、レシピを下に配置
       const combinedResults: ListCardItem[] = [];
       if (ingredientsData) {
         combinedResults.push(...ingredientsData);
@@ -96,21 +91,6 @@ export default function SearchResults() {
       [allergenId]: !prev[allergenId],
     }));
   };
-
-  // const filteredResults = results.filter((result) => {
-  //   if (filter === "all") return true;
-  //   return result.type === filter;
-  // });
-
-  // const sortedResults = results.sort((a, b) => {
-  //   if (sortBy === "name") {
-  //     return a.name.localeCompare(b.name);
-  //   }
-  //   if (sortBy === "subtitle" && a.startStage && b.startStage) {
-  //     return a.startStage.localeCompare(b.startStage);
-  //   }
-  //   return 0; // relevance (default order)
-  // });
 
   // ページロード時とアレルゲン項目がないときに実行
   useEffect(() => {

@@ -1,6 +1,13 @@
 import { atom } from "jotai";
 import { Session } from "@supabase/supabase-js";
-import { Allergen, ChildInfo, FavoriteUpdate, ParentInfo, User } from "@/types";
+import {
+  Allergen,
+  ChildInfo,
+  FavoriteUpdate,
+  ParentInfo,
+  SearchState,
+  User,
+} from "@/types";
 
 export const sessionAtom = atom<Session | null>(null);
 export const loginDialogSourceAtom = atom<string | null>(null);
@@ -36,3 +43,13 @@ export const favoriteUpdateAtom = atom<FavoriteUpdate>(null);
 export const filterCategoryAtom = atom<string>("all");
 export const filterStageAtom = atom<string>("all");
 export const filterStatusAtom = atom<string>("all");
+
+//　検索履歴を保持する
+export const searchStateAtom = atom<SearchState>({
+  query: "",
+  results: [],
+  allergenExclusions: {},
+});
+
+//　前のページを保持する
+export const prevPathAtom = atom<string | null>(null);

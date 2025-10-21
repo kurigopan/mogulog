@@ -1,4 +1,5 @@
 import { Profile, Child } from "@/types/db";
+import { ListCardItem } from "@/types/ui";
 
 export interface User {
   id?: string;
@@ -92,3 +93,9 @@ export type FavoriteUpdate = {
   isFavorited: boolean;
   timestamp: number;
 } | null;
+
+export type SearchState = {
+  query: string;
+  results: ListCardItem[];
+  allergenExclusions: Record<string, boolean>;
+};

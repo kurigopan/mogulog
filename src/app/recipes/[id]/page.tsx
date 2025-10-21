@@ -1,23 +1,16 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import {
-  EditIcon,
-  ScheduleIcon,
-  PeopleIcon,
-  // InfoOutlineIcon,
-  DeleteIcon,
-} from "@/icons";
-// import { Tooltip, IconButton } from "@mui/material";
+import { EditIcon, ScheduleIcon, PeopleIcon, DeleteIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NotFoundPage from "@/components/common/NotFound";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
-import { useAtomValue } from "jotai";
-import { userIdAtom } from "@/lib/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { prevPathAtom, userIdAtom } from "@/lib/atoms";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
 import {
   deleteRecipe,
@@ -31,22 +24,20 @@ export default function RecipeDetail({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const router = useRouter();
   const unwrapParams = use(params);
+  const pathname = usePathname();
   const id = Number(unwrapParams.id);
+  const userId = useAtomValue(userIdAtom);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-  const userId = useAtomValue(userIdAtom);
-  const router = useRouter();
+  const setPrevPath = useSetAtom(prevPathAtom);
+
+  // TODO : メモ機能
   // const [memo, setMemo] = useState("");
-
   // const infoText = "自分専用なので他の人は見れません";
-
   // const handleMemoSave = () => {
   //   console.log("メモを保存:", memo);
-  // };
-
-  // const handleEdit = () => {
-  //   router.push({ pathname: "/recipes/[id]/edit", query: { id } });
   // };
 
   const handleDelete = async () => {
@@ -58,7 +49,6 @@ export default function RecipeDetail({
     if (!confirmDelete) return;
 
     try {
-      // レシピの削除
       const response = await deleteRecipe(id);
 
       if (response.error) {
@@ -92,12 +82,17 @@ export default function RecipeDetail({
     fetchData();
   }, [id, userId]);
 
-  // コンポーネントがマウントされた時に、ローカルストレージに保存
+  // 閲覧履歴ローカルストレージに保存
   useEffect(() => {
     if (recipe) {
       savedBrowsingHistory(recipe);
     }
   }, [recipe]);
+
+  // 前に見たページとして保存
+  useEffect(() => {
+    setPrevPath(pathname);
+  }, [pathname, setPrevPath]);
 
   let tools;
   if (recipe) {
@@ -243,17 +238,6 @@ export default function RecipeDetail({
                         </p>
                       </div>
                     </div>
-                    {/* 画像があれば表示する */}
-                    {/* {step.image && (
-                  <Image
-                    src={step.image}
-                    alt={`${step.step}の画像`}
-                    width={400}
-                    height={300}
-                    className="w-full rounded-2xl shadow-sm"
-                    unoptimized // 画像がsvgの場合ブロックされてしまうため設定
-                  />
-                )} */}
                   </div>
                 ))}
               </div>
@@ -301,7 +285,7 @@ export default function RecipeDetail({
               </section>
             )}
 
-            {/* メモ */}
+            {/* TODO：メモ機能 */}
             {/* <section>
           <div className="flex items-center gap-2 mb-4">
             <h3 className="text-lg font-bold text-stone-700">マイメモ</h3>

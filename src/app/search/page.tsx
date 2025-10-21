@@ -10,8 +10,14 @@ import {
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import { useAtomValue, useSetAtom } from "jotai";
-import { childIdAtom, loadingAtom, userIdAtom } from "@/lib/atoms";
+import { usePreserveSearchState } from "@/hooks/usePreserveSearchState";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  childIdAtom,
+  loadingAtom,
+  searchStateAtom,
+  userIdAtom,
+} from "@/lib/atoms";
 import {
   getAllergens,
   searchIngredientsWithAllergens,
@@ -20,29 +26,31 @@ import {
 import { Allergen, ListCardItem } from "@/types";
 
 export default function SearchResults() {
+  usePreserveSearchState();
   const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
+
+  const [searchState, setSearchState] = useAtom(searchStateAtom);
+  const { query: searchQuery, results, allergenExclusions } = searchState;
+
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-  const [allergenExclusions, setAllergenExclusions] = useState<
-    Record<string, boolean>
-  >({});
   const [showAllergens, setShowAllergens] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const [results, setResults] = useState<ListCardItem[]>([]);
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const currentQuery = inputRef.current?.value || "";
 
       if (!currentQuery.trim()) {
-        setResults([]);
-        setSearchQuery("");
+        setSearchState((prev) => ({
+          ...prev,
+          query: "",
+          results: [],
+        }));
         return;
       }
       setIsLoading(true);
-      setSearchQuery(currentQuery);
 
       const excludedAllergenIds = Object.keys(allergenExclusions)
         .filter((id) => allergenExclusions[id] === true)
@@ -80,19 +88,27 @@ export default function SearchResults() {
       if (recipesData) {
         combinedResults.push(...recipesData);
       }
-      setResults(combinedResults);
+
+      setSearchState((prev) => ({
+        ...prev,
+        query: currentQuery,
+        results: combinedResults,
+      }));
       setIsLoading(false);
     }
   };
 
   const toggleAllergen = (allergenId: number) => {
-    setAllergenExclusions((prev) => ({
+    setSearchState((prev) => ({
       ...prev,
-      [allergenId]: !prev[allergenId],
+      allergenExclusions: {
+        ...prev.allergenExclusions,
+        [allergenId]: !prev.allergenExclusions[allergenId],
+      },
     }));
   };
 
-  // ページロード時とアレルゲン項目がないときに実行
+  // 初回ロードでアレルゲン一覧を取得、かつ atom 側に初期除外マップがない場合はセット
   useEffect(() => {
     inputRef.current?.focus();
     const fetchAllergens = async () => {
@@ -100,11 +116,21 @@ export default function SearchResults() {
         const data = await getAllergens();
         if (data) {
           setAllergens(data);
-          const initialExclusions: Record<string, boolean> = {};
-          data.forEach((allergen) => {
-            initialExclusions[allergen.id] = false;
-          });
-          setAllergenExclusions(initialExclusions);
+
+          // atom が空のオブジェクトなら初期値を入れる
+          if (
+            !searchState.allergenExclusions ||
+            Object.keys(searchState.allergenExclusions).length === 0
+          ) {
+            const initialExclusions: Record<string, boolean> = {};
+            data.forEach((a) => {
+              initialExclusions[a.id] = false;
+            });
+            setSearchState((prev) => ({
+              ...prev,
+              allergenExclusions: initialExclusions,
+            }));
+          }
         }
       }
     };
@@ -212,7 +238,6 @@ export default function SearchResults() {
           </div>
         )}
       </div>
-
       <Footer />
     </>
   );

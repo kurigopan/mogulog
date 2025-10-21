@@ -330,10 +330,9 @@ export default function RecipeForm({
     }
   };
 
-  // 下書き保存処理
+  // TODO: 下書き機能
   // const handleSaveDraft = async () => {
   //   setIsSaving(true);
-  //   // TODO: 下書きとして保存するロジック（isPrivateを強制的にtrueにするなど）を実装
   //   console.log("下書きとして保存:", formData);
   //   setTimeout(() => {
   //     setIsSaving(false);
@@ -561,7 +560,7 @@ export default function RecipeForm({
               className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
             />
 
-            {/* 非公開設定 */}
+            {/* TODO:非公開設定 */}
             {/* <div className="flex items-center">
               <FormControlLabel
                 control={
@@ -780,18 +779,7 @@ export default function RecipeForm({
 
         {/* フォーム送信ボタン */}
         <div className="flex justify-center space-x-8 p-4">
-          {/* 編集モードの場合のみ削除ボタンを表示 */}
-          {/* {isEditMode && (
-            <button
-              type="button"
-              onClick={() => setShowConfirm(true)}
-              disabled={isSaving}
-              className="flex items-center px-6 py-3 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
-            >
-              削除
-            </button>
-          )} */}
-
+          {/* TODO:下書き機能 */}
           {/* <button
             type="button"
             onClick={handleSaveDraft}

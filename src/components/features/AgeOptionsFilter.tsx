@@ -2,17 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ExpandLessIcon, ExpandMoreIcon } from "@/icons";
+import { useAtom } from "jotai";
+import { childAgeStageAtom } from "@/lib/atoms";
 
 type AgeOptionsFilterProps = {
-  initialChildAgeStage: string;
   onChildAgeStageChange: (newStage: string) => void;
 };
 
 export default function AgeOptionsFilter({
-  initialChildAgeStage,
   onChildAgeStageChange,
 }: AgeOptionsFilterProps) {
-  const [childAgeStage, setChildAgeStage] = useState(initialChildAgeStage);
+  const [childAgeStage, setChildAgeStage] = useAtom(childAgeStageAtom);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -22,10 +22,6 @@ export default function AgeOptionsFilter({
     { label: "9-11ヶ月", value: "後期" },
     { label: "12-18ヶ月", value: "完了期" },
   ];
-
-  useEffect(() => {
-    setChildAgeStage(initialChildAgeStage);
-  }, [initialChildAgeStage]);
 
   const handleStageChange = (newStage: string) => {
     setChildAgeStage(newStage);

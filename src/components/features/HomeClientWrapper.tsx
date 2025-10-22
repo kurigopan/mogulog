@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import AgeOptionsFilter from "@/components/features/AgeOptionsFilter";
 import AgeFilteredContent from "@/components/features/AgeFilteredContent";
 import BrowsingHistory from "@/components/common/BrowsingHistory";
+import { useAtom } from "jotai";
+import { childAgeStageAtom } from "@/lib/atoms";
 import { CardContent } from "@/types";
 
 interface HomeClientWrapperProps {
@@ -20,12 +22,20 @@ export default function HomeClientWrapper({
 }: HomeClientWrapperProps) {
   const router = useRouter();
   const [activeChildAgeStage, setActiveChildAgeStage] =
-    useState(initialChildAgeStage);
+    useAtom(childAgeStageAtom);
 
-  // AgeOptionsFilterから月齢変更を受け取るコールバック
-  const handleChildAgeStageChange = useCallback((newAge: string) => {
-    setActiveChildAgeStage(newAge);
-  }, []);
+  useEffect(() => {
+    if (!activeChildAgeStage && initialChildAgeStage) {
+      setActiveChildAgeStage(initialChildAgeStage);
+    }
+  }, [initialChildAgeStage, activeChildAgeStage, setActiveChildAgeStage]);
+
+  const handleChildAgeStageChange = useCallback(
+    (newAge: string) => {
+      setActiveChildAgeStage(newAge);
+    },
+    [setActiveChildAgeStage]
+  );
 
   return (
     <>
@@ -33,10 +43,7 @@ export default function HomeClientWrapper({
         pageName="home"
         title="もぐログ"
         tools={
-          <AgeOptionsFilter
-            initialChildAgeStage={activeChildAgeStage}
-            onChildAgeStageChange={handleChildAgeStageChange}
-          />
+          <AgeOptionsFilter onChildAgeStageChange={handleChildAgeStageChange} />
         }
       />
       <div className="p-4 space-y-6">
@@ -53,10 +60,7 @@ export default function HomeClientWrapper({
           />
         </div>
         {/* 月齢フィルターで変わるカードコンテンツ */}
-        <AgeFilteredContent
-          currentActiveAgeStage={activeChildAgeStage}
-          initialCardContents={initialCardContents}
-        />
+        <AgeFilteredContent initialCardContents={initialCardContents} />
         {/* 閲覧履歴 */}
         <BrowsingHistory />
       </div>

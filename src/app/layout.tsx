@@ -1,15 +1,15 @@
 import "@/app/globals.css";
 import type { Metadata } from "next";
-import { Provider } from "jotai";
+import { M_PLUS_Rounded_1c } from "next/font/google";
 import { AuthObserver } from "@/components/common/AuthObserver";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { LoadingResetter } from "@/components/common/LoadingResetter";
 import { UserInitializer } from "@/components/common/UserInitializer";
 import LoginPromptDialog from "@/components/common/LoginPromptDialog";
-import { M_PLUS_Rounded_1c } from "next/font/google";
+import { Provider } from "jotai";
 
 const mPlus = M_PLUS_Rounded_1c({
-  weight: ["300", "400", "500", "700"], // 使用するウェイト
+  weight: ["300", "400", "500", "700"],
   display: "swap",
   preload: false,
 });

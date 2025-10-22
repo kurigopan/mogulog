@@ -11,8 +11,6 @@ export function usePreserveSearchState() {
   const [prevPath, setPrevPath] = useAtom(prevPathAtom);
 
   useEffect(() => {
-    console.log("pathname:", pathname);
-    console.log("prevPath:", prevPath);
     if (!pathname) return;
 
     // 詳細ページから戻ってきた場合

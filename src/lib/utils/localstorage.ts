@@ -1,11 +1,11 @@
 import { ListCardItem } from "@/types";
-
-// ローカルストレージに保存するキー
-const VIEWED_KEY = "viewedItems";
+import { LOCAL_STORAGE_KEYS } from "@/lib/config/constants";
 
 export const savedBrowsingHistory = (item: ListCardItem): void => {
   try {
-    const viewedItemsString = localStorage.getItem(VIEWED_KEY);
+    const viewedItemsString = localStorage.getItem(
+      LOCAL_STORAGE_KEYS.VIEWED_ITEMS
+    );
     const viewedItems: ListCardItem[] = viewedItemsString
       ? JSON.parse(viewedItemsString)
       : [];
@@ -17,7 +17,10 @@ export const savedBrowsingHistory = (item: ListCardItem): void => {
     const newViewedItems = [item, ...filteredItems].slice(0, 20); // 最大20件を保持
 
     // ローカルストレージに保存
-    localStorage.setItem(VIEWED_KEY, JSON.stringify(newViewedItems));
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.VIEWED_ITEMS,
+      JSON.stringify(newViewedItems)
+    );
   } catch (error) {
     console.error("Failed to save browsing history to localStorage", error);
   }
@@ -25,7 +28,9 @@ export const savedBrowsingHistory = (item: ListCardItem): void => {
 
 export const getBrowsingHistory = (limit?: number): ListCardItem[] => {
   try {
-    const viewedItemsString = localStorage.getItem(VIEWED_KEY);
+    const viewedItemsString = localStorage.getItem(
+      LOCAL_STORAGE_KEYS.VIEWED_ITEMS
+    );
     const viewedItems: ListCardItem[] = viewedItemsString
       ? JSON.parse(viewedItemsString)
       : [];
@@ -38,7 +43,7 @@ export const getBrowsingHistory = (limit?: number): ListCardItem[] => {
 
 export const removeBrowsingHistory = () => {
   try {
-    localStorage.removeItem(VIEWED_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.VIEWED_ITEMS);
   } catch (error) {
     console.error("Failed to reset viewed items to localStorage", error);
   }

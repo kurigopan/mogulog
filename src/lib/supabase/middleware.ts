@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { COOKIES_KEYS } from "@/lib/config/constants";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next();
@@ -33,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (request.nextUrl.pathname === "/") {
-    const hasVisited = request.cookies.get("hasVisited");
+    const hasVisited = request.cookies.get(COOKIES_KEYS.HAS_VISITED);
 
     if (!hasVisited) {
       const url = request.nextUrl.clone();
@@ -41,7 +42,7 @@ export async function updateSession(request: NextRequest) {
 
       const redirectResponse = NextResponse.redirect(url);
 
-      redirectResponse.cookies.set("hasVisited", "true", {
+      redirectResponse.cookies.set(COOKIES_KEYS.HAS_VISITED, "true", {
         maxAge: 60 * 60 * 24 * 365,
       }); // 1年有効
       // supabaseのcookieも引き継ぐ

@@ -8,7 +8,7 @@ import AgeOptionsFilter from "@/components/features/AgeOptionsFilter";
 import AgeFilteredContent from "@/components/features/AgeFilteredContent";
 import BrowsingHistory from "@/components/common/BrowsingHistory";
 import { useAtom } from "jotai";
-import { childAgeStageAtom } from "@/lib/atoms";
+import { childAgeStageAtom } from "@/lib/utils/atoms";
 import { CardContent } from "@/types";
 
 interface HomeClientWrapperProps {

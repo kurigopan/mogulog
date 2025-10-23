@@ -15,7 +15,7 @@ import {
   ErrorIcon,
 } from "@/icons";
 import { useAtomValue } from "jotai";
-import { userIdAtom } from "@/lib/atoms";
+import { userIdAtom } from "@/lib/utils/atoms";
 import {
   createRecipe,
   createRecipeAllergens,

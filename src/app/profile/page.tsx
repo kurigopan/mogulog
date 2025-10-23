@@ -6,7 +6,7 @@ import Image from "next/image";
 import { AccountBoxIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/atoms";
+import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
 import {
   createChild,
   createChildAllergens,

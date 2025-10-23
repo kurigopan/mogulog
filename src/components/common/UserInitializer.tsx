@@ -9,7 +9,7 @@ import {
   loadingAtom,
   userIdAtom,
   childIdAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 import {
   getProfile,
   getChild,

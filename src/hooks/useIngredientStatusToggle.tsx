@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { userIdAtom, childIdAtom, loginDialogSourceAtom } from "@/lib/atoms";
+import {
+  userIdAtom,
+  childIdAtom,
+  loginDialogSourceAtom,
+} from "@/lib/utils/atoms";
 import { upsertIngredientStatus, deleteIngredientStatus } from "@/lib/supabase";
 import { Ingredient } from "@/types";
 

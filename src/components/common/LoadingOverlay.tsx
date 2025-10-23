@@ -2,7 +2,7 @@
 
 import { CircularProgress } from "@mui/material";
 import { useAtomValue } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { loadingAtom } from "@/lib/utils/atoms";
 
 export const LoadingOverlay = () => {
   const isLoading = useAtomValue(loadingAtom);

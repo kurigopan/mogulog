@@ -13,7 +13,7 @@ import {
   filterCategoryAtom,
   filterStageAtom,
   filterStatusAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 
 interface IngredientsFilterProps {
   showFilters: boolean;

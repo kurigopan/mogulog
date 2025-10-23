@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { HomeIcon, FavoriteIcon, ListIcon, PersonIcon, AddIcon } from "@/icons";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loginDialogSourceAtom, userIdAtom } from "@/lib/atoms";
+import { loginDialogSourceAtom, userIdAtom } from "@/lib/utils/atoms";
 
 type HeaderProps = {
   pageName?: pageType;

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { userIdAtom } from "@/lib/atoms";
+import { userIdAtom } from "@/lib/utils/atoms";
 import { supabase } from "@/lib/supabase";
 
 export const AuthObserver = () => {

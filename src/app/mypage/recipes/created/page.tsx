@@ -8,7 +8,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/atoms";
+import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
 import { getRecipesCreatedByUser } from "@/lib/supabase";
 import { ListCardItem } from "@/types";
 

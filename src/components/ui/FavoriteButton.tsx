@@ -8,7 +8,7 @@ import {
   loadingAtom,
   loginDialogSourceAtom,
   userIdAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 import { toggleFavoriteItem } from "@/lib/supabase";
 import { Type } from "@/types";
 

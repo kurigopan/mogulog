@@ -28,7 +28,7 @@ import {
   loadingAtom,
   loginDialogSourceAtom,
   userIdAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 import { getAgeStageDisplay } from "@/lib/utils";
 import { Ingredient } from "@/types";
 

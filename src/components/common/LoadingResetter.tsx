@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { loadingAtom } from "@/lib/utils/atoms";
 
 export const LoadingResetter = () => {
   const setIsLoading = useSetAtom(loadingAtom);

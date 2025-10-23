@@ -51,8 +51,5 @@ export const searchStateAtom = atom<SearchState>({
   allergenExclusions: {},
 });
 
-//　前のページを保持する
-export const prevPathAtom = atom<string | null>(null);
-
 //　月齢フィルターを維持する
 export const childAgeStageAtom = atom<string>("初期");

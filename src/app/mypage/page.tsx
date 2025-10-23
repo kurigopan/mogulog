@@ -26,7 +26,7 @@ import {
   parentInfoAtom,
   sessionAtom,
   userIdAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 import {
   logout,
   updateChild,

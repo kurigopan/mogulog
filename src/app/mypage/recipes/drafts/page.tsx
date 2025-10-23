@@ -7,7 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { loadingAtom } from "@/lib/utils/atoms";
 import { Recipe } from "@/types";
 import { mockRecipes } from "@/mocks/recipes";
 

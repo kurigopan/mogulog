@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
-import { loginDialogSourceAtom } from "@/lib/atoms";
+import { loginDialogSourceAtom } from "@/lib/utils/atoms";
 import {
   Dialog,
   DialogTitle,

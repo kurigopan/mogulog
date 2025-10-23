@@ -12,7 +12,7 @@ import {
   loadingAtom,
   loginDialogSourceAtom,
   userIdAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
 import { ListCardItem } from "@/types";
 

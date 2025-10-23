@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { VisibilityIcon, VisibilityOffIcon, PasswordIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { loadingAtom } from "@/lib/utils/atoms";
 import { updatePassword } from "@/lib/supabase";
 
 type ValidationErrors = {

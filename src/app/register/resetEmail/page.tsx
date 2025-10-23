@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MailOutlineIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { loadingAtom } from "@/lib/utils/atoms";
 import { updateEmail } from "@/lib/supabase";
 
 type ValidationErrors = {

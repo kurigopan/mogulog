@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ExpandLessIcon, ExpandMoreIcon } from "@/icons";
 import { useAtom } from "jotai";
-import { childAgeStageAtom } from "@/lib/atoms";
+import { childAgeStageAtom } from "@/lib/utils/atoms";
 
 type AgeOptionsFilterProps = {
   onChildAgeStageChange: (newStage: string) => void;

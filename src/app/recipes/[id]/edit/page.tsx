@@ -5,7 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RecipeForm from "@/components/features/RecipeForm";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/atoms";
+import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
 import { getRecipeById } from "@/lib/supabase";
 import { Recipe } from "@/types";
 

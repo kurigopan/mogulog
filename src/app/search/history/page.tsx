@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import RemoveButton from "@/components/ui/RemoveButton";
 import { useSetAtom } from "jotai";
-import { loadingAtom } from "@/lib/atoms";
+import { loadingAtom } from "@/lib/utils/atoms";
 import { getBrowsingHistory } from "@/lib/utils/localstorage";
 import { ListCardItem } from "@/types";
 

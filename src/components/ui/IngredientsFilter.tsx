@@ -55,7 +55,6 @@ export default function IngredientsFilter({
 
   const statusFilters = [
     { value: "all", label: "すべて" },
-    { value: "not-eaten", label: "未経験" },
     { value: "eaten", label: "食べた" },
     { value: "ng", label: "NG" },
   ];

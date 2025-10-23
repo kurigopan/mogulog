@@ -156,12 +156,6 @@ export default function IngredientsList() {
     }
 
     // ステータスフィルター
-    if (
-      selectedStatusFilter === "not-eaten" &&
-      (ingredient.eaten || ingredient.ng)
-    ) {
-      return false;
-    }
     if (selectedStatusFilter === "eaten" && !ingredient.eaten) {
       return false;
     }

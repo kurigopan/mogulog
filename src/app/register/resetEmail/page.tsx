@@ -33,7 +33,6 @@ export default function UpdateEmail() {
 
   return (
     <CenteredCard>
-      {" "}
       <h2 className="text-2xl font-bold text-stone-700 text-center mb-4">
         メールアドレス変更
       </h2>
@@ -53,7 +52,7 @@ export default function UpdateEmail() {
             確認メールを送りました
           </h3>
           <p className="text-stone-600">
-            メールのリンクをクリックすると変更が完了します。
+            メールのリンクをクリックすると変更が完了します
           </p>
         </div>
       ) : (

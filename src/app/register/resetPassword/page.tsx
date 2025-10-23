@@ -56,7 +56,7 @@ export default function ResetPassword() {
           <h3 className="text-xl font-bold text-stone-700">
             パスワードを更新しました
           </h3>
-          <p className="text-stone-600">3秒後にログインページに移動します。</p>
+          <p className="text-stone-600">3秒後にログインページに移動します</p>
         </div>
       ) : (
         <form onSubmit={handleUpdatePassword} className="space-y-6">

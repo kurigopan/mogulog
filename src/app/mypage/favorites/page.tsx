@@ -25,7 +25,6 @@ export default function Favorites() {
   const [favoriteIngredients, setFavoriteIngredients] = useState<
     ListCardItem[]
   >([]);
-  // const [removedItemKeys, setRemovedItemKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isLoading && !userId) {
@@ -55,10 +54,8 @@ export default function Favorites() {
     const { itemId, itemType, isFavorited } = favoriteUpdate;
 
     const updateList = (prevList: ListCardItem[]) => {
-      // リスト全体をマップし、対象アイテムの isFavorite フラグを更新
       return prevList.map((item) => {
         if (item.id === itemId && item.type === itemType) {
-          // ⭐️ isFavorite フラグをトグル（これでハートの塗りつぶし状態が変わる）
           return { ...item, isFavorite: isFavorited };
         }
         return item;
@@ -92,7 +89,7 @@ export default function Favorites() {
             <p className="text-stone-500 mb-6">
               お気に入りを見つけたら、ハートマークを押して
               <br />
-              お気に入りに追加してみてください。
+              お気に入りに追加してみてください
             </p>
             <Link
               href="/"

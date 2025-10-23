@@ -37,7 +37,7 @@ export default function Footer({ pageName }: HeaderProps) {
     requiresAuth: boolean
   ) => {
     if (requiresAuth && !userId) {
-      e.preventDefault(); // ページ遷移を阻止
+      e.preventDefault();
       setLoginDialogSource("footer");
     }
   };
@@ -63,10 +63,10 @@ export default function Footer({ pageName }: HeaderProps) {
         </div>
       </nav>
 
-      {/* フローティングアクションボタン */}
+      {/* レシピ作成フローティングボタン */}
       {pageName !== "create" && pageName !== "edit" && (
         <div className="fixed bottom-24 right-4">
-          <Link href="/recipes/create">
+          <Link href="/recipes/create" onClick={(e) => handleClick(e, true)}>
             <button className="w-14 h-14 bg-gradient-to-r from-violet-400 to-violet-400 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 group">
               <div className="text-white group-hover:rotate-90 transition-transform duration-200">
                 <AddIcon />

@@ -4,8 +4,12 @@ import { use, useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RecipeForm from "@/components/features/RecipeForm";
-import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  loadingAtom,
+  loginDialogSourceAtom,
+  userIdAtom,
+} from "@/lib/utils/atoms";
 import { getRecipeById } from "@/lib/supabase";
 import { Recipe } from "@/types";
 
@@ -15,10 +19,17 @@ export default function RecipeEditPage({
   params: Promise<{ id: string }>;
 }) {
   const unwrapParams = use(params);
-  const setIsLoading = useSetAtom(loadingAtom);
+  const [isLoading, setIsLoading] = useAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const recipeId = Number(unwrapParams.id);
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && !userId) {
+      setLoginDialogSource("edit");
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -26,8 +37,7 @@ export default function RecipeEditPage({
       const data = await getRecipeById(userId, recipeId);
       if (!data) {
         console.error("レシピの取得に失敗しました:");
-        // エラー処理（例：ユーザーに通知、トップページへリダイレクト）
-      } else if (data) {
+      } else {
         setRecipeData(data);
       }
       setIsLoading(false);
@@ -38,7 +48,6 @@ export default function RecipeEditPage({
   return (
     <>
       <Header title="レシピ編集" />
-      {/* ローディング中はメッセージを表示、データ取得後はフォームを表示 */}
       {recipeData ? (
         <RecipeForm initialData={recipeData} isEditMode={true} />
       ) : (

@@ -72,10 +72,6 @@ export default function RecipeForm({
   const [image, setImage] = useState<File | null>(null);
   const userId = useAtomValue(userIdAtom);
 
-  if (!userId) {
-    router.push("/");
-  }
-
   // 画像の変更処理
   const onUpLoadImage = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

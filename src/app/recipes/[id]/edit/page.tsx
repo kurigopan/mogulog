@@ -52,10 +52,10 @@ export default function RecipeEditPage({
         <RecipeForm initialData={recipeData} isEditMode={true} />
       ) : (
         <div className="p-8 text-center text-red-500">
-          レシピが見つかりませんでした。
+          レシピが見つかりませんでした
         </div>
       )}
-      <Footer pageName="edit" />
+      <Footer />
     </>
   );
 }

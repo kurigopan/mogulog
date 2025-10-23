@@ -4,12 +4,11 @@ import Link from "next/link";
 import { HomeIcon, FavoriteIcon, ListIcon, PersonIcon, AddIcon } from "@/icons";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loginDialogSourceAtom, userIdAtom } from "@/lib/utils/atoms";
+import { PageName } from "@/types";
 
 type HeaderProps = {
-  pageName?: pageType;
+  pageName?: PageName;
 };
-
-type pageType = "create" | "edit";
 
 export default function Footer({ pageName }: HeaderProps) {
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
@@ -64,7 +63,7 @@ export default function Footer({ pageName }: HeaderProps) {
       </nav>
 
       {/* レシピ作成フローティングボタン */}
-      {pageName !== "create" && pageName !== "edit" && (
+      {pageName === "home" && (
         <div className="fixed bottom-24 right-4">
           <Link href="/recipes/create" onClick={(e) => handleClick(e, true)}>
             <button className="w-14 h-14 bg-gradient-to-r from-violet-400 to-violet-400 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 group">

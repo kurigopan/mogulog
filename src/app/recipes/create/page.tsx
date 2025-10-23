@@ -21,7 +21,7 @@ export default function RecipeCreatePage() {
     <>
       <Header title="レシピ作成" />
       <RecipeForm initialData={null} isEditMode={false} />
-      <Footer pageName="create" />
+      <Footer />
     </>
   );
 }

@@ -33,7 +33,7 @@ export default async function Home() {
         initialChildAgeStage={initialChildAgeStage}
         initialCardContents={initialCardContents}
       />
-      <Footer />
+      <Footer pageName="home" />
     </>
   );
 }

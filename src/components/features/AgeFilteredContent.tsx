@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import { useAtomValue, useSetAtom } from "jotai";
-import { childAgeStageAtom, loadingAtom } from "@/lib/atoms";
+import { childAgeStageAtom, loadingAtom } from "@/lib/utils/atoms";
 import {
   getPopularRecipes,
   getRecommendedRecipes,

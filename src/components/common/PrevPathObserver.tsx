@@ -8,7 +8,6 @@ export function PrevPathObserver() {
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log("pathname:", pathname);
     return () => {
       sessionStorage.setItem(SESSION_STORAGE_KEYS.PREVIOUS_PATH, pathname);
     };

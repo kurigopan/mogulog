@@ -61,15 +61,12 @@ export default function MyPage() {
   const onUpLoadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
 
-    // ファイルが選択されていない場合
     if (!files || files.length === 0) {
       setParentInfo((prev) => ({ ...prev, avatar_url: null }));
       setAvatar(null);
     } else {
-      // 画像URLを生成してparentInfoにセット
       const imageUrl = URL.createObjectURL(files[0]);
       setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
-      // 画像をセット
       setAvatar(files[0]);
     }
   };
@@ -91,7 +88,6 @@ export default function MyPage() {
     setIsLoading(true);
     let newAvatarUrl = parentInfo.avatar_url;
 
-    // avatarファイルが存在する場合のみ、画像をアップロードする
     if (avatar) {
       newAvatarUrl = await uploadAvatar(avatar, userId!);
     }
@@ -100,7 +96,6 @@ export default function MyPage() {
       avatar_url: newAvatarUrl,
     });
     if (error) throw error;
-    // UIを更新
     setParentInfo((prev) => ({
       ...prev,
       name: data.name,
@@ -114,12 +109,10 @@ export default function MyPage() {
   const handleChildSave = async () => {
     setIsLoading(true);
     try {
-      // 子どものプロフィールを更新
       await updateChild(childId!, {
         name: childInfo.name,
         birthday: childInfo.birthday,
       });
-      // アレルギー情報を一括更新
       await upsertChildAllergens(childId!, childInfo.allergens);
       setIsEditingChild(false);
     } catch (error) {
@@ -198,21 +191,25 @@ export default function MyPage() {
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               {/* 名前 */}
-              <h2 className="text-lg font-bold text-stone-700">
-                {isEditingParent ? (
-                  <input
-                    type="text"
-                    value={parentInfo.name}
-                    onChange={(e) =>
-                      setParentInfo({ ...parentInfo, name: e.target.value })
-                    }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
-                  />
-                ) : (
-                  parentInfo.name
-                )}
-                のプロフィール
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-stone-700">
+                  {isEditingParent ? (
+                    <input
+                      type="text"
+                      value={parentInfo.name}
+                      onChange={(e) =>
+                        setParentInfo({ ...parentInfo, name: e.target.value })
+                      }
+                      className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
+                    />
+                  ) : (
+                    parentInfo.name
+                  )}
+                </h2>
+                <span className="text-stone-600 font-medium">
+                  のプロフィール
+                </span>
+              </div>
               {/* ボタン */}
               {isEditingParent ? (
                 <button
@@ -310,23 +307,27 @@ export default function MyPage() {
         {/* 子供のプロフィール */}
         <section>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
-            {/* 名前 */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-stone-700">
-                {isEditingChild ? (
-                  <input
-                    type="text"
-                    value={childInfo.name}
-                    onChange={(e) =>
-                      setChildInfo({ ...childInfo, name: e.target.value })
-                    }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                  />
-                ) : (
-                  childInfo.name
-                )}
-                のプロフィール
-              </h2>
+              {/* 名前 */}
+              <div>
+                <h2 className="text-lg font-bold text-stone-700">
+                  {isEditingChild ? (
+                    <input
+                      type="text"
+                      value={childInfo.name}
+                      onChange={(e) =>
+                        setChildInfo({ ...childInfo, name: e.target.value })
+                      }
+                      className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    />
+                  ) : (
+                    childInfo.name
+                  )}
+                </h2>
+                <span className="text-stone-600 font-medium">
+                  のプロフィール
+                </span>
+              </div>
               <button
                 onClick={
                   isEditingChild ? handleChildSave : handleChildEditToggle

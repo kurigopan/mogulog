@@ -5,6 +5,7 @@ import { AuthObserver } from "@/components/common/AuthObserver";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { LoadingResetter } from "@/components/common/LoadingResetter";
 import { UserInitializer } from "@/components/common/UserInitializer";
+import { PrevPathObserver } from "@/components/common/PrevPathObserver";
 import LoginPromptDialog from "@/components/common/LoginPromptDialog";
 import { Provider } from "jotai";
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
           <LoadingOverlay />
           <LoadingResetter />
           <UserInitializer />
+          <PrevPathObserver />
           <div className="bg-stone-50 text-stone-700 min-h-screen">
             {children}
           </div>

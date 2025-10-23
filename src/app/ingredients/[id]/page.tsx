@@ -2,7 +2,6 @@
 
 import { use, useState, useEffect } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { Tabs, Tab, Box } from "@mui/material";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,13 +10,8 @@ import Card from "@/components/ui/Card";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import IngredientStatusButtons from "@/components/ui/IngredientStatusButtons";
-import { useAtomValue, useSetAtom } from "jotai";
-import {
-  childIdAtom,
-  childInfoAtom,
-  prevPathAtom,
-  userIdAtom,
-} from "@/lib/atoms";
+import { useAtomValue } from "jotai";
+import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/utils/atoms";
 import { getIngredientById, searchRecipesByIngredient } from "@/lib/supabase";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
 import { CardItem, Ingredient } from "@/types";
@@ -28,7 +22,6 @@ export default function IngredientDetail({
   params: Promise<{ id: string }>;
 }) {
   const unwrapParams = use(params);
-  const pathname = usePathname();
   const id = Number(unwrapParams.id);
   const [ingredient, setIngredient] = useState<Ingredient | null>(null);
   const [relatedRecipes, setRelatedRecipes] = useState<CardItem[]>([]);
@@ -36,7 +29,6 @@ export default function IngredientDetail({
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
-  const setPrevPath = useSetAtom(prevPathAtom);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -85,11 +77,6 @@ export default function IngredientDetail({
       savedBrowsingHistory(ingredient);
     }
   }, [ingredient]);
-
-  // 前に見たページとして保存
-  useEffect(() => {
-    setPrevPath(pathname);
-  }, [pathname, setPrevPath]);
 
   let tools;
   if (ingredient) {

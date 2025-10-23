@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { EditIcon, ScheduleIcon, PeopleIcon, DeleteIcon } from "@/icons";
 import Header from "@/components/layout/Header";
@@ -9,8 +9,8 @@ import Footer from "@/components/layout/Footer";
 import NotFoundPage from "@/components/common/NotFound";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
-import { useAtomValue, useSetAtom } from "jotai";
-import { prevPathAtom, userIdAtom } from "@/lib/atoms";
+import { useAtomValue } from "jotai";
+import { userIdAtom } from "@/lib/utils/atoms";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
 import {
   deleteRecipe,
@@ -26,12 +26,10 @@ export default function RecipeDetail({
 }) {
   const router = useRouter();
   const unwrapParams = use(params);
-  const pathname = usePathname();
   const id = Number(unwrapParams.id);
   const userId = useAtomValue(userIdAtom);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
-  const setPrevPath = useSetAtom(prevPathAtom);
 
   // TODO : メモ機能
   // const [memo, setMemo] = useState("");
@@ -88,11 +86,6 @@ export default function RecipeDetail({
       savedBrowsingHistory(recipe);
     }
   }, [recipe]);
-
-  // 前に見たページとして保存
-  useEffect(() => {
-    setPrevPath(pathname);
-  }, [pathname, setPrevPath]);
 
   let tools;
   if (recipe) {

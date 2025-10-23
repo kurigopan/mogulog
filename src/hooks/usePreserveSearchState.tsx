@@ -1,33 +1,28 @@
 "use client";
 
-import { useAtom, useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { prevPathAtom, searchStateAtom } from "@/lib/atoms";
+import { useSetAtom } from "jotai";
+import { searchStateAtom } from "@/lib/utils/atoms";
+import { SESSION_STORAGE_KEYS } from "@/lib/config/constants";
 
 export function usePreserveSearchState() {
   const setSearchState = useSetAtom(searchStateAtom);
-  const pathname = usePathname();
-  const [prevPath, setPrevPath] = useAtom(prevPathAtom);
 
   useEffect(() => {
-    if (!pathname) return;
+    const prevPath = sessionStorage.getItem(SESSION_STORAGE_KEYS.PREVIOUS_PATH);
 
-    // 詳細ページから戻ってきた場合
+    // 詳細ページから戻ってきたかを判定
     const isFromDetailPage =
       prevPath?.match(/^\/recipes\/\d+$/) ||
       prevPath?.match(/^\/ingredients\/\d+$/);
 
-    // 詳細ページ以外から来た場合はリセット
-    if (pathname === "/search") {
-      if (!isFromDetailPage) {
-        setSearchState({
-          query: "",
-          results: [],
-          allergenExclusions: {},
-        });
-      }
+    // 詳細ページ以外からの遷移の場合は、検索状態をリセット
+    if (!isFromDetailPage) {
+      setSearchState({
+        query: "",
+        results: [],
+        allergenExclusions: {},
+      });
     }
-    setPrevPath(pathname);
-  }, [pathname, setSearchState]);
+  }, [setSearchState]);
 }

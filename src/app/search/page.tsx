@@ -17,7 +17,7 @@ import {
   loadingAtom,
   searchStateAtom,
   userIdAtom,
-} from "@/lib/atoms";
+} from "@/lib/utils/atoms";
 import {
   getAllergens,
   searchIngredientsWithAllergens,
@@ -117,7 +117,6 @@ export default function SearchResults() {
         if (data) {
           setAllergens(data);
 
-          // atom が空のオブジェクトなら初期値を入れる
           if (
             !searchState.allergenExclusions ||
             Object.keys(searchState.allergenExclusions).length === 0

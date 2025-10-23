@@ -36,6 +36,16 @@ export async function updateEmail(newEmail: string) {
   }
 }
 
+export async function resetPassword(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${location.origin}/reset-password`,
+  });
+
+  if (error) {
+    console.error("メール送信に失敗しました。", error.message);
+  }
+}
+
 export async function updatePassword(newPassword: string) {
   const { error } = await supabase.auth.updateUser({
     password: newPassword,

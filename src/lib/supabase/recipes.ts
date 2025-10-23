@@ -32,7 +32,7 @@ export async function searchRecipesWithAllergens(
   return validatedData.map((d) => recipeListCardSchema.parse(d));
 }
 
-// 離乳食段階と食材名を考慮したレシピ検索
+// 離乳食段階と食材名を考慮したレシピ　5件取得
 export async function searchRecipesByIngredient(
   userId: string | null = null,
   ingredientName: string,
@@ -42,6 +42,7 @@ export async function searchRecipesByIngredient(
     parent_id_param: userId,
     ingredient_name_param: ingredientName,
     age_stage_param: ageStage,
+    limit_count: 5,
   });
 
   if (error) {

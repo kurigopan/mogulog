@@ -549,10 +549,7 @@ export type Database = {
       };
     };
     Functions: {
-      get_current_season: {
-        Args: Record<PropertyKey, never>;
-        Returns: string;
-      };
+      get_current_season: { Args: never; Returns: string };
       get_favorite_ingredients: {
         Args: { parent_id_param: string };
         Returns: {
@@ -767,6 +764,12 @@ export type Database = {
           updated_at: string;
           updated_by: string;
         }[];
+        SetofOptions: {
+          from: "*";
+          to: "recipes";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
       get_seasonal_ingredients: {
         Args: { limit_count: number; stage: string };
@@ -786,6 +789,12 @@ export type Database = {
           updated_at: string;
           updated_by: string;
         }[];
+        SetofOptions: {
+          from: "*";
+          to: "ingredients";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
       search_ingredients_with_allergens: {
         Args: {

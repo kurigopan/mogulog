@@ -46,9 +46,7 @@ export default function IngredientDetail({
             childInfo.ageStage
           );
           if (recipeData) {
-            // シャッフルして先頭5件を推薦レシピに設定
-            const shuffled = [...recipeData].sort(() => 0.5 - Math.random());
-            setRelatedRecipes(shuffled.slice(0, 5));
+            setRelatedRecipes(recipeData);
           }
         }
       } else {
@@ -61,9 +59,7 @@ export default function IngredientDetail({
             ""
           );
           if (recipeData) {
-            // シャッフルして先頭5件を推薦レシピに設定
-            const shuffled = [...recipeData].sort(() => 0.5 - Math.random());
-            setRelatedRecipes(shuffled.slice(0, 5));
+            setRelatedRecipes(recipeData);
           }
         }
       }

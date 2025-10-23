@@ -9,7 +9,6 @@ import {
   ChevronRightIcon,
   FavoriteBorderIcon,
   MenuBookIcon,
-  // EditNoteIcon,
   LogoutIcon,
   FaceIcon,
   ChildCareIcon,
@@ -24,7 +23,6 @@ import {
   loadingAtom,
   loginDialogSourceAtom,
   parentInfoAtom,
-  sessionAtom,
   userIdAtom,
 } from "@/lib/utils/atoms";
 import {
@@ -38,7 +36,6 @@ import {
 export default function MyPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useAtom(loadingAtom);
-  const setSession = useSetAtom(sessionAtom);
   const [userId, setUserId] = useAtom(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const [parentInfo, setParentInfo] = useAtom(parentInfoAtom);
@@ -143,7 +140,6 @@ export default function MyPage() {
     setShowLogoutConfirm(false);
     await logout();
     setUserId(null);
-    setSession(null);
     router.push("/");
   };
 
@@ -182,6 +178,7 @@ export default function MyPage() {
       bgColor: "bg-violet-100",
       link: "/mypage/recipes/created",
     },
+    // TODO: 下書き機能追加
     // {
     //   id: "drafts",
     //   title: "下書きレシピ",
@@ -275,7 +272,7 @@ export default function MyPage() {
                   </span>
                 </div>
                 {isEditingParent ? (
-                  <Link href="/resetEmail">
+                  <Link href="/register/resetEmail">
                     <button className="text-violet-500 hover:text-violet-600 font-medium">
                       変更する
                     </button>
@@ -290,7 +287,7 @@ export default function MyPage() {
                   <span className="text-stone-600 font-medium">パスワード</span>
                 </div>
                 {isEditingParent ? (
-                  <Link href="/resetPassword">
+                  <Link href="/register/resetPassword">
                     <button className="text-violet-500 hover:text-violet-600 font-medium">
                       変更する
                     </button>

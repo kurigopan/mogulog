@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSetAtom } from "jotai";
+import { useEffect } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
   parentInfoAtom,
   childInfoAtom,
@@ -21,17 +21,21 @@ import { calculateAgeInMonths, getAgeStage } from "@/lib/utils";
 
 export const UserInitializer = () => {
   const setIsLoading = useSetAtom(loadingAtom);
-  const setUserId = useSetAtom(userIdAtom);
   const setParentInfo = useSetAtom(parentInfoAtom);
   const setChildId = useSetAtom(childIdAtom);
   const setChildInfo = useSetAtom(childInfoAtom);
   const setAllergens = useSetAtom(allergensAtom);
 
-  // 初回ロード完了フラグ
-  const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
+  // AuthObserverによって更新されるuserIdを監視する
+  const userId = useAtomValue(userIdAtom);
 
   useEffect(() => {
-    const initializeUserSession = async () => {
+    const initializeUserData = async () => {
+      // userIdがundefined（初期状態）の場合は、AuthObserverによるセットを待つ
+      if (typeof userId === "undefined") {
+        return;
+      }
+
       setIsLoading(true);
       try {
         // 現在のセッション情報を取得
@@ -39,12 +43,12 @@ export const UserInitializer = () => {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session) {
-          const currentUserId = session.user.id;
-          setUserId(currentUserId);
+        // userIdが存在する場合（ログイン済み）
+        if (session && userId) {
+          // 現在のセッション情報を取得
 
           const [profileData, childData, allergensResponse] = await Promise.all(
-            [getProfile(currentUserId), getChild(currentUserId), getAllergens()]
+            [getProfile(userId), getChild(userId), getAllergens()]
           );
 
           if (allergensResponse) {
@@ -52,7 +56,7 @@ export const UserInitializer = () => {
           }
           if (profileData) {
             setParentInfo({
-              id: currentUserId,
+              id: userId,
               name: profileData.name || "親",
               avatar_url: profileData.avatar_url || null,
               email: session.user.email || "未設定",
@@ -95,9 +99,7 @@ export const UserInitializer = () => {
             setChildId(null);
           }
         } else {
-          // セッションがない場合（未ログイン）
-          setUserId(null);
-          setChildId(null);
+          // userIdがnullの場合（未ログイン）
           setParentInfo({
             id: "",
             name: "ゲスト",
@@ -113,30 +115,25 @@ export const UserInitializer = () => {
             ageStage: "未設定",
             allergens: [],
           });
+          setChildId(null);
         }
       } catch (error) {
         console.error("Failed to initialize user session:", error);
         // エラー時もJotaiの状態をリセット
-        setUserId(null);
         setChildId(null);
       } finally {
         setIsLoading(false);
-        setInitialLoadCompleted(true); // 初回ロードが完了したことをマーク
       }
     };
 
-    // このuseEffectは初回マウント時のみ実行
-    if (!initialLoadCompleted) {
-      initializeUserSession();
-    }
+    initializeUserData();
   }, [
-    setUserId,
+    userId,
+    setIsLoading,
     setParentInfo,
     setChildId,
     setChildInfo,
     setAllergens,
-    setIsLoading,
-    initialLoadCompleted,
   ]);
 
   return null;

@@ -1,5 +1,4 @@
 import { atom } from "jotai";
-import { Session } from "@supabase/supabase-js";
 import {
   Allergen,
   ChildInfo,
@@ -9,7 +8,6 @@ import {
   User,
 } from "@/types";
 
-export const sessionAtom = atom<Session | null>(null);
 export const loginDialogSourceAtom = atom<string | null>(null);
 
 export const loadingAtom = atom<boolean>(true);

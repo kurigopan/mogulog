@@ -1,44 +1,79 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Avatar } from "@mui/material";
 import {
   EditIcon,
   ChevronRightIcon,
   FavoriteBorderIcon,
   MenuBookIcon,
-  EditNoteIcon,
   LogoutIcon,
   FaceIcon,
   ChildCareIcon,
 } from "@/icons";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  allergensAtom,
+  childIdAtom,
+  childInfoAtom,
+  loadingAtom,
+  loginDialogSourceAtom,
+  parentInfoAtom,
+  userIdAtom,
+} from "@/lib/utils/atoms";
+import {
+  logout,
+  updateChild,
+  updateProfile,
+  uploadAvatar,
+  upsertChildAllergens,
+} from "@/lib/supabase";
 
 export default function MyPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useAtom(loadingAtom);
+  const [userId, setUserId] = useAtom(userIdAtom);
+  const childId = useAtomValue(childIdAtom);
+  const [parentInfo, setParentInfo] = useAtom(parentInfoAtom);
+  const [childInfo, setChildInfo] = useAtom(childInfoAtom);
+  const allergens = useAtomValue(allergensAtom);
   const [isEditingParent, setIsEditingParent] = useState(false);
   const [isEditingChild, setIsEditingChild] = useState(false);
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
 
-  // 親のサンプルデータ
-  const [parentInfo, setParentInfo] = useState({
-    avatar: <FaceIcon style={{ fontSize: 150 }} />,
-    name: "親",
-    email: "parent@example.com",
-    joinDate: "2024年1月",
-  });
+  useEffect(() => {
+    if (
+      !isLoading &&
+      (!userId || !childId || !parentInfo.id || !childInfo.id)
+    ) {
+      setLoginDialogSource("mypage");
+    }
+  }, [isLoading]);
 
-  // 子供の情報
-  const [childInfo, setChildInfo] = useState({
-    avatar: <ChildCareIcon style={{ fontSize: 150 }} />,
-    name: "みーちゃん",
-    age: "8ヶ月",
-    allergies: ["卵", "牛乳"],
-  });
+  // アバター画像の変更処理
+  const onUpLoadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
 
-  // 統計情報
-  const stats = {
-    favoriteRecipes: 23,
-    createdRecipes: 5,
-    draftRecipes: 2,
+    if (!files || files.length === 0) {
+      setParentInfo((prev) => ({ ...prev, avatar_url: null }));
+      setAvatar(null);
+    } else {
+      const imageUrl = URL.createObjectURL(files[0]);
+      setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
+      setAvatar(files[0]);
+    }
+  };
+
+  const getAllergenNameById = (id: number) => {
+    const allergen = allergens.find((a) => a.id === id);
+    return allergen ? allergen.name : "不明";
   };
 
   const handleParentEditToggle = () => {
@@ -49,114 +84,181 @@ export default function MyPage() {
     setIsEditingChild(!isEditingChild);
   };
 
-  const handleParentSave = () => {
+  const handleParentSave = async () => {
+    setIsLoading(true);
+    let newAvatarUrl = parentInfo.avatar_url;
+
+    if (avatar) {
+      newAvatarUrl = await uploadAvatar(avatar, userId!);
+    }
+    const { data, error } = await updateProfile(userId!, {
+      name: parentInfo.name,
+      avatar_url: newAvatarUrl,
+    });
+    if (error) throw error;
+    setParentInfo((prev) => ({
+      ...prev,
+      name: data.name,
+      avatar_url: newAvatarUrl,
+    }));
     setIsEditingParent(false);
-    console.log("ママの情報を保存:", parentInfo);
+    setAvatar(null);
+    setIsLoading(false);
   };
 
-  const handleChildSave = () => {
+  const handleChildSave = async () => {
+    setIsLoading(true);
+    try {
+      await updateChild(childId!, {
+        name: childInfo.name,
+        birthday: childInfo.birthday,
+      });
+      await upsertChildAllergens(childId!, childInfo.allergens);
+      setIsEditingChild(false);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(
+          "子どもの情報更新中にエラーが発生しました:",
+          error.message
+        );
+        alert(error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
     setIsEditingChild(false);
-    console.log("子供の情報を保存:", childInfo);
-  };
-  const handleLogout = () => {
-    setShowLogoutConfirm(false);
-    // ログアウト処理
-    console.log("ログアウト");
   };
 
-  const handleAddAllergy = () => {
-    const newAllergy = prompt("アレルギー食材を入力してください");
-    if (newAllergy && !childInfo.allergies.includes(newAllergy)) {
+  const handleLogout = async () => {
+    setShowLogoutConfirm(false);
+    await logout();
+    setUserId(null);
+    router.push("/");
+  };
+
+  const handleToggleAllergen = (allergenId: number) => {
+    if (!childInfo) return;
+
+    if (childInfo.allergens.includes(allergenId)) {
       setChildInfo({
         ...childInfo,
-        allergies: [...childInfo.allergies, newAllergy],
+        allergens: childInfo.allergens.filter(
+          (id: number) => id !== allergenId
+        ),
+      });
+    } else {
+      setChildInfo({
+        ...childInfo,
+        allergens: [...childInfo.allergens, allergenId],
       });
     }
-  };
-
-  const handleRemoveAllergy = (allergyToRemove: string) => {
-    setChildInfo({
-      ...childInfo,
-      allergies: childInfo.allergies.filter(
-        (allergy) => allergy !== allergyToRemove
-      ),
-    });
   };
 
   const menuItems = [
     {
       id: "favorites",
-      title: "お気に入りレシピ",
-      stats: `${stats.favoriteRecipes}`,
+      title: "お気に入り",
       icon: <FavoriteBorderIcon />,
       color: "text-red-500",
       bgColor: "bg-red-100",
-      action: () => console.log("お気に入りレシピへ"),
+      link: "/mypage/favorites",
     },
     {
       id: "created",
       title: "作成したレシピ",
-      stats: `${stats.createdRecipes}`,
       icon: <MenuBookIcon />,
-      color: "text-purple-500",
-      bgColor: "bg-purple-100",
-      action: () => console.log("作成レシピへ"),
+      color: "text-violet-500",
+      bgColor: "bg-violet-100",
+      link: "/mypage/recipes/created",
     },
-    {
-      id: "drafts",
-      title: "下書きレシピ",
-      stats: `${stats.draftRecipes}`,
-      icon: <EditNoteIcon />,
-      color: "text-amber-500",
-      bgColor: "bg-amber-100",
-      action: () => console.log("下書きへ"),
-    },
+    // TODO: 下書き機能追加
+    // {
+    //   id: "drafts",
+    //   title: "下書きレシピ",
+    //   icon: <EditNoteIcon />,
+    //   color: "text-amber-500",
+    //   bgColor: "bg-amber-100",
+    //   link: "/mypage/recipes/drafts",
+    // },
   ];
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="マイページ" />
       <div className="p-4 space-y-6">
         {/* 親プロフィール */}
         <section>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-stone-700">
-                {isEditingParent ? (
-                  <input
-                    type="text"
-                    value={parentInfo.name}
-                    onChange={(e) =>
-                      setParentInfo({ ...parentInfo, name: e.target.value })
-                    }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                ) : (
-                  parentInfo.name
-                )}
-                のプロフィール
-              </h2>
-              <button
-                onClick={
-                  isEditingParent ? handleParentSave : handleParentEditToggle
-                }
-                className={`flex items-center px-4 py-2 rounded-xl font-medium transition-colors ${
-                  isEditingParent
-                    ? "bg-purple-500 text-white hover:bg-purple-600"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                {isEditingParent ? (
-                  "保存"
-                ) : (
-                  <>
-                    <EditIcon />
-                    <span className="ml-2">編集</span>
-                  </>
-                )}
-              </button>
+              {/* 名前 */}
+              <div>
+                <h2 className="text-lg font-bold text-stone-700">
+                  {isEditingParent ? (
+                    <input
+                      type="text"
+                      value={parentInfo.name}
+                      onChange={(e) =>
+                        setParentInfo({ ...parentInfo, name: e.target.value })
+                      }
+                      className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
+                    />
+                  ) : (
+                    parentInfo.name
+                  )}
+                </h2>
+                <span className="text-stone-600 font-medium">
+                  のプロフィール
+                </span>
+              </div>
+              {/* ボタン */}
+              {isEditingParent ? (
+                <button
+                  onClick={handleParentSave}
+                  className="flex items-center px-4 py-2 rounded-2xl font-medium transition-colors bg-violet-500 text-white hover:bg-violet-600"
+                >
+                  保存
+                </button>
+              ) : (
+                <button
+                  onClick={handleParentEditToggle}
+                  className="flex items-center px-4 py-2 rounded-2xl font-medium transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200"
+                >
+                  <EditIcon />
+                  <span className="ml-2">編集</span>
+                </button>
+              )}
             </div>
-            <div className="text-center text-6xl mb-6">{parentInfo.avatar}</div>
+            <div className="flex text-center justify-center text-6xl mb-6">
+              {isEditingParent ? (
+                <>
+                  <Avatar
+                    src={parentInfo.avatar_url ?? undefined}
+                    sx={{ width: 150, height: 150, cursor: "pointer" }}
+                    onClick={() => avatarInputRef.current?.click()}
+                  >
+                    {!parentInfo.avatar_url && (
+                      <FaceIcon sx={{ fontSize: 150 }} />
+                    )}
+                  </Avatar>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={onUpLoadImage}
+                    className="hidden"
+                  />
+                </>
+              ) : (
+                <Avatar
+                  src={parentInfo.avatar_url ?? undefined}
+                  sx={{ width: 150, height: 150 }}
+                >
+                  {!parentInfo.avatar_url && (
+                    <FaceIcon sx={{ fontSize: 150 }} />
+                  )}
+                </Avatar>
+              )}
+            </div>
 
             {/* 親プロフィール詳細 */}
             <div className="space-y-4">
@@ -167,14 +269,11 @@ export default function MyPage() {
                   </span>
                 </div>
                 {isEditingParent ? (
-                  <input
-                    type="email"
-                    value={parentInfo.email}
-                    onChange={(e) =>
-                      setParentInfo({ ...parentInfo, email: e.target.value })
-                    }
-                    className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
+                  <Link href="/register/resetEmail">
+                    <button className="text-violet-500 hover:text-violet-600 font-medium">
+                      変更する
+                    </button>
+                  </Link>
                 ) : (
                   <span className="text-stone-700">{parentInfo.email}</span>
                 )}
@@ -185,11 +284,13 @@ export default function MyPage() {
                   <span className="text-stone-600 font-medium">パスワード</span>
                 </div>
                 {isEditingParent ? (
-                  <button className="text-purple-500 hover:text-purple-600 font-medium">
-                    変更する
-                  </button>
+                  <Link href="/register/resetPassword">
+                    <button className="text-violet-500 hover:text-violet-600 font-medium">
+                      変更する
+                    </button>
+                  </Link>
                 ) : (
-                  <span className="text-stone-400">••••••••</span>
+                  <span className="text-stone-400">* * * * * *</span>
                 )}
               </div>
 
@@ -207,28 +308,33 @@ export default function MyPage() {
         <section>
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-stone-700">
-                {isEditingChild ? (
-                  <input
-                    type="text"
-                    value={childInfo.name}
-                    onChange={(e) =>
-                      setChildInfo({ ...childInfo, name: e.target.value })
-                    }
-                    className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                ) : (
-                  childInfo.name
-                )}
-                のプロフィール
-              </h2>
+              {/* 名前 */}
+              <div>
+                <h2 className="text-lg font-bold text-stone-700">
+                  {isEditingChild ? (
+                    <input
+                      type="text"
+                      value={childInfo.name}
+                      onChange={(e) =>
+                        setChildInfo({ ...childInfo, name: e.target.value })
+                      }
+                      className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    />
+                  ) : (
+                    childInfo.name
+                  )}
+                </h2>
+                <span className="text-stone-600 font-medium">
+                  のプロフィール
+                </span>
+              </div>
               <button
                 onClick={
                   isEditingChild ? handleChildSave : handleChildEditToggle
                 }
-                className={`flex items-center px-4 py-2 rounded-xl font-medium transition-colors ${
+                className={`flex items-center px-4 py-2 rounded-2xl font-medium transition-colors ${
                   isEditingChild
-                    ? "bg-purple-500 text-white hover:bg-purple-600"
+                    ? "bg-violet-500 text-white hover:bg-violet-600"
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
@@ -242,104 +348,108 @@ export default function MyPage() {
                 )}
               </button>
             </div>
-
-            <div className="text-center text-6xl mb-6">{childInfo.avatar}</div>
-
+            {/* アバター画像 */}
+            <div className="text-center text-6xl mb-6">
+              <ChildCareIcon style={{ fontSize: 150 }} />
+            </div>
             <div className="space-y-4">
+              {/* 誕生日*/}
               <div className="flex items-center justify-between py-3 border-b border-stone-100">
-                <span className="text-stone-600 font-medium">月齢</span>
+                <span className="text-stone-600 font-medium">誕生日</span>
                 {isEditingChild ? (
-                  <select
-                    value={childInfo.age}
+                  <input
+                    type="date"
+                    value={childInfo.birthday || ""}
                     onChange={(e) =>
-                      setChildInfo({ ...childInfo, age: e.target.value })
+                      setChildInfo({ ...childInfo, birthday: e.target.value })
                     }
-                    className="text-stone-700 bg-stone-50 rounded-lg p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="5ヶ月">5ヶ月</option>
-                    <option value="6ヶ月">6ヶ月</option>
-                    <option value="7ヶ月">7ヶ月</option>
-                    <option value="8ヶ月">8ヶ月</option>
-                    <option value="9ヶ月">9ヶ月</option>
-                    <option value="10ヶ月">10ヶ月</option>
-                    <option value="11ヶ月">11ヶ月</option>
-                    <option value="12ヶ月">12ヶ月</option>
-                    <option value="18ヶ月">18ヶ月</option>
-                  </select>
+                    className="text-stone-700 bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  />
                 ) : (
-                  <span className="text-stone-700">{childInfo.age}</span>
+                  <span className="text-stone-700">{childInfo.birthday}</span>
                 )}
               </div>
-
+              {/* 月齢 */}
+              <div className="flex items-center justify-between py-3 border-b border-stone-100">
+                <span className="text-stone-600 font-medium">月齢</span>
+                <span className="text-stone-700">
+                  {childInfo.birthday ? childInfo.age : "未設定"}
+                </span>
+              </div>
+              {/* アレルギー */}
               <div className="py-3">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-stone-600 font-medium">アレルギー</span>
-                  {isEditingChild && (
-                    <button
-                      onClick={handleAddAllergy}
-                      className="text-purple-500 hover:text-purple-600 font-medium text-sm"
-                    >
-                      + 追加
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {childInfo.allergies.length > 0 ? (
-                    childInfo.allergies.map((allergy, index) => (
-                      <div
-                        key={index}
-                        className="inline-flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
-                      >
-                        <span>{allergy}</span>
-                        {isEditingChild && (
-                          <button
-                            onClick={() => handleRemoveAllergy(allergy)}
-                            className="ml-2 text-red-500 hover:text-red-700"
+                  {/* 既存アレルギー */}
+                  {!isEditingChild &&
+                    childInfo.allergens &&
+                    childInfo.allergens.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {childInfo.allergens.map((allergenId: number) => (
+                          <div
+                            key={allergenId}
+                            className="inline-flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
                           >
-                            ×
-                          </button>
-                        )}
+                            <span>{getAllergenNameById(allergenId)}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  ) : (
-                    <span className="text-stone-400 text-sm">なし</span>
-                  )}
+                    )}
+                  {/*情報なし*/}
+                  {!isEditingChild &&
+                    (!childInfo.allergens ||
+                      childInfo.allergens.length === 0) &&
+                    allergens.length === 0 && (
+                      <span className="text-stone-400 text-sm ml-2">
+                        アレルギー情報がありません。
+                      </span>
+                    )}
                 </div>
+                {/* アレルギー一覧から選択（編集モード） */}
+                {isEditingChild && allergens.length > 0 && (
+                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 mt-2">
+                    {allergens.map((allergen) => (
+                      <button
+                        key={allergen.id}
+                        onClick={() => handleToggleAllergen(allergen.id)}
+                        className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
+                          childInfo.allergens.includes(allergen.id)
+                            ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                            : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
+                        }`}
+                      >
+                        <span>{allergen.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Menu Items */}
+        {/* メニュー */}
         <section>
-          <div className="space-y-3">
+          <div className="space-y-3 ">
             {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={item.action}
-                className="w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className={`${item.color} mr-4`}>{item.icon}</div>
-                    <h4 className="font-bold text-stone-700 mr-4">
-                      {item.title}
-                    </h4>
-                    <p
-                      className={`w-10 text-sm text-stone-500 p-1 rounded-full ${item.bgColor}`}
-                    >
-                      {item.stats}
-                    </p>
-                    {/* <p className="text-sm text-stone-500">{item.subtitle}</p> */}
+              <Link href={item.link} key={item.id}>
+                <button className="w-full mb-4 bg-white rounded-3xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className={`${item.color} mr-4`}>{item.icon}</div>
+                      <h4 className="font-bold text-stone-700 mr-4">
+                        {item.title}
+                      </h4>
+                    </div>
+                    <ChevronRightIcon />
                   </div>
-                  <ChevronRightIcon />
-                </div>
-              </button>
+                </button>
+              </Link>
             ))}
           </div>
         </section>
 
-        {/* Logout Section */}
+        {/* ログアウト */}
         <section>
           <button
             onClick={() => setShowLogoutConfirm(true)}
@@ -354,10 +464,10 @@ export default function MyPage() {
           </button>
         </section>
       </div>
-      {/* Logout Confirmation Modal */}
+      {/* ログアウト確認モーダル */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+        <div className="fixed inset-0 bg-black bg-opacity-300 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm">
             <div className="text-center mb-6">
               <h3 className="text-lg font-bold text-stone-700 mb-2">
                 ログアウトしますか？
@@ -369,21 +479,22 @@ export default function MyPage() {
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 py-3 px-4 bg-stone-100 text-stone-600 rounded-xl font-medium hover:bg-stone-200 transition-colors"
+                className="flex-1 py-3 px-4 bg-stone-100 text-stone-600 rounded-2xl font-medium hover:bg-stone-200 transition-colors"
               >
                 キャンセル
               </button>
-              <button
+              <Link
+                href="/"
                 onClick={handleLogout}
-                className="flex-1 py-3 px-4 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors"
+                className="flex justify-center flex-1 py-3 px-4 bg-red-500 text-white rounded-2xl font-medium hover:bg-red-600 transition-colors"
               >
                 ログアウト
-              </button>
+              </Link>
             </div>
           </div>
         </div>
       )}
       <Footer />
-    </div>
+    </>
   );
 }

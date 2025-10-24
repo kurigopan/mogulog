@@ -1,18 +1,61 @@
 "use client";
 
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import RecipeForm from "@/components/recipeForm";
-import { mockRecipes } from "@/mocks/recipes";
+import { use, useEffect, useState } from "react";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import RecipeForm from "@/components/features/RecipeForm";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  loadingAtom,
+  loginDialogSourceAtom,
+  userIdAtom,
+} from "@/lib/utils/atoms";
+import { getRecipeById } from "@/lib/supabase";
+import { Recipe } from "@/types";
 
-// レシピ編集ページのコンポーネント
-export default function RecipeEditPage() {
+export default function RecipeEditPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const unwrapParams = use(params);
+  const [isLoading, setIsLoading] = useAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
+  const recipeId = Number(unwrapParams.id);
+  const [recipeData, setRecipeData] = useState<Recipe | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && !userId) {
+      setLoginDialogSource("edit");
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      setIsLoading(true);
+      const data = await getRecipeById(userId, recipeId);
+      if (!data) {
+        console.error("レシピの取得に失敗しました:");
+      } else {
+        setRecipeData(data);
+      }
+      setIsLoading(false);
+    };
+    fetchRecipe();
+  }, [recipeId]);
+
   return (
-    <div className="min-h-screen bg-stone-50">
+    <>
       <Header title="レシピ編集" />
-      {/* RecipeFormコンポーネントを呼び出し、既存データを渡します */}
-      <RecipeForm initialData={mockRecipes[0]} isEditMode={true} />
+      {recipeData ? (
+        <RecipeForm initialData={recipeData} isEditMode={true} />
+      ) : (
+        <div className="p-8 text-center text-red-500">
+          レシピが見つかりませんでした
+        </div>
+      )}
       <Footer />
-    </div>
+    </>
   );
 }

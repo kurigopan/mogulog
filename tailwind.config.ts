@@ -9,10 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "soft-white": "#f9fafb",
-        "soft-gray": "#e5e7eb",
-        "soft-text": "#4b5563",
-        "soft-accent": "#8b5cf6", // Example accent color
+        "soft-white": "#fdfcfa", // やわらかい白（温かさ重視）
+        "soft-gray": "#e5e7eb", // 淡いグレー
+        "soft-text": "#4b5563", // 落ち着いた文字色
+        "soft-purple": "#a78bfa", // 柔らかい紫
+        "soft-pink": "#f9a8d4",
+        "soft-brown": "#a47551", // 柔らかブラウン（木の温かみ）
       },
       boxShadow: {
         soft: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",

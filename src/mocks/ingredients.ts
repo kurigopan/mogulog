@@ -1,4 +1,4 @@
-import { Ingredient, Category } from "@/types";
+import { Ingredient } from "@/types";
 
 export const mockIngredients: Ingredient[] = [
   {

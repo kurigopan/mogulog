@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ShareIcon } from "@/icons";
 
 type Props = {
@@ -8,8 +7,6 @@ type Props = {
 };
 
 export default function ShareButton({ title }: Props) {
-  const [copied, setCopied] = useState(false);
-
   const handleShare = async () => {
     const shareData = {
       title,
@@ -28,8 +25,6 @@ export default function ShareButton({ title }: Props) {
     } else {
       try {
         await navigator.clipboard.writeText(shareData.url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
       } catch (err) {
         console.error("コピーに失敗しました", err);
       }

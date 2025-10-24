@@ -4,7 +4,7 @@ export async function uploadAvatar(file: File, userId: string) {
   const bucketName = "avatars";
   const filePath = `${userId}/${file.name}`;
 
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from(bucketName)
     .upload(filePath, file, {
       cacheControl: "3600",
@@ -46,7 +46,7 @@ export async function uploadImage(file: File, userId: string) {
   const fileName = `${crypto.randomUUID()}.${fileExt}`;
   const filePath = `${userId}/${fileName}`;
 
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from(bucketName)
     .upload(filePath, file, {
       cacheControl: "3600",

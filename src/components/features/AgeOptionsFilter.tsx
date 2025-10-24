@@ -32,8 +32,9 @@ export default function AgeOptionsFilter({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
+        event.target instanceof Node &&
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target)
       ) {
         setIsDropdownOpen(false);
       }
@@ -46,7 +47,7 @@ export default function AgeOptionsFilter({
   }, []);
 
   const currentAgeLabel = ageOptions.find(
-    (option) => option.value === childAgeStage
+    (option) => option.value === childAgeStage,
   )?.label;
 
   return (

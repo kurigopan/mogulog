@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import { AuthObserver } from "@/components/common/AuthObserver";
@@ -31,7 +32,9 @@ export default async function RootLayout({
         <Provider>
           <AuthObserver />
           <LoadingOverlay />
-          <LoadingResetter />
+          <Suspense fallback={null}>
+            <LoadingResetter />
+          </Suspense>
           <UserInitializer />
           <PrevPathObserver />
           <div className="bg-stone-50 text-stone-700 min-h-screen">

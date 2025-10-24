@@ -16,9 +16,7 @@ export async function uploadAvatar(file: File, userId: string) {
     return null;
   }
 
-  const signedUrl = await getSignedUrl(filePath, bucketName);
-
-  return signedUrl;
+  return await getSignedUrl(filePath, bucketName);
 }
 
 export async function getSignedUrl(filePath: string, bucketName: string) {
@@ -57,9 +55,7 @@ export async function uploadImage(file: File, userId: string) {
     return null;
   }
 
-  const publicUrl = getPublicUrl(filePath, bucketName);
-
-  return publicUrl;
+  return getPublicUrl(filePath, bucketName);
 }
 
 export function getPublicUrl(filePath: string, bucketName: string) {

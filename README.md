@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# mogulog
 
-## Getting Started
+新米パパママの不安を「もぐもぐ」解消！
+離乳食作りをもっと楽しく、もっと安心にサポートするアプリ
 
-First, run the development server:
+## 概要
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+「mogulog」は、0〜1 歳の子どもを育てる、特に初めての育児で不安が多い新米ママ・パパの方に向けた離乳食アプリです。  
+離乳食のレシピ検索はもちろん、アレルギー情報の確認やNG食材の管理や、 月齢やアレルギー情報、旬に合わせたレシピ・食材を提案し、
+お子様に寄り添った離乳食づくりをサポートします。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 「mogulog」が提供する体験:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 初めての離乳食も安心: 「何を作ればいいかわからない」という不安を軽減し、最初の一歩をサポートします。
+- アレルギー対応も万全: お子様のアレルギーに配慮したレシピが見つかる安心感を提供します。
+- 新しい発見と驚き: 自分では思いつかないようなレシピや、手軽で美味しそうなレシピとの出会いが、離乳食づくりをワクワクするものに変えます。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+これらの体験を通じて、新米ママ・パパが自信を持って、そして何よりも楽しく離乳食ライフを送れるようサポートします。
 
-## Learn More
+### こんな方におすすめ
 
-To learn more about Next.js, take a look at the following resources:
+- 離乳食の進み具合や時期に合わせた適切なレシピ選びに悩んでいる方
+- お子様がどの食材を食べられたか手軽に記録したい方
+- オリジナル離乳食レシピを記録・整理したい方
+- 他のパパ・ママと離乳食のアイデアを参考にしたい方
+- アレルギーがあるお子様向けの離乳食レシピを探している方
+- 離乳食づくりをもっと楽しく、もっとクリエイティブにしたい方
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 主な機能
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 全ユーザー向け
 
-## Deploy on Vercel
+- **食材・レシピ検索**: キーワード（例：にんじん、スープ）から、食材の情報や最適なレシピを検索
+- **食材情報の閲覧**: 月齢に応じた調理方法、栄養情報、調理のコツなどの食材の詳細情報を閲覧
+- **レシピ情報の閲覧**: 材料、作り方、アレルゲンなどのレシピの詳細情報を閲覧
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 認証ユーザー
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **フィルター機能**: 登録されたお子様の月齢に基づき、表示される食材やレシピを自動でフィルタリングし、パーソナライズされた情報を提供。
+- **食材管理**: 子供が食べたことのある食材や NG な食材を登録・管理。アレルギー管理もサポート。
+- **レシピ管理**: レシピの新規作成、編集、削除。
+- **お気に入り**: 気になる食材やレシピをブックマークし、いつでもすぐにアクセス。
+- **マイページ**: 自分や子供の情報、作成したレシピやお気に入りを一覧表示。
+
+## 今後搭載したい機能
+
+- **レシピ下書き**: レシピを作成している途中で下書き保存
+- **レシピメモ**: 自分だけが確認できる調理メモを作成
+- **レシピ非公開**: 公開はしない、レシピを作成
+- **AI 提案**: AI がお子様の成長や好みに合わせて、新しい食材やレシピを個別に提案
+- **買い物リスト自動生成**: レシピを選択すると、レシピに合わせた材料の買い物リストを自動作成
+- **家族での記録共有**: 家族内でお子様の記録を共有・確認・編集
+- **ユーザー間の交流**: 気になるユーザーをフォロー、コメントで交流
+
+## 技術スタック
+
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Backend / DB**: [Supabase](https://supabase.io/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components**: [Material-UI](https://mui.com/)
+- **State Management**: [Jotai](https://jotai.org/)
+- **Schema Validation**: [Zod](https://zod.dev/)
+
+## 工夫した点
+- Typescript及びzodを使用し、型安全での開発を実施しました。
+- 検索条件や閲覧履歴を自動保存するようにし、再入力や再検索の手間をなるべく削減しました。
+- 役割ごとのコードの分離を行い、見通しやすいコードを意識しました。
+
+## アプリケーション URL
+https://mogulog.vercel.app/
+
+- スマートフォンでの使用を前提としているため、モバイル環境での確認を推奨しております。
+- 実際のレシピや食材情報を登録しているのではなく、デモデータを登録していることをご了承ください。
+
+## ライセンス
+このプロジェクトは MIT ライセンスのもとで公開されています。詳細は [LICENSE](LICENSE) ファイルをご覧ください。

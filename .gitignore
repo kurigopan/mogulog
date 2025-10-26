@@ -2,6 +2,8 @@
 
 # IDE
 .idea
+.kiro
+.vscode
 
 # dependencies
 /node_modules

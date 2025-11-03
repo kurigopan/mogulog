@@ -24,6 +24,9 @@ export const step2Schema = z.object({
   allergens: z.array(z.string()),
 });
 
+export const profileSchema = step1Schema.extend(step2Schema.shape);
+export type ProfileForm = z.infer<typeof profileSchema>;
+
 export const recipeIngredientSchema = z.object({
   name: z.string().min(1, "材料名を入力してください"),
   amount: z.string().optional(),

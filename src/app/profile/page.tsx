@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { ZodFormattedError } from "zod";
 import { AccountBoxIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useAtomValue, useSetAtom } from "jotai";
@@ -16,16 +17,12 @@ import {
 } from "@/lib/supabase";
 import { Allergen, FormData } from "@/types";
 import { step1Schema, step2Schema } from "@/types/schemas";
-
-type ValidationErrors = {
-  [key: string]: string[];
-};
+import type { ProfileForm } from "@/types/schemas";
 
 export default function ProfilePage() {
   const router = useRouter();
   const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
-  const [errors, setErrors] = useState<ValidationErrors | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     avatar_url: null as string | null,
@@ -42,6 +39,9 @@ export default function ProfilePage() {
   const [avatar, setAvatar] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [today, setToday] = useState("");
+  const [formErrors, setFormErrors] =
+    useState<ZodFormattedError<ProfileForm> | null>(null);
+  const [errors, setErrors] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,7 +66,7 @@ export default function ProfilePage() {
       // 画像をセット
       setAvatar(files[0]);
     },
-    []
+    [],
   );
 
   const toggleAllergen = (allergenId: number) => {
@@ -77,12 +77,14 @@ export default function ProfilePage() {
   };
 
   const handleNext = () => {
+    setIsLoading(true);
     const result = step1Schema.safeParse(formData);
     if (!result.success) {
-      setErrors(result.error.flatten().fieldErrors);
+      setFormErrors(result.error.format());
+      setIsLoading(false);
       return;
     }
-    setErrors(null);
+    setFormErrors(null);
     setStep(2);
   };
 
@@ -92,11 +94,11 @@ export default function ProfilePage() {
 
     const result = step2Schema.safeParse(formData);
     if (!result.success) {
-      setErrors(result.error.flatten().fieldErrors);
+      setFormErrors(result.error.format());
       setIsLoading(false);
       return;
     }
-    setErrors(null);
+    setFormErrors(null);
 
     // 選択されたアレルゲン情報を抽出
     const selectedAllergenIds = Object.keys(allergenExclusions)
@@ -120,7 +122,7 @@ export default function ProfilePage() {
         await createChildAllergens(
           { ...formData, allergens: selectedAllergenIds },
           childId,
-          userId!
+          userId!,
         );
       }
 
@@ -130,9 +132,9 @@ export default function ProfilePage() {
       // いずれかのステップでエラーが発生した場合
       console.error(err);
       if (err instanceof Error) {
-        setErrors({ general: [err.message] });
+        setErrors(err.message);
       } else {
-        setErrors({ general: ["不明なエラーが発生しました。"] });
+        setErrors("不明なエラーが発生しました。");
       }
     } finally {
       setIsLoading(false);
@@ -143,20 +145,24 @@ export default function ProfilePage() {
   useEffect(() => {
     inputRef.current?.focus();
     const fetchAllergens = async () => {
-      if (allergens.length === 0) {
-        const data = await getAllergens();
-        if (data) {
-          setAllergens(data);
-          const initialExclusions: Record<string, boolean> = {};
-          data.forEach((allergen) => {
-            initialExclusions[allergen.id] = false;
-          });
-          setAllergenExclusions(initialExclusions);
+      try {
+        if (allergens.length === 0) {
+          const data = await getAllergens();
+          if (data) {
+            setAllergens(data);
+            const initialExclusions: Record<string, boolean> = {};
+            data.forEach((allergen) => {
+              initialExclusions[allergen.id] = false;
+            });
+            setAllergenExclusions(initialExclusions);
+          }
         }
+      } catch (error) {
+        console.error("アレルゲン取得中にエラー:", error);
       }
     };
-    fetchAllergens();
-  }, []);
+    fetchAllergens().catch((e) => console.error(e));
+  });
 
   useEffect(() => {
     // 今日の日付を YYYY-MM-DD に変換
@@ -166,17 +172,14 @@ export default function ProfilePage() {
 
   return (
     <CenteredCard>
-      {" "}
       <h2 className="text-2xl font-bold text-stone-700 text-center mb-2">
         プロフィール設定
       </h2>
       <p className="text-stone-500 text-sm text-center mb-6">
         ステップ {step}/2
       </p>
-      {errors?.general && (
-        <div className="text-red-500 text-sm text-center mb-4">
-          {errors.general[0]}
-        </div>
+      {errors && (
+        <div className="text-red-500 text-sm text-center mb-4">{errors}</div>
       )}
       {step === 1 && (
         <div className="space-y-6">
@@ -191,8 +194,10 @@ export default function ProfilePage() {
               onChange={handleChange}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {errors?.name && (
-              <p className="mt-2 text-sm text-red-500">{errors.name[0]}</p>
+            {formErrors?.name?._errors && (
+              <p className="mt-2 text-sm text-red-500">
+                {formErrors.name._errors[0]}
+              </p>
             )}
           </div>
           <div>
@@ -251,8 +256,10 @@ export default function ProfilePage() {
               onChange={handleChange}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {errors?.childName && (
-              <p className="mt-2 text-sm text-red-500">{errors.childName[0]}</p>
+            {formErrors?.childName?._errors && (
+              <p className="mt-2 text-sm text-red-500">
+                {formErrors.childName._errors[0]}
+              </p>
             )}
           </div>
           <div>
@@ -267,9 +274,9 @@ export default function ProfilePage() {
               onChange={handleChange}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {errors?.childBirthday && (
+            {formErrors?.childBirthday?._errors && (
               <p className="mt-2 text-sm text-red-500">
-                {errors.childBirthday[0]}
+                {formErrors.childBirthday._errors[0]}
               </p>
             )}
           </div>

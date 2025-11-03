@@ -3,9 +3,7 @@ import { Recipe, Season, ingredientNutrition } from "@/types";
 import { convertUtcToJst } from "@/lib/utils";
 
 export const registerSchema = z.object({
-  email: z
-    .string()
-    .email({ message: "有効なメールアドレスを入力してください" }),
+  email: z.email({ message: "有効なメールアドレスを入力してください" }),
   password: z
     .string()
     .min(6, { message: "パスワードは6文字以上で設定してください" }),
@@ -26,10 +24,48 @@ export const step2Schema = z.object({
   allergens: z.array(z.string()),
 });
 
+export const recipeIngredientSchema = z.object({
+  name: z.string().min(1, "材料名を入力してください"),
+  amount: z.string().optional(),
+  note: z.string().optional(),
+});
+
+export const recipeStepSchema = z.object({
+  step: z.number().min(1),
+  description: z.string().min(1, "作り方を入力してください"),
+});
+
+export const recipeFormSchema = z.object({
+  name: z.string().min(1, "レシピ名を入力してください"),
+  image: z.string().optional(),
+  startStage: z
+    .enum(["初期", "中期", "後期", "完了期"])
+    .refine((val) => !!val, { message: "時期を選択してください" }),
+  category: z
+    .enum(["主食", "主菜", "副菜", "汁物", "おやつ"])
+    .refine((val) => !!val, { message: "カテゴリーを選択してください" }),
+  cookingTime: z.string().optional(),
+  servings: z.string().optional(),
+  description: z
+    .string()
+    .max(500, "説明は500文字以内で入力してください")
+    .optional(),
+  ingredients: z
+    .array(recipeIngredientSchema)
+    .min(1, "少なくとも1つの材料を入力してください"),
+  steps: z
+    .array(recipeStepSchema)
+    .min(1, "少なくとも1つの作り方を入力してください"),
+  tags: z.array(z.string()).optional(),
+  isPrivate: z.boolean().optional(),
+  savedMemo: z.string().optional(),
+});
+
+export type RecipeForm = z.infer<typeof recipeFormSchema>;
+
 // ユニオン型に対応するスキーマ
 export const seasonSchema = z.enum(["通年", "春", "夏", "秋", "冬"]);
 export const stageSchema = z.enum(["初期", "中期", "後期", "完了期"]);
-export const statusSchema = z.enum(["draft", "published"]);
 export const categorySchema = z.enum([
   "主食",
   "主菜",
@@ -120,7 +156,7 @@ export const ingredientListCardSchema = rpcIngredientListCardSchema.transform(
   (dbData) => ({
     ...ingredientSchema(dbData),
     isFavorite: dbData.is_favorite ?? false,
-  })
+  }),
 );
 export const ingredientDetailSchema = rpcIngredientDetailSchema.transform(
   (dbData) => ({
@@ -128,27 +164,27 @@ export const ingredientDetailSchema = rpcIngredientDetailSchema.transform(
     isFavorite: dbData.is_favorite ?? false,
     eaten: dbData.eaten ?? false,
     ng: dbData.ng ?? false,
-  })
+  }),
 );
 
 // ingredientsテーブルからのレスポンス全体（配列）のスキーマ
-export const ingredientsResponseSchema = z.array(dbIngredientCardSchema);
+// export const ingredientsResponseSchema = z.array(dbIngredientCardSchema);
 
 // スキーマからTypeScriptの型を推論
-export type SupabaseSeason = z.infer<typeof seasonSchema>;
-export type Ingredient = z.infer<typeof ingredientSchema>;
-export type IngredientNutrition = z.infer<typeof ingredientNutritionSchema>;
-export type IngredientStageInfo = z.infer<typeof ingredientStageInfoSchema>;
+// export type SupabaseSeason = z.infer<typeof seasonSchema>;
+// export type Ingredient = z.infer<typeof ingredientSchema>;
+// export type IngredientNutrition = z.infer<typeof ingredientNutritionSchema>;
+// export type IngredientStageInfo = z.infer<typeof ingredientStageInfoSchema>;
 
 // RecipeIngredient に対応するスキーマ
-export const recipeIngredientSchema = z.object({
+export const dbRecipeIngredientSchema = z.object({
   name: z.string(),
   amount: z.string(),
   note: z.string().nullable(),
 });
 
 // RecipeStep に対応するスキーマ
-export const recipeStepSchema = z.object({
+export const dbRecipeStepSchema = z.object({
   step: z.number(),
   description: z.string(),
 });
@@ -165,8 +201,8 @@ export const dbRecipeCardSchema = z.object({
   servings: z.string().nullable(),
   memo: z.string().nullable(),
   tags: z.array(z.string()),
-  ingredients: z.array(recipeIngredientSchema),
-  steps: z.array(recipeStepSchema),
+  ingredients: z.array(dbRecipeIngredientSchema),
+  steps: z.array(dbRecipeStepSchema),
   start_stage: stageSchema,
   // status: statusSchema,
   created_at: z.string(),
@@ -214,7 +250,7 @@ export const recipeListCardSchema = rpcRecipeListCardSchema.transform(
   (dbData) => ({
     ...recipeSchema(dbData),
     isFavorite: dbData.is_favorite ?? false,
-  })
+  }),
 );
 export const recipeDetailSchema = rpcRecipeDetailSchema.transform((dbData) => ({
   ...recipeSchema(dbData),
@@ -223,14 +259,9 @@ export const recipeDetailSchema = rpcRecipeDetailSchema.transform((dbData) => ({
   author: dbData.author,
 }));
 
-/**
- * フロントエンドのレシピデータをSupabaseのデータベースの形式に変換する
- * @param recipe - 変換するレシピデータ（IDを除く）
- * @returns Supabaseのrecipesテーブルに挿入可能なデータ
- */
 export function formatRecipeForSupabase(
   recipe: Omit<Recipe, "id">,
-  userId: string
+  userId: string,
 ) {
   // フロントエンドのcamelCaseキーをデータベースのsnake_caseキーにマッピング
   // ingredientsとstepsはJSONBカラムなので、JSON.stringifyで文字列に変換
@@ -247,7 +278,7 @@ export function formatRecipeForSupabase(
     memo: recipe.savedMemo,
     // status: recipe.status,
     ingredients: recipe.ingredients.map((ing) =>
-      JSON.parse(JSON.stringify(ing))
+      JSON.parse(JSON.stringify(ing)),
     ),
     steps: recipe.steps.map((step) => JSON.parse(JSON.stringify(step))),
     created_by: userId,

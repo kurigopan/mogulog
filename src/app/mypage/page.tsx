@@ -113,13 +113,13 @@ export default function MyPage() {
         name: childInfo.name,
         birthday: childInfo.birthday,
       });
-      await upsertChildAllergens(childId!, childInfo.allergens);
+      await upsertChildAllergens(childId!, childInfo.allergens, userId!);
       setIsEditingChild(false);
     } catch (error) {
       if (error instanceof Error) {
         console.error(
           "子どもの情報更新中にエラーが発生しました:",
-          error.message
+          error.message,
         );
         alert(error.message);
       }
@@ -143,7 +143,7 @@ export default function MyPage() {
       setChildInfo({
         ...childInfo,
         allergens: childInfo.allergens.filter(
-          (id: number) => id !== allergenId
+          (id: number) => id !== allergenId,
         ),
       });
     } else {
@@ -378,13 +378,15 @@ export default function MyPage() {
               </div>
               {/* アレルギー */}
               <div className="py-3">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-stone-600 font-medium">アレルギー</span>
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-stone-600 font-medium whitespace-nowrap mr-4">
+                    アレルギー
+                  </span>
                   {/* 既存アレルギー */}
                   {!isEditingChild &&
                     childInfo.allergens &&
                     childInfo.allergens.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap justify-end gap-2 flex-1">
                         {childInfo.allergens.map((allergenId: number) => (
                           <div
                             key={allergenId}

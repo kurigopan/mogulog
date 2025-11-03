@@ -18,7 +18,6 @@ export interface ingredientNutrition {
 export interface recipeStep {
   step: number;
   description: string;
-  image?: string;
 }
 
 export interface recipeIngredient {

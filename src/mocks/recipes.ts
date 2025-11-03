@@ -28,19 +28,16 @@ export const mockRecipes: Recipe[] = [
         step: 1,
         description:
           "にんじんとかぼちゃを月齢に適した大きさに切る。にんじんは皮を厚めに剥き、かぼちゃは種とワタを取り除きます。",
-        image: "https://placehold.co/600x400/E5E7EB/4B5563?text=Step+1",
       },
       {
         step: 2,
         description:
           "小鍋にだし汁を入れ、切った野菜を加えて弱火で煮込みます。野菜が柔らかくなるまで約10分煮込みます。",
-        image: "https://placehold.co/600x400/E5E7EB/4B5563?text=Step+2",
       },
       {
         step: 3,
         description:
           "野菜が柔らかくなったら、後期の場合は少量のしょうゆを加えます。中期までは味付けなしで自然の甘みを楽しみます。",
-        image: "",
       },
     ],
     tags: ["野菜", "煮物", "冷凍OK", "作り置きOK"],
@@ -71,17 +68,14 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "柔らかくなるまで蒸す。",
-        image: "",
       },
       {
         step: 2,
         description: "すりおろしたりんごを加える。",
-        image: "",
       },
       {
         step: 3,
         description: "ブレンダーで滑らかにする。",
-        image: "",
       },
     ],
     tags: ["野菜", "果物", "ペースト", "初期"],
@@ -113,17 +107,14 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "ひき肉と野菜、片栗粉を混ぜて丸める。",
-        image: "",
       },
       {
         step: 2,
         description: "沸騰したお湯で茹でる。",
-        image: "",
       },
       {
         step: 3,
         description: "食べやすい温度まで冷ます。",
-        image: "",
       },
     ],
     tags: ["肉", "ミートボール", "作り置きOK"],
@@ -154,12 +145,10 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "葉先まで柔らかく茹でる。",
-        image: "",
       },
       {
         step: 2,
         description: "水切りした豆腐とだし汁で和える。",
-        image: "",
       },
     ],
     tags: ["野菜", "豆腐", "中期", "後期"],
@@ -191,17 +180,14 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "細かく切ったささみを煮る。",
-        image: "",
       },
       {
         step: 2,
         description: "小さく切ったかぼちゃを煮る。",
-        image: "",
       },
       {
         step: 3,
         description: "軟飯と一緒に煮込む。",
-        image: "",
       },
     ],
     tags: ["主食", "肉", "煮物", "後期", "完了期"],
@@ -232,17 +218,14 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "小さく切る。",
-        image: "",
       },
       {
         step: 2,
         description: "柔らかくなるまで煮る。",
-        image: "",
       },
       {
         step: 3,
         description: "ペースト状にする。",
-        image: "",
       },
     ],
     tags: ["野菜", "スープ", "作り置きOK"],
@@ -273,12 +256,10 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "すべての果物をつぶす。",
-        image: "",
       },
       {
         step: 2,
         description: "ヨーグルトを和える。",
-        image: "",
       },
     ],
     tags: ["果物", "おやつ", "中期", "後期"],
@@ -309,12 +290,10 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "柔らかく茹でる。",
-        image: "",
       },
       {
         step: 2,
         description: "ツナと和えてペーストにする。",
-        image: "",
       },
     ],
     tags: ["野菜", "魚", "後期", "作り置きOK"],
@@ -346,12 +325,10 @@ export const mockRecipes: Recipe[] = [
       {
         step: 1,
         description: "ペースト状にして混ぜる。",
-        image: "",
       },
       {
         step: 2,
         description: "蒸し器で蒸す。",
-        image: "",
       },
     ],
     tags: ["おやつ", "野菜", "後期", "作り置きOK"],

@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { ZodFormattedError } from "zod";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-// import { FormControlLabel, Switch } from "@mui/material";
 import {
   AddIcon,
-  // InfoOutlineIcon,
   PhotoCameraIcon,
   ImageIcon,
   ScheduleIcon,
@@ -26,6 +25,8 @@ import {
   uploadImage,
 } from "@/lib/supabase";
 import { Allergen, Category, Recipe, Stage } from "@/types";
+import { recipeFormSchema } from "@/types/schemas";
+import type { RecipeForm } from "@/types/schemas";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
 const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];
@@ -45,7 +46,7 @@ export default function RecipeForm({
     servings: "",
     description: "",
     ingredients: [{ name: "", amount: "", note: "" }],
-    steps: [{ step: 1, description: "", image: "" }],
+    steps: [{ step: 1, description: "" }],
     tags: [],
     isPrivate: false,
     date: new Date(),
@@ -70,6 +71,8 @@ export default function RecipeForm({
     string[]
   >([]);
   const [image, setImage] = useState<File | null>(null);
+  const [formErrors, setFormErrors] =
+    useState<ZodFormattedError<RecipeForm> | null>(null);
   const userId = useAtomValue(userIdAtom);
 
   // 画像の変更処理
@@ -89,12 +92,12 @@ export default function RecipeForm({
         setImage(files[0]);
       }
     },
-    []
+    [],
   );
 
   // 入力フィールドの変更をハンドル
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -132,7 +135,7 @@ export default function RecipeForm({
   };
   const handleIngredientChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
+    index: number,
   ) => {
     const { name, value } = e.target;
     const newIngredients = [...formData.ingredients];
@@ -159,7 +162,6 @@ export default function RecipeForm({
             title: "",
             description: "",
             time: "",
-            image: "",
           },
         ],
       };
@@ -175,7 +177,7 @@ export default function RecipeForm({
   };
   const handleStepChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
+    index: number,
   ) => {
     const { name, value } = e.target;
     const newSteps = [...formData.steps];
@@ -230,7 +232,7 @@ export default function RecipeForm({
 
       // 材料にアレルゲン要素がまだ含まれているか確認
       let hasAllergenInIngredients = allIngredients.includes(
-        clickedAllergen.name
+        clickedAllergen.name,
       );
       if (clickedAllergen.variants) {
         clickedAllergen.variants.forEach((variant) => {
@@ -254,14 +256,14 @@ export default function RecipeForm({
       // 選択する場合（'OFF' -> 'ON'）
       // サジェストリストから該当のアレルゲンを削除
       setSuggestedAllergenNames((prev) =>
-        prev.filter((name) => name !== clickedAllergen.name)
+        prev.filter((name) => name !== clickedAllergen.name),
       );
     }
   };
 
   // 材料名の変更をチェックしてアレルゲンサジェストを更新
   const checkAndSuggestAllergens = (
-    ingredients: { name: string; amount: string; note?: string | null }[]
+    ingredients: { name: string; amount: string; note?: string | null }[],
   ) => {
     const allIngredients = ingredients.map((ing) => ing.name).join(" ");
     const newSuggestions: string[] = [];
@@ -280,10 +282,18 @@ export default function RecipeForm({
   // フォーム送信処理
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // setIsSaving(true);
+
+    const result = recipeFormSchema.safeParse(formData);
+    if (!result.success) {
+      setFormErrors(result.error.format());
+      return;
+    }
+    setFormErrors(null);
     setIsSaving(true);
+
     try {
       let recipeId;
-      let newRecipeData; // createRecipeの戻り値を受け取る変数
       let newImageUrl = formData.image; // 画像URLを保持する変数
 
       // imageファイルが存在する場合のみ、画像をアップロードする
@@ -296,31 +306,38 @@ export default function RecipeForm({
         await updateRecipe(
           initialData.id,
           { ...formData, image: newImageUrl },
-          userId!
+          userId!,
         );
         recipeId = initialData.id;
         setFormData((prev) => ({ ...prev, image: newImageUrl }));
+
+        // 選択されたアレルゲン情報を抽出
+        const selectedAllergenIds = Object.keys(allergenInclusions)
+          .filter((key) => allergenInclusions[parseInt(key, 10)])
+          .map((key) => parseInt(key, 10));
+        await deleteRecipeAllergens(recipeId);
+        if (selectedAllergenIds.length > 0) {
+          await createRecipeAllergens(recipeId, selectedAllergenIds, userId!);
+        }
       } else {
         // 新規作成モードの場合、レシピを作成
-        newRecipeData = await createRecipe(
+        recipeId = await createRecipe(
           { ...formData, image: newImageUrl },
-          userId!
+          userId!,
         );
-        recipeId = newRecipeData.id;
         setFormData((prev) => ({ ...prev, image: newImageUrl }));
+        // 選択されたアレルゲン情報を抽出
+        const selectedAllergenIds = Object.keys(allergenInclusions)
+          .filter((key) => allergenInclusions[parseInt(key, 10)])
+          .map((key) => parseInt(key, 10));
+        if (selectedAllergenIds.length > 0) {
+          await createRecipeAllergens(recipeId, selectedAllergenIds, userId!);
+        }
       }
-      // 選択されたアレルゲン情報を抽出
-      const selectedAllergenIds = Object.keys(allergenInclusions)
-        .filter((key) => allergenInclusions[parseInt(key, 10)])
-        .map((key) => parseInt(key, 10));
-      // 既存のアレルゲンデータを削除（編集モードの場合）
-      await deleteRecipeAllergens(recipeId);
-      // 新しいアレルゲンデータを登録
-      await createRecipeAllergens(recipeId, selectedAllergenIds, userId!);
 
       router.push(`/recipes/${recipeId}`);
-    } catch {
-      // TODO: エラーが発生したら更新をロールバックする処理を実装
+    } catch (error) {
+      console.error("保存中にエラーが発生:", error);
     } finally {
       setIsSaving(false);
     }
@@ -350,7 +367,7 @@ export default function RecipeForm({
         servings: rest.servings || "",
         description: rest.description || "",
         ingredients: rest.ingredients || [{ name: "", amount: "", note: "" }],
-        steps: rest.steps || [{ title: "", description: "", image: "" }],
+        steps: rest.steps || [{ title: "", description: "" }],
         tags: rest.tags || [],
         isPrivate: rest.isPrivate || false,
         date: new Date(),
@@ -369,48 +386,52 @@ export default function RecipeForm({
   useEffect(() => {
     inputRef.current?.focus();
     const fetchAllergens = async () => {
-      if (allergens.length === 0) {
-        const data = await getAllergens();
-        if (data) {
-          setAllergens(data);
+      try {
+        if (allergens.length === 0) {
+          const data = await getAllergens();
+          if (data) {
+            setAllergens(data);
 
-          // マップを作成
-          const newMap = new Map<string, string>();
-          data.forEach((allergen) => {
-            // 同義語をキー、アレルゲン名を値として保存
-            if (allergen.variants) {
-              allergen.variants.forEach((variant: string) => {
-                newMap.set(variant, allergen.name);
-              });
-            }
-          });
-          allergenMap.current = newMap;
-
-          // レシピIDがすでに存在する場合、そのレシピに紐づくアレルゲンも取得
-          if (isEditMode && initialData?.id) {
-            const selectedAllergenIds = await getRecipeAllergensById(
-              initialData.id
-            );
-            if (selectedAllergenIds) {
-              const initialAllergenState: Record<string, boolean> = {};
-              data.forEach((allergen) => {
-                initialAllergenState[allergen.id] =
-                  selectedAllergenIds.includes(allergen.id);
-              });
-              setAllergenInclusions(initialAllergenState);
-            }
-          } else {
-            // 新規作成モードの場合、全てのアレルゲンをfalseで初期化
-            const initialInclusions: Record<string, boolean> = {};
+            // マップを作成
+            const newMap = new Map<string, string>();
             data.forEach((allergen) => {
-              initialInclusions[allergen.id] = false;
+              // 同義語をキー、アレルゲン名を値として保存
+              if (allergen.variants) {
+                allergen.variants.forEach((variant: string) => {
+                  newMap.set(variant, allergen.name);
+                });
+              }
             });
-            setAllergenInclusions(initialInclusions);
+            allergenMap.current = newMap;
+
+            // レシピIDがすでに存在する場合、そのレシピに紐づくアレルゲンも取得
+            if (isEditMode && initialData?.id) {
+              const selectedAllergenIds = await getRecipeAllergensById(
+                initialData.id,
+              );
+              if (selectedAllergenIds) {
+                const initialAllergenState: Record<string, boolean> = {};
+                data.forEach((allergen) => {
+                  initialAllergenState[allergen.id] =
+                    selectedAllergenIds.includes(allergen.id);
+                });
+                setAllergenInclusions(initialAllergenState);
+              }
+            } else {
+              // 新規作成モードの場合、全てのアレルゲンをfalseで初期化
+              const initialInclusions: Record<string, boolean> = {};
+              data.forEach((allergen) => {
+                initialInclusions[allergen.id] = false;
+              });
+              setAllergenInclusions(initialInclusions);
+            }
           }
         }
+      } catch (error) {
+        console.error("アレルゲン取得中にエラー:", error);
       }
     };
-    fetchAllergens();
+    fetchAllergens().catch((e) => console.error(e));
   }, [allergens, isEditMode, initialData]);
 
   // 材料の変更をチェックしてサジェストを更新するuseEffect
@@ -464,15 +485,24 @@ export default function RecipeForm({
 
           <div className="space-y-4 mt-6">
             {/* レシピ名 */}
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="にんじんとかぼちゃの煮物"
-              className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all font-medium text-lg"
-              required
-            />
+            <div className="space-y-2 mb-6">
+              <h2 className="text-sm font-medium text-stone-600 mb-2">
+                レシピ名
+              </h2>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="にんじんとかぼちゃの煮物"
+                className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all font-medium text-lg"
+              />
+              {formErrors?.name?._errors && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formErrors.name._errors[0]}
+                </p>
+              )}
+            </div>
 
             {/* 離乳食段階選択 */}
             <div className="space-y-2 mb-6">
@@ -555,6 +585,11 @@ export default function RecipeForm({
               rows={4}
               className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
             />
+            {formErrors?.description?._errors && (
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.description._errors[0]}
+              </p>
+            )}
 
             {/* TODO:非公開設定 */}
             {/* <div className="flex items-center">
@@ -644,6 +679,11 @@ export default function RecipeForm({
                       className="w-24 bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     />
                   </div>
+                  {formErrors?.ingredients?.[index]?.name?._errors && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {formErrors.ingredients[index].name._errors[0]}
+                    </p>
+                  )}
                   <div className="flex justify-between mb-4">
                     <input
                       type="text"
@@ -657,6 +697,11 @@ export default function RecipeForm({
                 </div>
               </div>
             ))}
+            {formErrors?.ingredients?._errors && (
+              <p className="text-red-500 text-sm">
+                {formErrors.ingredients._errors[0]}
+              </p>
+            )}
           </div>
         </section>
 
@@ -703,8 +748,18 @@ export default function RecipeForm({
                   rows={3}
                   className="w-full bg-stone-50 rounded-2xl p-3 border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all resize-none"
                 />
+                {formErrors?.steps?.[index]?.description?._errors && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.steps[index].description._errors[0]}
+                  </p>
+                )}
               </div>
             ))}
+            {formErrors?.steps?._errors && (
+              <p className="text-red-500 text-sm">
+                {formErrors.steps._errors[0]}
+              </p>
+            )}
           </div>
         </section>
 

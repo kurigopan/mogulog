@@ -61,7 +61,7 @@ export async function getRecipeAllergensById(recipeId: number) {
 export async function createChildAllergens(
   formData: { allergens: number[] },
   childId: number,
-  userId: string // supabase.auth.signUp 後の user.id
+  userId: string, // supabase.auth.signUp 後の user.id
 ) {
   const allergenData: Omit<ChildAllergens, "id">[] = formData.allergens.map(
     (allergenId) => ({
@@ -69,7 +69,7 @@ export async function createChildAllergens(
       allergen_id: allergenId,
       created_by: userId,
       updated_by: userId,
-    })
+    }),
   );
 
   const { data, error } = await supabase
@@ -88,7 +88,7 @@ export async function createChildAllergens(
 export async function createRecipeAllergens(
   recipeId: number,
   allergenIds: number[],
-  userId: string
+  userId: string,
 ) {
   // 挿入するデータの配列を生成
   const dataToInsert = allergenIds.map((allergenId) => ({
@@ -119,7 +119,8 @@ export async function createRecipeAllergens(
 
 export async function upsertChildAllergens(
   childId: number,
-  allergenIds: number[]
+  allergenIds: number[],
+  userId: string,
 ) {
   // 1. 既存のアレルギー情報を削除
   const { error: deleteError } = await supabase
@@ -135,6 +136,8 @@ export async function upsertChildAllergens(
   const newAllergens = allergenIds.map((allergenId) => ({
     child_id: childId,
     allergen_id: allergenId,
+    created_by: userId,
+    updated_by: userId,
   }));
 
   // 3. 新しい情報を挿入

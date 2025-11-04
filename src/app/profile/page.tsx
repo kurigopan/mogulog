@@ -16,8 +16,8 @@ import {
   uploadAvatar,
 } from "@/lib/supabase";
 import { Allergen, FormData } from "@/types";
-import { step1Schema, step2Schema } from "@/types/schemas";
-import type { ProfileForm } from "@/types/schemas";
+import { parentSchema, childCreateSchema } from "@/types/schemas";
+import type { ParentForm, ChildCreateForm } from "@/types/schemas";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -39,8 +39,10 @@ export default function ProfilePage() {
   const [avatar, setAvatar] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [today, setToday] = useState("");
-  const [formErrors, setFormErrors] =
-    useState<ZodFormattedError<ProfileForm> | null>(null);
+  const [parentFormErrors, setParentFormErrors] =
+    useState<ZodFormattedError<ParentForm> | null>(null);
+  const [childFormErrors, setChildFormErrors] =
+    useState<ZodFormattedError<ChildCreateForm> | null>(null);
   const [errors, setErrors] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,13 +80,13 @@ export default function ProfilePage() {
 
   const handleNext = () => {
     setIsLoading(true);
-    const result = step1Schema.safeParse(formData);
+    const result = parentSchema.safeParse(formData);
     if (!result.success) {
-      setFormErrors(result.error.format());
+      setParentFormErrors(result.error.format());
       setIsLoading(false);
       return;
     }
-    setFormErrors(null);
+    setParentFormErrors(null);
     setStep(2);
   };
 
@@ -92,13 +94,13 @@ export default function ProfilePage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = step2Schema.safeParse(formData);
+    const result = childCreateSchema.safeParse(formData);
     if (!result.success) {
-      setFormErrors(result.error.format());
+      setChildFormErrors(result.error.format());
       setIsLoading(false);
       return;
     }
-    setFormErrors(null);
+    setChildFormErrors(null);
 
     // 選択されたアレルゲン情報を抽出
     const selectedAllergenIds = Object.keys(allergenExclusions)
@@ -194,9 +196,9 @@ export default function ProfilePage() {
               onChange={handleChange}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {formErrors?.name?._errors && (
+            {parentFormErrors?.name?._errors && (
               <p className="mt-2 text-sm text-red-500">
-                {formErrors.name._errors[0]}
+                {parentFormErrors.name._errors[0]}
               </p>
             )}
           </div>
@@ -256,9 +258,9 @@ export default function ProfilePage() {
               onChange={handleChange}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {formErrors?.childName?._errors && (
+            {childFormErrors?.childName?._errors?.[0] && (
               <p className="mt-2 text-sm text-red-500">
-                {formErrors.childName._errors[0]}
+                {childFormErrors.childName._errors[0]}
               </p>
             )}
           </div>
@@ -274,9 +276,9 @@ export default function ProfilePage() {
               onChange={handleChange}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {formErrors?.childBirthday?._errors && (
+            {childFormErrors?.childBirthday?._errors?.[0] && (
               <p className="mt-2 text-sm text-red-500">
-                {formErrors.childBirthday._errors[0]}
+                {childFormErrors.childBirthday._errors[0]}
               </p>
             )}
           </div>

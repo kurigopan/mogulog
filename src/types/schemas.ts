@@ -9,28 +9,37 @@ export const registerSchema = z.object({
     .min(6, { message: "パスワードは6文字以上で設定してください" }),
 });
 
-export const step1Schema = z.object({
+export const parentSchema = z.object({
   name: z
     .string()
     .min(2, { message: "ユーザー名は２文字以上で設定してください" }),
   avatar_url: z.url().nullable(),
 });
 
-export const step2Schema = z.object({
+export const childCreateSchema = z.object({
   childName: z
     .string()
     .min(2, { message: "お子様の名前は２文字以上で設定してください" }),
   childBirthday: z.string().min(1, { message: "誕生日を入力してください" }),
-  allergens: z.array(z.string()),
+  allergens: z.array(z.number()),
 });
 
-export const profileSchema = step1Schema.extend(step2Schema.shape);
-export type ProfileForm = z.infer<typeof profileSchema>;
+export const childUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "お子様の名前は２文字以上で設定してください" }),
+  birthday: z.string().min(1, { message: "誕生日を入力してください" }),
+  allergens: z.array(z.number()),
+});
+
+export type ParentForm = z.infer<typeof parentSchema>;
+export type ChildCreateForm = z.infer<typeof childCreateSchema>;
+export type ChildUpdateForm = z.infer<typeof childUpdateSchema>;
 
 export const recipeIngredientSchema = z.object({
   name: z.string().min(1, "材料名を入力してください"),
   amount: z.string().optional(),
-  note: z.string().optional(),
+  note: z.string().nullable(),
 });
 
 export const recipeStepSchema = z.object({
@@ -179,19 +188,6 @@ export const ingredientDetailSchema = rpcIngredientDetailSchema.transform(
 // export type IngredientNutrition = z.infer<typeof ingredientNutritionSchema>;
 // export type IngredientStageInfo = z.infer<typeof ingredientStageInfoSchema>;
 
-// RecipeIngredient に対応するスキーマ
-export const dbRecipeIngredientSchema = z.object({
-  name: z.string(),
-  amount: z.string(),
-  note: z.string().nullable(),
-});
-
-// RecipeStep に対応するスキーマ
-export const dbRecipeStepSchema = z.object({
-  step: z.number(),
-  description: z.string(),
-});
-
 // 1.データベースから直接取得するレシピデータのスキーマを定義
 export const dbRecipeCardSchema = z.object({
   id: z.number(),
@@ -204,10 +200,9 @@ export const dbRecipeCardSchema = z.object({
   servings: z.string().nullable(),
   memo: z.string().nullable(),
   tags: z.array(z.string()),
-  ingredients: z.array(dbRecipeIngredientSchema),
-  steps: z.array(dbRecipeStepSchema),
+  ingredients: z.array(recipeIngredientSchema),
+  steps: z.array(recipeStepSchema),
   start_stage: stageSchema,
-  // status: statusSchema,
   created_at: z.string(),
   created_by: z.string(),
   updated_at: z.string(),

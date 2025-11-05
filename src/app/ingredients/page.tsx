@@ -294,7 +294,7 @@ export default function IngredientsList() {
                       >
                         <div className="flex items-center">
                           {/* 食材名 */}
-                          <div className="flex-1 min-w-0 px-3">
+                          <div className="flex-1 min-w-0">
                             <Link
                               href={`/ingredients/${ingredient.id}`}
                               className="group"
@@ -306,7 +306,7 @@ export default function IngredientsList() {
                           </div>
 
                           {/* 離乳食段階 */}
-                          <div className="w-32 text-center px-2 mr-6">
+                          <div className="w-32 text-center px-2 mr-4">
                             <div className="flex justify-center items-center space-x-1">
                               {stageDisplay.map(({ stage, isActive }) => (
                                 <span

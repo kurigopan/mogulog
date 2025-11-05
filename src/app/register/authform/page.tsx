@@ -1,19 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ZodFormattedError } from "zod";
 import { VisibilityIcon, VisibilityOffIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/utils/atoms";
 import { login, signup } from "@/lib/supabase";
-import { registerSchema } from "@/types/schemas";
-import { User } from "@/types";
-
-type ValidationErrors = {
-  [key: string]: string[];
-};
+import { registerSchema } from "@/types";
+import type { RegisterForm, User } from "@/types";
 
 export default function AuthForm() {
   const router = useRouter();
@@ -22,7 +19,9 @@ export default function AuthForm() {
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState<ValidationErrors | null>(null);
+  const [errors, setErrors] = useState<ZodFormattedError<RegisterForm> | null>(
+    null,
+  );
   const [showPassword, setShowPassword] = useState(false);
   // TODO: 新規登録の際に、メール認証を追加
   // const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
@@ -34,18 +33,19 @@ export default function AuthForm() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const result = registerSchema.safeParse(userData);
     if (!result.success) {
-      setErrors(result.error.flatten().fieldErrors);
+      setErrors(result.error.format());
+      setIsLoading(false);
       return;
     }
     setErrors(null);
-    setIsLoading(true);
 
     const { error: signupError } = await signup(
       userData.email,
-      userData.password
+      userData.password,
     );
 
     if (signupError) {
@@ -58,18 +58,19 @@ export default function AuthForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const result = registerSchema.safeParse(userData);
     if (!result.success) {
-      setErrors(result.error.flatten().fieldErrors);
+      setErrors(result.error.format());
+      setIsLoading(false);
       return;
     }
     setErrors(null);
-    setIsLoading(true);
 
     const { error: loginError } = await login(
       userData.email,
-      userData.password
+      userData.password,
     );
     if (loginError) {
       console.error("ログインに失敗しました:", loginError.message);
@@ -96,9 +97,9 @@ export default function AuthForm() {
               </p>
             </div>
           ) : ()} */}
-      {errors?.general && (
+      {errors?._errors && (
         <div className="text-red-500 text-sm text-center mb-4">
-          {errors.general[0]}
+          {errors._errors[0]}
         </div>
       )}
       <div className="space-y-6">
@@ -137,12 +138,14 @@ export default function AuthForm() {
               {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
             </button>
           </div>
-          {errors?.password && (
-            <p className="mt-2 text-sm text-red-500">{errors.password[0]}</p>
+          {errors?.password?._errors[0] && (
+            <p className="mt-2 text-sm text-red-500">
+              {errors.password._errors[0]}
+            </p>
           )}
           <Link
             href="/register/forgetPassword"
-            className="flex items-center justify-center block text-sm font-medium text-stone-600"
+            className="flex items-center justify-center text-sm font-medium text-stone-600"
           >
             パスワードを忘れた方はこちら
           </Link>

@@ -1,13 +1,18 @@
 import { z } from "zod";
-import { Recipe, Season, ingredientNutrition } from "@/types";
 import { convertUtcToJst } from "@/lib/utils";
+import type { Recipe, Season, ingredientNutrition } from "@/types";
 
-export const registerSchema = z.object({
-  email: z.email({ message: "有効なメールアドレスを入力してください" }),
+export const emailSchema = z.object({
+  email: z.email({
+    message: "有効なメールアドレスを入力してください",
+  }),
+});
+export const passwordSchema = z.object({
   password: z
     .string()
     .min(6, { message: "パスワードは6文字以上で設定してください" }),
 });
+export const registerSchema = emailSchema.and(passwordSchema);
 
 export const parentSchema = z.object({
   name: z
@@ -32,6 +37,9 @@ export const childUpdateSchema = z.object({
   allergens: z.array(z.number()),
 });
 
+export type EmailForm = z.infer<typeof emailSchema>;
+export type PasswordForm = z.infer<typeof passwordSchema>;
+export type RegisterForm = z.infer<typeof registerSchema>;
 export type ParentForm = z.infer<typeof parentSchema>;
 export type ChildCreateForm = z.infer<typeof childCreateSchema>;
 export type ChildUpdateForm = z.infer<typeof childUpdateSchema>;

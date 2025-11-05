@@ -1,32 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { ZodFormattedError } from "zod";
 import { MailOutlineIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/utils/atoms";
 import { resetPassword } from "@/lib/supabase";
 import Link from "next/link";
-
-type ValidationErrors = {
-  [key: string]: string[];
-};
+import { emailSchema } from "@/types";
+import type { EmailForm } from "@/types";
 
 export default function ForgetPassword() {
   const setIsLoading = useSetAtom(loadingAtom);
-  const [errors, setErrors] = useState<ValidationErrors | null>(null);
+  const [errors, setErrors] = useState<ZodFormattedError<EmailForm> | null>(
+    null,
+  );
   const [email, setEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setErrors({ email: ["正しいメールアドレスを入力してください"] });
+    const result = emailSchema.safeParse({ email: email });
+    if (!result.success) {
+      setErrors(result.error.format());
+      setIsLoading(false);
       return;
     }
     setErrors(null);
-    setIsLoading(true);
     await resetPassword(email);
     setIsLoading(false);
     setIsSuccess(true);
@@ -42,11 +45,6 @@ export default function ForgetPassword() {
           <MailOutlineIcon className="text-violet-500 text-3xl" />
         </div>
       </div>
-      {errors?.general && (
-        <div className="text-red-500 text-sm text-center mb-4">
-          {errors.general[0]}
-        </div>
-      )}
       {isSuccess ? (
         <div className="text-center p-6 space-y-4">
           <h3 className="text-xl font-bold text-stone-700">
@@ -59,7 +57,7 @@ export default function ForgetPassword() {
           </p>
         </div>
       ) : (
-        <form onSubmit={handleSendEmail} className="space-y-6">
+        <form onSubmit={handleSendEmail} className="space-y-6" noValidate>
           <div>
             <label className="block text-sm font-medium text-stone-600 mb-2">
               登録メールアドレス
@@ -70,8 +68,10 @@ export default function ForgetPassword() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-4 rounded-2xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
             />
-            {errors?.email && (
-              <p className="mt-2 text-sm text-red-500">{errors.email[0]}</p>
+            {errors?.email?._errors && (
+              <p className="mt-2 text-sm text-red-500">
+                {errors.email._errors[0]}
+              </p>
             )}
           </div>
           <button
@@ -82,7 +82,7 @@ export default function ForgetPassword() {
           </button>
           <Link
             href="/register/authform"
-            className="flex items-center justify-center block text-sm font-medium text-stone-600"
+            className="flex items-center justify-center text-sm font-medium text-stone-600"
           >
             ログイン・新規登録する方はこちら
           </Link>

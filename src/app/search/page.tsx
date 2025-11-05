@@ -53,7 +53,7 @@ export default function SearchResults() {
       setIsLoading(true);
 
       const excludedAllergenIds = Object.keys(allergenExclusions)
-        .filter((id) => allergenExclusions[id] === true)
+        .filter((id) => allergenExclusions[id])
         .map(Number);
 
       let ingredientsData: ListCardItem[] | null;
@@ -111,7 +111,9 @@ export default function SearchResults() {
   // 初回ロードでアレルゲン一覧を取得、かつ atom 側に初期除外マップがない場合はセット
   useEffect(() => {
     inputRef.current?.focus();
-    const fetchAllergens = async () => {
+    setIsLoading(true);
+
+    (async () => {
       if (allergens.length === 0) {
         const data = await getAllergens();
         if (data) {
@@ -132,9 +134,9 @@ export default function SearchResults() {
           }
         }
       }
-    };
-    fetchAllergens();
-  }, []);
+    })();
+    setIsLoading(false);
+  });
 
   return (
     <>

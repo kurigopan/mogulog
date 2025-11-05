@@ -21,11 +21,10 @@ export default function CreatedRecipes() {
   useEffect(() => {
     if (userId) {
       setIsLoading(true);
-      const fetchRecipes = async () => {
+      (async () => {
         const recipes = await getRecipesCreatedByUser(userId);
         setCreatedRecipes(recipes);
-      };
-      fetchRecipes();
+      })();
       setIsLoading(false);
     } else {
       router.push("/");

@@ -37,7 +37,7 @@ export const childIdAtom = atom<number | null>(null);
 //  お気に入り操作の変更を通知する
 export const favoriteUpdateAtom = atom<FavoriteUpdate>(null);
 
-// 食材一覧ページのフィルターを維持する
+// 食べたよ記録ページのフィルターを維持する
 export const filterCategoryAtom = atom<string>("all");
 export const filterStageAtom = atom<string>("all");
 export const filterStatusAtom = atom<string>("all");

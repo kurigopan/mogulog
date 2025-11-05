@@ -65,7 +65,7 @@ export default function IngredientsFilter({
 
     if (selectedCategory !== "all") {
       const label = categories.find(
-        (cat) => cat.value === selectedCategory
+        (cat) => cat.value === selectedCategory,
       )?.label;
       if (label) {
         tags.push({
@@ -78,7 +78,7 @@ export default function IngredientsFilter({
 
     if (selectedStageFilter !== "all") {
       const label = stageFilters.find(
-        (stage) => stage.value === selectedStageFilter
+        (stage) => stage.value === selectedStageFilter,
       )?.label;
       if (label) {
         tags.push({
@@ -91,7 +91,7 @@ export default function IngredientsFilter({
 
     if (selectedStatusFilter !== "all") {
       const label = statusFilters.find(
-        (status) => status.value === selectedStatusFilter
+        (status) => status.value === selectedStatusFilter,
       )?.label;
       if (label) {
         tags.push({
@@ -112,7 +112,18 @@ export default function IngredientsFilter({
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col mb-2">
+        {/* フィルターボタン */}
+        <div className="flex gap-2 justify-end mb-2">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2 w-42 h-11 px-4 py-2 bg-white border border-stone-200 rounded-full shadow-sm hover:shadow-md transition-all"
+          >
+            <FilterListIcon />
+            <span className="text-sm font-medium">フィルター</span>
+            {showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </button>
+        </div>
         {/* 選択中のタグ表示エリア */}
         {activeFilterTags && (
           <div className="flex flex-wrap gap-3 mr-4">
@@ -123,8 +134,8 @@ export default function IngredientsFilter({
                   tag.type === "category"
                     ? "bg-violet-100"
                     : tag.type === "stage"
-                    ? "bg-amber-100"
-                    : "bg-blue-100"
+                      ? "bg-amber-100"
+                      : "bg-blue-100"
                 }`}
               >
                 {tag.label}
@@ -138,8 +149,8 @@ export default function IngredientsFilter({
                       tag.type === "category"
                         ? "text-violet-600"
                         : tag.type === "stage"
-                        ? "text-amber-600"
-                        : "text-blue-600"
+                          ? "text-amber-600"
+                          : "text-blue-600"
                     }`}
                   />
                 </button>
@@ -147,17 +158,6 @@ export default function IngredientsFilter({
             ))}
           </div>
         )}
-        {/* フィルターボタン */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-stone-200 rounded-full shadow-sm hover:shadow-md transition-all"
-          >
-            <FilterListIcon />
-            <span className="text-sm font-medium">フィルター</span>
-            {showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </button>
-        </div>
       </div>
 
       {/* フィルター */}

@@ -22,7 +22,7 @@ export default function Footer({ pageName }: HeaderProps) {
       label: "お気に入り",
       requiresAuth: true,
     },
-    { href: "/ingredients", icon: <ListIcon />, label: "食材リスト" },
+    { href: "/ingredients", icon: <ListIcon />, label: "食べたよ記録" },
     {
       href: "/mypage",
       icon: <PersonIcon />,
@@ -33,7 +33,7 @@ export default function Footer({ pageName }: HeaderProps) {
 
   const handleClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    requiresAuth: boolean
+    requiresAuth: boolean,
   ) => {
     if (requiresAuth && !userId) {
       e.preventDefault();

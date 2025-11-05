@@ -46,7 +46,7 @@ export type ChildUpdateForm = z.infer<typeof childUpdateSchema>;
 
 export const recipeIngredientSchema = z.object({
   name: z.string().min(1, "材料名を入力してください"),
-  amount: z.string().optional(),
+  amount: z.string().min(1, "分量を入力してください"),
   note: z.string().nullable(),
 });
 

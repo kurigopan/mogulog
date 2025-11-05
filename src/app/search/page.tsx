@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ExpandLessIcon,
   ExpandMoreIcon,
@@ -23,7 +23,7 @@ import {
   searchIngredientsWithAllergens,
   searchRecipesWithAllergens,
 } from "@/lib/supabase";
-import { Allergen, ListCardItem } from "@/types";
+import type { Allergen, ListCardItem } from "@/types";
 
 export default function SearchResults() {
   usePreserveSearchState();
@@ -56,8 +56,8 @@ export default function SearchResults() {
         .filter((id) => allergenExclusions[id] === true)
         .map(Number);
 
-      let ingredientsData: ListCardItem[] | null = [];
-      let recipesData: ListCardItem[] | null = [];
+      let ingredientsData: ListCardItem[] | null;
+      let recipesData: ListCardItem[] | null;
 
       if (userId) {
         [ingredientsData, recipesData] = await Promise.all([
@@ -65,7 +65,7 @@ export default function SearchResults() {
             currentQuery,
             excludedAllergenIds,
             userId,
-            childId
+            childId,
           ),
           searchRecipesWithAllergens(currentQuery, excludedAllergenIds, userId),
         ]);
@@ -75,7 +75,7 @@ export default function SearchResults() {
             currentQuery,
             excludedAllergenIds,
             null,
-            null
+            null,
           ),
           searchRecipesWithAllergens(currentQuery, excludedAllergenIds, null),
         ]);

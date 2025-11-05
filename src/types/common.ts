@@ -1,5 +1,5 @@
-import { Profile, Child } from "@/types/db";
-import { ListCardItem } from "@/types/ui";
+import { Profile, Child } from "@/types";
+import { ListCardItem } from "@/types";
 
 export interface User {
   id?: string;

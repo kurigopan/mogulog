@@ -30,7 +30,7 @@ import {
   userIdAtom,
 } from "@/lib/utils/atoms";
 import { getAgeStageDisplay } from "@/lib/utils";
-import { Ingredient } from "@/types";
+import type { Ingredient } from "@/types";
 
 export default function IngredientsList() {
   const setIsLoading = useSetAtom(loadingAtom);
@@ -65,7 +65,7 @@ export default function IngredientsList() {
           eaten: newEatenStatus,
           ng: newEatenStatus ? false : ing.ng,
         };
-      })
+      }),
     );
     // 3. **DB操作を実行**
     try {
@@ -88,7 +88,7 @@ export default function IngredientsList() {
             eaten: originalEatenStatus,
             ng: originalNgStatus,
           };
-        })
+        }),
       );
     }
   };
@@ -111,7 +111,7 @@ export default function IngredientsList() {
           eaten: newNgStatus ? false : ing.eaten,
           ng: newNgStatus,
         };
-      })
+      }),
     );
     // 3. **DB操作を実行**
     try {
@@ -133,7 +133,7 @@ export default function IngredientsList() {
             eaten: originalEatenStatus,
             ng: originalNgStatus,
           };
-        })
+        }),
       );
     }
   };
@@ -247,7 +247,7 @@ export default function IngredientsList() {
                 <div className="divide-y divide-stone-100">
                   {filteredIngredients.map((ingredient) => {
                     const stageDisplay = getAgeStageDisplay(
-                      ingredient.stageInfo
+                      ingredient.stageInfo,
                     );
                     return (
                       <div

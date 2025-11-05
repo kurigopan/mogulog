@@ -17,7 +17,7 @@ import {
   getRecipeAllergens,
   getRecipeById,
 } from "@/lib/supabase";
-import { Allergen, Recipe } from "@/types";
+import type { Allergen, Recipe } from "@/types";
 
 export default function RecipeDetail({
   params,
@@ -42,7 +42,7 @@ export default function RecipeDetail({
     if (!recipe) return;
 
     const confirmDelete = window.confirm(
-      "本当にこのレシピを削除しますか？この操作は元に戻せません。"
+      "本当にこのレシピを削除しますか？この操作は元に戻せません。",
     );
     if (!confirmDelete) return;
 

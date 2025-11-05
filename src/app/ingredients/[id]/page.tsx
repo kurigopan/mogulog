@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import React, { use, useState, useEffect } from "react";
 import Image from "next/image";
 import { Tabs, Tab, Box } from "@mui/material";
 import Header from "@/components/layout/Header";
@@ -14,7 +14,7 @@ import { useAtomValue } from "jotai";
 import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/utils/atoms";
 import { getIngredientById, searchRecipesByIngredient } from "@/lib/supabase";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
-import { CardItem, Ingredient } from "@/types";
+import type { CardItem, Ingredient } from "@/types";
 
 export default function IngredientDetail({
   params,
@@ -43,7 +43,7 @@ export default function IngredientDetail({
           const recipeData = await searchRecipesByIngredient(
             userId,
             ingredientData.name,
-            childInfo.ageStage
+            childInfo.ageStage,
           );
           if (recipeData) {
             setRelatedRecipes(recipeData);
@@ -56,7 +56,7 @@ export default function IngredientDetail({
           const recipeData = await searchRecipesByIngredient(
             null,
             ingredientData.name,
-            ""
+            "",
           );
           if (recipeData) {
             setRelatedRecipes(recipeData);

@@ -15,9 +15,8 @@ import {
   getAllergens,
   uploadAvatar,
 } from "@/lib/supabase";
-import { Allergen, FormData } from "@/types";
-import { parentSchema, childCreateSchema } from "@/types/schemas";
-import type { ParentForm, ChildCreateForm } from "@/types/schemas";
+import { parentSchema, childCreateSchema } from "@/types";
+import type { Allergen, FormData, ParentForm, ChildCreateForm } from "@/types";
 
 export default function ProfilePage() {
   const router = useRouter();

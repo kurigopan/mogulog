@@ -8,8 +8,8 @@ import {
   recipeListCardSchema,
   rpcRecipeDetailSchema,
   rpcRecipeListCardSchema,
-} from "@/types/schemas";
-import { Recipe } from "@/types";
+} from "@/types";
+import type { Recipe } from "@/types";
 
 // アレルゲンを除外したレシピ検索
 export async function searchRecipesWithAllergens(

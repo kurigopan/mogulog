@@ -11,7 +11,7 @@ import {
   userIdAtom,
 } from "@/lib/utils/atoms";
 import { getRecipeById } from "@/lib/supabase";
-import { Recipe } from "@/types";
+import type { Recipe } from "@/types";
 
 export default function RecipeEditPage({
   params,

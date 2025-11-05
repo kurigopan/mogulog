@@ -33,8 +33,8 @@ import {
   uploadAvatar,
   upsertChildAllergens,
 } from "@/lib/supabase";
-import { parentSchema, childUpdateSchema } from "@/types/schemas";
-import type { ParentForm, ChildUpdateForm } from "@/types/schemas";
+import { parentSchema, childUpdateSchema } from "@/types";
+import type { ParentForm, ChildUpdateForm } from "@/types";
 
 export default function MyPage() {
   const router = useRouter();

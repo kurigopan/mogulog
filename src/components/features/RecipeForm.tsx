@@ -24,9 +24,8 @@ import {
   updateRecipe,
   uploadImage,
 } from "@/lib/supabase";
-import { Allergen, Category, Recipe, Stage } from "@/types";
-import { recipeFormSchema } from "@/types/schemas";
-import type { RecipeForm } from "@/types/schemas";
+import { recipeFormSchema } from "@/types";
+import type { Allergen, Category, Recipe, Stage, RecipeForm } from "@/types";
 
 const stageValues: Stage[] = ["初期", "中期", "後期", "完了期"];
 const categoryValues: Category[] = ["主食", "主菜", "副菜", "汁物", "おやつ"];
@@ -442,7 +441,7 @@ export default function RecipeForm({
 
   return (
     <div className="p-4 space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         {/* レシピ基本情報 */}
         <section className="bg-white rounded-3xl p-6 shadow-sm">
           {/* 画像プレビュー */}

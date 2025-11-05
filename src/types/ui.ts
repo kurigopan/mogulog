@@ -1,4 +1,5 @@
-import { Category, Stage, Type } from "@/types/common";
+import React from "react";
+import { Category, Stage, Type } from "@/types";
 
 export interface CardItem {
   id: number;

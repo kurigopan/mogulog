@@ -10,7 +10,7 @@ import RemoveButton from "@/components/ui/RemoveButton";
 import { useSetAtom } from "jotai";
 import { loadingAtom } from "@/lib/utils/atoms";
 import { getBrowsingHistory } from "@/lib/utils/localstorage";
-import { ListCardItem } from "@/types";
+import type { ListCardItem } from "@/types";
 
 export default function BrowsingHistoryPage() {
   const setIsLoading = useSetAtom(loadingAtom);
@@ -45,7 +45,7 @@ export default function BrowsingHistoryPage() {
               こちらに履歴として記録されます。
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center px-6 py-3 bg-violet-500 text-white rounded-2xl hover:bg-violet-600 transition-colors font-medium"
             >
               ホームに戻る

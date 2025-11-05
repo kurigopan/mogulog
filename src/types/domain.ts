@@ -1,4 +1,4 @@
-import { ListCardItem } from "@/types/ui";
+import { ListCardItem } from "@/types";
 
 export interface ingredientStageInfo {
   stage: string;

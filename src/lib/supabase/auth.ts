@@ -26,9 +26,12 @@ export async function logout() {
 }
 
 export async function updateEmail(newEmail: string) {
-  const { error } = await supabase.auth.updateUser({
-    email: newEmail,
-  });
+  const { error } = await supabase.auth.updateUser(
+    {
+      email: newEmail,
+    },
+    { emailRedirectTo: `${location.origin}/register/authform` },
+  );
 
   if (error) {
     console.error("メールアドレスの更新に失敗しました:", error.message);
@@ -38,7 +41,7 @@ export async function updateEmail(newEmail: string) {
 
 export async function resetPassword(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${location.origin}/reset-password`,
+    redirectTo: `${location.origin}/register/resetPassword`,
   });
 
   if (error) {

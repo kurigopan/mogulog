@@ -271,11 +271,15 @@ export default function MyPage() {
                 <>
                   <Avatar
                     src={displayParentInfo.avatar_url ?? undefined}
-                    sx={{ width: 150, height: 150, cursor: "pointer" }}
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      cursor: "pointer",
+                    }}
                     onClick={() => avatarInputRef.current?.click()}
                   >
                     {!displayParentInfo.avatar_url && (
-                      <FaceIcon sx={{ fontSize: 150 }} />
+                      <FaceIcon style={{ fontSize: 150 }} />
                     )}
                   </Avatar>
                   <input
@@ -289,10 +293,15 @@ export default function MyPage() {
               ) : (
                 <Avatar
                   src={displayParentInfo.avatar_url ?? undefined}
-                  sx={{ width: 150, height: 150 }}
+                  sx={{
+                    width: 150,
+                    height: 150,
+                    bgcolor: "transparent", // 背景を消す
+                    color: "#44403c",
+                  }}
                 >
                   {!displayParentInfo.avatar_url && (
-                    <FaceIcon sx={{ fontSize: 150 }} />
+                    <FaceIcon style={{ fontSize: 150 }} />
                   )}
                 </Avatar>
               )}
@@ -377,7 +386,6 @@ export default function MyPage() {
                 </span>
               </div>
               <button
-                // disabled={!(childInfo.name && childInfo.birthday)}
                 onClick={
                   isEditingChild ? handleChildSave : handleChildEditToggle
                 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ZodFormattedError } from "zod";
 import { Avatar } from "@mui/material";
 import {
   EditIcon,
@@ -32,6 +33,8 @@ import {
   uploadAvatar,
   upsertChildAllergens,
 } from "@/lib/supabase";
+import { parentSchema, childUpdateSchema } from "@/types";
+import type { ParentForm, ChildUpdateForm } from "@/types";
 
 export default function MyPage() {
   const router = useRouter();
@@ -41,12 +44,18 @@ export default function MyPage() {
   const [parentInfo, setParentInfo] = useAtom(parentInfoAtom);
   const [childInfo, setChildInfo] = useAtom(childInfoAtom);
   const allergens = useAtomValue(allergensAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const [isEditingParent, setIsEditingParent] = useState(false);
   const [isEditingChild, setIsEditingChild] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
+  const [displayParentInfo, setDisplayParentInfo] = useState(parentInfo);
+  const [displayChildInfo, setDisplayChildInfo] = useState(childInfo);
+  const [parentFormErrors, setParentFormErrors] =
+    useState<ZodFormattedError<ParentForm> | null>(null);
+  const [childFormErrors, setChildFormErrors] =
+    useState<ZodFormattedError<ChildUpdateForm> | null>(null);
 
   useEffect(() => {
     if (
@@ -86,13 +95,22 @@ export default function MyPage() {
 
   const handleParentSave = async () => {
     setIsLoading(true);
+
+    const result = parentSchema.safeParse(displayParentInfo);
+    if (!result.success) {
+      setParentFormErrors(result.error.format());
+      setIsLoading(false);
+      return;
+    }
+    setParentFormErrors(null);
+
     let newAvatarUrl = parentInfo.avatar_url;
 
     if (avatar) {
       newAvatarUrl = await uploadAvatar(avatar, userId!);
     }
     const { data, error } = await updateProfile(userId!, {
-      name: parentInfo.name,
+      name: displayParentInfo.name,
       avatar_url: newAvatarUrl,
     });
     if (error) throw error;
@@ -108,18 +126,28 @@ export default function MyPage() {
 
   const handleChildSave = async () => {
     setIsLoading(true);
+
+    const result = childUpdateSchema.safeParse(displayChildInfo);
+    if (!result.success) {
+      setChildFormErrors(result.error.format());
+      setIsLoading(false);
+      return;
+    }
+    setChildFormErrors(null);
+
     try {
       await updateChild(childId!, {
-        name: childInfo.name,
-        birthday: childInfo.birthday,
+        name: displayChildInfo.name,
+        birthday: displayChildInfo.birthday,
       });
-      await upsertChildAllergens(childId!, childInfo.allergens);
+      await upsertChildAllergens(childId!, displayChildInfo.allergens, userId!);
+      setChildInfo(displayChildInfo);
       setIsEditingChild(false);
     } catch (error) {
       if (error instanceof Error) {
         console.error(
           "子どもの情報更新中にエラーが発生しました:",
-          error.message
+          error.message,
         );
         alert(error.message);
       }
@@ -143,7 +171,7 @@ export default function MyPage() {
       setChildInfo({
         ...childInfo,
         allergens: childInfo.allergens.filter(
-          (id: number) => id !== allergenId
+          (id: number) => id !== allergenId,
         ),
       });
     } else {
@@ -194,16 +222,26 @@ export default function MyPage() {
               <div>
                 <h2 className="text-lg font-bold text-stone-700">
                   {isEditingParent ? (
-                    <input
-                      type="text"
-                      value={parentInfo.name}
-                      onChange={(e) =>
-                        setParentInfo({ ...parentInfo, name: e.target.value })
-                      }
-                      className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
-                    />
+                    <div className="flex flex-col items-center">
+                      <input
+                        type="text"
+                        value={displayParentInfo.name}
+                        onChange={(e) =>
+                          setDisplayParentInfo({
+                            ...displayParentInfo,
+                            name: e.target.value,
+                          })
+                        }
+                        className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500 mr-2"
+                      />
+                      {parentFormErrors?.name?._errors && (
+                        <p className="mt-2 text-sm text-red-500 max-w-[200px] font-medium">
+                          {parentFormErrors.name._errors[0]}
+                        </p>
+                      )}
+                    </div>
                   ) : (
-                    parentInfo.name
+                    displayParentInfo.name
                   )}
                 </h2>
                 <span className="text-stone-600 font-medium">
@@ -232,12 +270,16 @@ export default function MyPage() {
               {isEditingParent ? (
                 <>
                   <Avatar
-                    src={parentInfo.avatar_url ?? undefined}
-                    sx={{ width: 150, height: 150, cursor: "pointer" }}
+                    src={displayParentInfo.avatar_url ?? undefined}
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      cursor: "pointer",
+                    }}
                     onClick={() => avatarInputRef.current?.click()}
                   >
-                    {!parentInfo.avatar_url && (
-                      <FaceIcon sx={{ fontSize: 150 }} />
+                    {!displayParentInfo.avatar_url && (
+                      <FaceIcon style={{ fontSize: 150 }} />
                     )}
                   </Avatar>
                   <input
@@ -250,11 +292,16 @@ export default function MyPage() {
                 </>
               ) : (
                 <Avatar
-                  src={parentInfo.avatar_url ?? undefined}
-                  sx={{ width: 150, height: 150 }}
+                  src={displayParentInfo.avatar_url ?? undefined}
+                  sx={{
+                    width: 150,
+                    height: 150,
+                    bgcolor: "transparent", // 背景を消す
+                    color: "#44403c",
+                  }}
                 >
-                  {!parentInfo.avatar_url && (
-                    <FaceIcon sx={{ fontSize: 150 }} />
+                  {!displayParentInfo.avatar_url && (
+                    <FaceIcon style={{ fontSize: 150 }} />
                   )}
                 </Avatar>
               )}
@@ -312,16 +359,26 @@ export default function MyPage() {
               <div>
                 <h2 className="text-lg font-bold text-stone-700">
                   {isEditingChild ? (
-                    <input
-                      type="text"
-                      value={childInfo.name}
-                      onChange={(e) =>
-                        setChildInfo({ ...childInfo, name: e.target.value })
-                      }
-                      className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    />
+                    <div className="flex flex-col items-center">
+                      <input
+                        type="text"
+                        value={displayChildInfo.name}
+                        onChange={(e) =>
+                          setDisplayChildInfo({
+                            ...displayChildInfo,
+                            name: e.target.value,
+                          })
+                        }
+                        className="text-xl font-bold text-stone-700 text-center bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      />
+                      {childFormErrors?.name?._errors?.[0] && (
+                        <p className="mt-2 text-sm text-red-500 max-w-[200px] font-medium">
+                          {childFormErrors.name._errors[0]}
+                        </p>
+                      )}
+                    </div>
                   ) : (
-                    childInfo.name
+                    displayChildInfo.name
                   )}
                 </h2>
                 <span className="text-stone-600 font-medium">
@@ -357,48 +414,64 @@ export default function MyPage() {
               <div className="flex items-center justify-between py-3 border-b border-stone-100">
                 <span className="text-stone-600 font-medium">誕生日</span>
                 {isEditingChild ? (
-                  <input
-                    type="date"
-                    value={childInfo.birthday || ""}
-                    onChange={(e) =>
-                      setChildInfo({ ...childInfo, birthday: e.target.value })
-                    }
-                    className="text-stone-700 bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                  />
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="date"
+                      value={displayChildInfo.birthday || ""}
+                      onChange={(e) =>
+                        setDisplayChildInfo({
+                          ...displayChildInfo,
+                          birthday: e.target.value,
+                        })
+                      }
+                      className="text-stone-700 bg-stone-50 rounded-2xl p-2 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    />
+                    {childFormErrors?.birthday?._errors?.[0] && (
+                      <p className="mt-2 text-sm text-red-500">
+                        {childFormErrors.birthday._errors[0]}
+                      </p>
+                    )}
+                  </div>
                 ) : (
-                  <span className="text-stone-700">{childInfo.birthday}</span>
+                  <span className="text-stone-700">
+                    {displayChildInfo.birthday}
+                  </span>
                 )}
               </div>
               {/* 月齢 */}
               <div className="flex items-center justify-between py-3 border-b border-stone-100">
                 <span className="text-stone-600 font-medium">月齢</span>
                 <span className="text-stone-700">
-                  {childInfo.birthday ? childInfo.age : "未設定"}
+                  {displayChildInfo.birthday ? childInfo.age : "未設定"}
                 </span>
               </div>
               {/* アレルギー */}
               <div className="py-3">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-stone-600 font-medium">アレルギー</span>
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-stone-600 font-medium whitespace-nowrap mr-4">
+                    アレルギー
+                  </span>
                   {/* 既存アレルギー */}
                   {!isEditingChild &&
-                    childInfo.allergens &&
-                    childInfo.allergens.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {childInfo.allergens.map((allergenId: number) => (
-                          <div
-                            key={allergenId}
-                            className="inline-flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
-                          >
-                            <span>{getAllergenNameById(allergenId)}</span>
-                          </div>
-                        ))}
+                    displayChildInfo.allergens &&
+                    displayChildInfo.allergens.length > 0 && (
+                      <div className="flex flex-wrap justify-end gap-2 flex-1">
+                        {displayChildInfo.allergens.map(
+                          (allergenId: number) => (
+                            <div
+                              key={allergenId}
+                              className="inline-flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
+                            >
+                              <span>{getAllergenNameById(allergenId)}</span>
+                            </div>
+                          ),
+                        )}
                       </div>
                     )}
                   {/*情報なし*/}
                   {!isEditingChild &&
-                    (!childInfo.allergens ||
-                      childInfo.allergens.length === 0) &&
+                    (!displayChildInfo.allergens ||
+                      displayChildInfo.allergens.length === 0) &&
                     allergens.length === 0 && (
                       <span className="text-stone-400 text-sm ml-2">
                         アレルギー情報がありません。
@@ -413,7 +486,7 @@ export default function MyPage() {
                         key={allergen.id}
                         onClick={() => handleToggleAllergen(allergen.id)}
                         className={`h-10 flex items-center justify-center p-1.5 rounded-full text-xs transition-all hover:scale-105 active:scale-95 ${
-                          childInfo.allergens.includes(allergen.id)
+                          displayChildInfo.allergens.includes(allergen.id)
                             ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
                             : "bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100"
                         }`}

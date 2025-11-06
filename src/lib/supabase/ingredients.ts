@@ -7,14 +7,14 @@ import {
   ingredientListCardSchema,
   rpcIngredientDetailSchema,
   rpcIngredientListCardSchema,
-} from "@/types/schemas";
+} from "@/types";
 
 // アレルゲンを除外した食材検索
 export async function searchIngredientsWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
   userId: string | null = null,
-  childId: number | null = null
+  childId: number | null = null,
 ) {
   const { data, error } = await supabase.rpc(
     "search_ingredients_with_allergens",
@@ -23,7 +23,7 @@ export async function searchIngredientsWithAllergens(
       excluded_allergen_ids: excludedAllergenIds,
       parent_id_param: userId,
       child_id_param: childId,
-    }
+    },
   );
 
   if (error) {
@@ -39,7 +39,7 @@ export async function searchIngredientsWithAllergens(
 export async function getIngredientById(
   userId: string | null = null,
   childId: number | null = null,
-  ingredientId: number
+  ingredientId: number,
 ) {
   const { data, error } = await supabase.rpc("get_ingredient_by_id", {
     parent_id_param: userId,
@@ -59,7 +59,7 @@ export async function getIngredientById(
 // 食材一覧と子どもの食べた履歴を取得
 export async function getIngredientsWithStatus(
   userId: string | null = null,
-  childId: number | null = null
+  childId: number | null = null,
 ) {
   const { data, error } = await supabase.rpc("get_ingredients_with_status", {
     parent_id_param: userId,
@@ -94,7 +94,7 @@ export async function upsertIngredientStatus(
   childId: number,
   ingredientId: number,
   status: string,
-  userId: string
+  userId: string,
 ) {
   const { data, error } = await supabase.from("child_ingredient_logs").upsert(
     {
@@ -109,7 +109,7 @@ export async function upsertIngredientStatus(
     {
       onConflict: "child_id, ingredient_id", // このユニーク制約を想定
       ignoreDuplicates: false,
-    }
+    },
   );
 
   if (error) {
@@ -121,7 +121,7 @@ export async function upsertIngredientStatus(
 
 export async function deleteIngredientStatus(
   childId: number,
-  ingredientId: number
+  ingredientId: number,
 ) {
   const { error } = await supabase
     .from("child_ingredient_logs")

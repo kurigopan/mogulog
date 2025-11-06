@@ -10,7 +10,7 @@ import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
 import { getRecipesCreatedByUser } from "@/lib/supabase";
-import { ListCardItem } from "@/types";
+import type { ListCardItem } from "@/types";
 
 export default function CreatedRecipes() {
   const router = useRouter();
@@ -21,11 +21,10 @@ export default function CreatedRecipes() {
   useEffect(() => {
     if (userId) {
       setIsLoading(true);
-      const fetchRecipes = async () => {
+      (async () => {
         const recipes = await getRecipesCreatedByUser(userId);
         setCreatedRecipes(recipes);
-      };
-      fetchRecipes();
+      })();
       setIsLoading(false);
     } else {
       router.push("/");

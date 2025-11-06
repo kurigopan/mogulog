@@ -1,5 +1,5 @@
-import { Profile, Child } from "@/types/db";
-import { ListCardItem } from "@/types/ui";
+import { Profile, Child } from "@/types";
+import { ListCardItem } from "@/types";
 
 export interface User {
   id?: string;
@@ -32,8 +32,6 @@ export type Stage =
   | "後期"
   | "完了期"
   | "離乳食終了";
-
-export type Age = "5-6ヶ月" | "7-8ヶ月" | "9-11ヶ月" | "12-18ヶ月";
 
 export type Season = "春" | "夏" | "秋" | "冬";
 

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ImageIcon } from "@/icons";
-import { ListCardItem, PageName } from "@/types";
+import type { ListCardItem, PageName } from "@/types";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 
 type ListCardProps = {

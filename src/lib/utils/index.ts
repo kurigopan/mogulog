@@ -5,9 +5,9 @@ import { StarIcon, LocalFloristIcon, RecommendIcon } from "@/icons";
 /**
  * UTCの日時をJST（日本標準時）の'YYYY-MM-DD HH:mm:ss'形式の文字列に変換します。
  * @param {Date | string | number} utcDate - 変換したいUTCの日時（Dateオブジェクト、ISO文字列、タイムスタンプなど）。
- * @returns {string} - JSTに変換された日時文字列。
+ * @returns {Date} - JSTに変換された日時文字列。
  */
-export const convertUtcToJst = (utcDate: string) => {
+export const convertUtcToJst = (utcDate: Date | string | number): Date => {
   // Dateオブジェクトに変換
   const date = new Date(utcDate);
 
@@ -28,7 +28,11 @@ export const convertUtcToJst = (utcDate: string) => {
   return new Date(formatter.format(date).replace(/\//g, "-"));
 };
 
-// 月齢を計算
+/**
+ * 月齢を計算します。
+ * @param {string} birthday - 誕生日（ISO文字列など）。
+ * @returns {number | null} - 月齢（月単位）または計算不可の場合はnull。
+ */
 export const calculateAgeInMonths = (birthday: string): number | null => {
   const birthDate = new Date(birthday);
   const today = new Date();
@@ -68,6 +72,11 @@ export const getAgeStageDisplay = (stageInfo: ingredientStageInfo[]) => {
   });
 };
 
+/**
+ * トップ画面のカードコンテンツのデータを生成します。
+ * @param {object} props - レシピと食材のデータを含むオブジェクト。
+ * @returns {CardContent[]} - 表示用のカードコンテンツ配列。
+ */
 export const getCardContents = ({
   popularRecipes,
   seasonalIngredients,

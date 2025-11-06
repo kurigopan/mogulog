@@ -8,14 +8,14 @@ import {
   recipeListCardSchema,
   rpcRecipeDetailSchema,
   rpcRecipeListCardSchema,
-} from "@/types/schemas";
-import { Recipe } from "@/types";
+} from "@/types";
+import type { Recipe } from "@/types";
 
 // アレルゲンを除外したレシピ検索
 export async function searchRecipesWithAllergens(
   searchTerm: string,
   excludedAllergenIds: number[],
-  userId: string | null = null
+  userId: string | null = null,
 ) {
   const { data, error } = await supabase.rpc("search_recipes_with_allergens", {
     search_term: searchTerm,
@@ -36,7 +36,7 @@ export async function searchRecipesWithAllergens(
 export async function searchRecipesByIngredient(
   userId: string | null = null,
   ingredientName: string,
-  ageStage: string
+  ageStage: string,
 ) {
   const { data, error } = await supabase.rpc("search_recipes_by_ingredient", {
     parent_id_param: userId,
@@ -57,7 +57,7 @@ export async function searchRecipesByIngredient(
 // レシピIDに基づいてレシピ情報を取得
 export async function getRecipeById(
   userId: string | null = null,
-  recipeId: number
+  recipeId: number,
 ) {
   const { data, error } = await supabase.rpc("get_recipe_by_id", {
     parent_id_param: userId,
@@ -90,28 +90,26 @@ export async function getFavoriteRecipes(userId: string) {
 
 export async function createRecipe(
   recipeData: Omit<Recipe, "id">,
-  userId: string
+  userId: string,
 ) {
   const formattedData = formatRecipeForSupabase(recipeData, userId);
   const { data, error } = await supabase
     .from("recipes")
     .insert([formattedData])
-    .select()
+    .select("id")
     .single();
 
   if (error) {
     console.error("レシピの登録に失敗しました:", error);
     throw error;
   }
-
-  const validatedData = rpcRecipeDetailSchema.parse(data);
-  return recipeDetailSchema.parse(validatedData);
+  return data.id;
 }
 
 export async function updateRecipe(
   recipeId: number,
   recipeData: Omit<Recipe, "id">,
-  userId: string
+  userId: string,
 ) {
   const formattedData = formatRecipeForSupabase(recipeData, userId);
   const { data, error } = await supabase

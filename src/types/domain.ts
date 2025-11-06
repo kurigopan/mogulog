@@ -1,4 +1,4 @@
-import { ListCardItem } from "@/types/ui";
+import { ListCardItem } from "@/types";
 
 export interface ingredientStageInfo {
   stage: string;
@@ -18,7 +18,6 @@ export interface ingredientNutrition {
 export interface recipeStep {
   step: number;
   description: string;
-  image?: string;
 }
 
 export interface recipeIngredient {

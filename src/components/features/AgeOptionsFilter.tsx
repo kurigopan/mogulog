@@ -6,11 +6,11 @@ import { useAtom } from "jotai";
 import { childAgeStageAtom } from "@/lib/utils/atoms";
 
 type AgeOptionsFilterProps = {
-  onChildAgeStageChange: (newStage: string) => void;
+  onChildAgeStageChangeAction: (newStage: string) => void;
 };
 
 export default function AgeOptionsFilter({
-  onChildAgeStageChange,
+  onChildAgeStageChangeAction,
 }: AgeOptionsFilterProps) {
   const [childAgeStage, setChildAgeStage] = useAtom(childAgeStageAtom);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,7 +26,7 @@ export default function AgeOptionsFilter({
   const handleStageChange = (newStage: string) => {
     setChildAgeStage(newStage);
     setIsDropdownOpen(false);
-    onChildAgeStageChange(newStage);
+    onChildAgeStageChangeAction(newStage);
   };
 
   useEffect(() => {

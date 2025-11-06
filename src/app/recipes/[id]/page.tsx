@@ -9,15 +9,15 @@ import Footer from "@/components/layout/Footer";
 import NotFoundPage from "@/components/common/NotFound";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
-import { useAtomValue } from "jotai";
-import { userIdAtom } from "@/lib/utils/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
 import {
   deleteRecipe,
   getRecipeAllergens,
   getRecipeById,
 } from "@/lib/supabase";
-import { Allergen, Recipe } from "@/types";
+import type { Allergen, Recipe } from "@/types";
 
 export default function RecipeDetail({
   params,
@@ -27,6 +27,7 @@ export default function RecipeDetail({
   const router = useRouter();
   const unwrapParams = use(params);
   const id = Number(unwrapParams.id);
+  const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
@@ -42,7 +43,7 @@ export default function RecipeDetail({
     if (!recipe) return;
 
     const confirmDelete = window.confirm(
-      "本当にこのレシピを削除しますか？この操作は元に戻せません。"
+      "本当にこのレシピを削除しますか？この操作は元に戻せません。",
     );
     if (!confirmDelete) return;
 
@@ -60,7 +61,8 @@ export default function RecipeDetail({
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    setIsLoading(true);
+    (async () => {
       const allergensData = await getRecipeAllergens(id);
       if (allergensData) {
         setAllergens(allergensData);
@@ -76,8 +78,8 @@ export default function RecipeDetail({
           setRecipe(recipeData);
         }
       }
-    };
-    fetchData();
+    })();
+    setIsLoading(false);
   }, [id, userId]);
 
   // 閲覧履歴ローカルストレージに保存
@@ -144,11 +146,15 @@ export default function RecipeDetail({
               <div className="flex justify-center space-x-6 text-sm text-stone-600 mb-4">
                 <div className="flex items-center">
                   <ScheduleIcon />
-                  <span className="ml-1">{recipe.cookingTime}</span>
+                  <span className="ml-1">
+                    {recipe.cookingTime ? recipe.cookingTime : "-"}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <PeopleIcon />
-                  <span className="ml-1">{recipe.servings}</span>
+                  <span className="ml-1">
+                    {recipe.servings ? recipe.servings : "-"}
+                  </span>
                 </div>
               </div>
 

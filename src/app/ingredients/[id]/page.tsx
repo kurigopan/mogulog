@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import React, { use, useState, useEffect } from "react";
 import Image from "next/image";
 import { Tabs, Tab, Box } from "@mui/material";
 import Header from "@/components/layout/Header";
@@ -10,11 +10,16 @@ import Card from "@/components/ui/Card";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import IngredientStatusButtons from "@/components/ui/IngredientStatusButtons";
-import { useAtomValue } from "jotai";
-import { childIdAtom, childInfoAtom, userIdAtom } from "@/lib/utils/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  childIdAtom,
+  childInfoAtom,
+  loadingAtom,
+  userIdAtom,
+} from "@/lib/utils/atoms";
 import { getIngredientById, searchRecipesByIngredient } from "@/lib/supabase";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
-import { CardItem, Ingredient } from "@/types";
+import type { CardItem, Ingredient } from "@/types";
 
 export default function IngredientDetail({
   params,
@@ -23,19 +28,21 @@ export default function IngredientDetail({
 }) {
   const unwrapParams = use(params);
   const id = Number(unwrapParams.id);
-  const [ingredient, setIngredient] = useState<Ingredient | null>(null);
-  const [relatedRecipes, setRelatedRecipes] = useState<CardItem[]>([]);
-  const [selectedTab, setSelectedTab] = useState(0);
+  const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const childInfo = useAtomValue(childInfoAtom);
+  const [ingredient, setIngredient] = useState<Ingredient | null>(null);
+  const [relatedRecipes, setRelatedRecipes] = useState<CardItem[]>([]);
+  const [selectedTab, setSelectedTab] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    setIsLoading(true);
+    (async () => {
       if (userId && childId) {
         const ingredientData = await getIngredientById(userId, childId, id);
         if (ingredientData) {
@@ -43,7 +50,7 @@ export default function IngredientDetail({
           const recipeData = await searchRecipesByIngredient(
             userId,
             ingredientData.name,
-            childInfo.ageStage
+            childInfo.ageStage,
           );
           if (recipeData) {
             setRelatedRecipes(recipeData);
@@ -56,15 +63,15 @@ export default function IngredientDetail({
           const recipeData = await searchRecipesByIngredient(
             null,
             ingredientData.name,
-            ""
+            "",
           );
           if (recipeData) {
             setRelatedRecipes(recipeData);
           }
         }
       }
-    };
-    fetchData();
+    })();
+    setIsLoading(false);
   }, [userId, childId, id, childInfo?.ageStage]);
 
   // 閲覧履歴ローカルストレージに保存

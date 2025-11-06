@@ -25,17 +25,21 @@ export default function HomeClientWrapper({
     useAtom(childAgeStageAtom);
 
   useEffect(() => {
-    if (!activeChildAgeStage && initialChildAgeStage) {
+    if (activeChildAgeStage === null) {
       setActiveChildAgeStage(initialChildAgeStage);
     }
-  }, [initialChildAgeStage, activeChildAgeStage, setActiveChildAgeStage]);
+  }, [activeChildAgeStage, initialChildAgeStage, setActiveChildAgeStage]);
 
-  const handleChildAgeStageChange = useCallback(
+  const handleChildAgeStageChangeAction = useCallback(
     (newAge: string) => {
       setActiveChildAgeStage(newAge);
     },
-    [setActiveChildAgeStage]
+    [setActiveChildAgeStage],
   );
+
+  if (activeChildAgeStage === null) {
+    return null;
+  }
 
   return (
     <>
@@ -43,7 +47,9 @@ export default function HomeClientWrapper({
         pageName="home"
         title="もぐログ"
         tools={
-          <AgeOptionsFilter onChildAgeStageChange={handleChildAgeStageChange} />
+          <AgeOptionsFilter
+            onChildAgeStageChangeAction={handleChildAgeStageChangeAction}
+          />
         }
       />
       <div className="p-4 space-y-6">

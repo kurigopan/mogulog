@@ -11,7 +11,7 @@ import {
   userIdAtom,
 } from "@/lib/utils/atoms";
 import { getRecipeById } from "@/lib/supabase";
-import { Recipe } from "@/types";
+import type { Recipe } from "@/types";
 
 export default function RecipeEditPage({
   params,
@@ -19,10 +19,10 @@ export default function RecipeEditPage({
   params: Promise<{ id: string }>;
 }) {
   const unwrapParams = use(params);
+  const recipeId = Number(unwrapParams.id);
   const [isLoading, setIsLoading] = useAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
-  const recipeId = Number(unwrapParams.id);
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
 
   useEffect(() => {
@@ -32,17 +32,16 @@ export default function RecipeEditPage({
   }, [isLoading]);
 
   useEffect(() => {
-    const fetchRecipe = async () => {
-      setIsLoading(true);
+    setIsLoading(true);
+    (async () => {
       const data = await getRecipeById(userId, recipeId);
       if (!data) {
         console.error("レシピの取得に失敗しました:");
       } else {
         setRecipeData(data);
       }
-      setIsLoading(false);
-    };
-    fetchRecipe();
+    })();
+    setIsLoading(false);
   }, [recipeId]);
 
   return (

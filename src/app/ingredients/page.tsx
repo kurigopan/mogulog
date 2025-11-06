@@ -30,7 +30,7 @@ import {
   userIdAtom,
 } from "@/lib/utils/atoms";
 import { getAgeStageDisplay } from "@/lib/utils";
-import { Ingredient } from "@/types";
+import type { Ingredient } from "@/types";
 
 export default function IngredientsList() {
   const setIsLoading = useSetAtom(loadingAtom);
@@ -65,7 +65,7 @@ export default function IngredientsList() {
           eaten: newEatenStatus,
           ng: newEatenStatus ? false : ing.ng,
         };
-      })
+      }),
     );
     // 3. **DB操作を実行**
     try {
@@ -88,7 +88,7 @@ export default function IngredientsList() {
             eaten: originalEatenStatus,
             ng: originalNgStatus,
           };
-        })
+        }),
       );
     }
   };
@@ -111,7 +111,7 @@ export default function IngredientsList() {
           eaten: newNgStatus ? false : ing.eaten,
           ng: newNgStatus,
         };
-      })
+      }),
     );
     // 3. **DB操作を実行**
     try {
@@ -133,46 +133,52 @@ export default function IngredientsList() {
             eaten: originalEatenStatus,
             ng: originalNgStatus,
           };
-        })
+        }),
       );
     }
   };
-
   const filteredIngredients = ingredients.filter((ingredient) => {
-    // カテゴリフィルター
-    if (
-      selectedCategory !== "all" &&
-      ingredient.category !== selectedCategory
-    ) {
-      return false;
-    }
+    // 1. カテゴリフィルター
+    const categoryMatch =
+      selectedCategory === "all" || ingredient.category === selectedCategory;
 
-    // 離乳食段階フィルター
-    if (
-      selectedStageFilter !== "all" &&
-      !ingredient.startStage.includes(selectedStageFilter)
-    ) {
-      return false;
-    }
+    // 2. 離乳食段階フィルター
+    const stageMatch =
+      selectedStageFilter === "all" ||
+      ingredient.startStage.includes(selectedStageFilter);
 
-    // ステータスフィルター
-    if (selectedStatusFilter === "eaten" && !ingredient.eaten) {
-      return false;
-    }
-    if (selectedStatusFilter === "ng" && !ingredient.ng) {
-      return false;
-    }
+    // 3. ステータスフィルター
+    const statusMatch =
+      selectedStatusFilter === "all" ||
+      (selectedStatusFilter === "eaten" && ingredient.eaten) ||
+      (selectedStatusFilter === "ng" && ingredient.ng);
 
-    return true;
+    // 単一のreturnステートメントに単純化
+    return categoryMatch && stageMatch && statusMatch;
   });
 
-  // ヘルプテキスト
-  const helpText =
-    "初：初期（5-6ヶ月）、中：中期（7-8ヶ月）、後：後期（9-11ヶ月）、完：完了期（12-18ヶ月）";
+  const helpText1 = (
+    <>
+      初：初期（5-6ヶ月）
+      <br />
+      中：中期（7-8ヶ月）
+      <br />
+      後：後期（9-11ヶ月）
+      <br />
+      完：完了期（12-18ヶ月）
+    </>
+  );
+  const helpText2 = (
+    <>
+      食べた：食べて問題のない食材
+      <br />
+      NG：食べてアレルギーまたは苦手な食材
+    </>
+  );
 
   useEffect(() => {
     setIsLoading(true);
-    const fetchIngredients = async () => {
+    (async () => {
       let ingredientsData;
       if (userId && childId) {
         ingredientsData = await getIngredientsWithStatus(userId, childId);
@@ -182,14 +188,13 @@ export default function IngredientsList() {
       if (ingredientsData) {
         setIngredients(ingredientsData);
       }
-    };
-    fetchIngredients();
+    })();
     setIsLoading(false);
   }, [userId, childId]);
 
   return (
     <>
-      <Header title="食材一覧" />
+      <Header title="食べたよ記録" />
       <div className="p-4 space-y-6">
         {/* フィルターボックス */}
         <IngredientsFilter
@@ -206,13 +211,13 @@ export default function IngredientsList() {
                 <div className="border-b-2 border-stone-200">
                   <div className="px-4 py-4 flex items-center text-sm font-semibold text-stone-700">
                     <div className="flex-1 min-w-0 px-3">食材名</div>
-                    <div className="w-32 text-center px-2 flex items-center justify-center gap-1">
+                    <div className="w-32 text-center flex items-center justify-center">
                       <span>離乳食段階</span>
                       <Tooltip
-                        title={helpText}
+                        title={helpText1}
                         placement="top"
                         arrow
-                        componentsProps={{
+                        slotProps={{
                           tooltip: {
                             sx: {
                               bgcolor: "rgba(0, 0, 0, 0.8)",
@@ -238,8 +243,41 @@ export default function IngredientsList() {
                         </IconButton>
                       </Tooltip>
                     </div>
-                    <div className="w-16 text-center px-1">食べた</div>
-                    <div className="w-12 text-center px-1">NG</div>
+                    <div className="w-28 text-center flex items-center justify-center">
+                      <div className="flex gap-3">
+                        <span>食べた</span>
+                        <span>NG</span>
+                      </div>
+                      <Tooltip
+                        title={helpText2}
+                        placement="top"
+                        arrow
+                        slotProps={{
+                          tooltip: {
+                            sx: {
+                              bgcolor: "rgba(0, 0, 0, 0.8)",
+                              fontSize: "12px",
+                              maxWidth: 280,
+                            },
+                          },
+                        }}
+                      >
+                        <IconButton
+                          size="small"
+                          sx={{
+                            padding: 0.5,
+                            marginLeft: 0.5,
+                            color: "rgba(120, 113, 108, 0.7)",
+                            "&:hover": {
+                              color: "rgba(120, 113, 108, 1)",
+                              backgroundColor: "rgba(147, 51, 234, 0.1)",
+                            },
+                          }}
+                        >
+                          <HelpOutlineIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
                   </div>
                 </div>
 
@@ -247,7 +285,7 @@ export default function IngredientsList() {
                 <div className="divide-y divide-stone-100">
                   {filteredIngredients.map((ingredient) => {
                     const stageDisplay = getAgeStageDisplay(
-                      ingredient.stageInfo
+                      ingredient.stageInfo,
                     );
                     return (
                       <div
@@ -256,7 +294,7 @@ export default function IngredientsList() {
                       >
                         <div className="flex items-center">
                           {/* 食材名 */}
-                          <div className="flex-1 min-w-0 px-3">
+                          <div className="flex-1 min-w-0">
                             <Link
                               href={`/ingredients/${ingredient.id}`}
                               className="group"
@@ -268,7 +306,7 @@ export default function IngredientsList() {
                           </div>
 
                           {/* 離乳食段階 */}
-                          <div className="w-32 text-center px-2 mr-6">
+                          <div className="w-32 text-center px-2 mr-4">
                             <div className="flex justify-center items-center space-x-1">
                               {stageDisplay.map(({ stage, isActive }) => (
                                 <span
@@ -288,9 +326,9 @@ export default function IngredientsList() {
                           </div>
 
                           {/* 食べた・NGチェック */}
-                          <div className="flex items-center gap-3">
-                            {/* 食べたチェック */}
-                            <div className="w-12 text-center">
+                          <div className="w-26 flex items-center gap-4">
+                            {/* 食べたボタン */}
+                            <div className="text-center">
                               <button
                                 onClick={() => toggleEaten(ingredient)}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${
@@ -307,8 +345,8 @@ export default function IngredientsList() {
                               </button>
                             </div>
 
-                            {/* NGチェック */}
-                            <div className="w-10 text-center">
+                            {/* NGボタン */}
+                            <div className="text-center">
                               <button
                                 onClick={() => toggleNG(ingredient)}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${

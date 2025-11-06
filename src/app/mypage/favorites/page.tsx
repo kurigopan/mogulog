@@ -35,15 +35,14 @@ export default function Favorites() {
   useEffect(() => {
     if (userId) {
       setIsLoading(true);
-      const fetchFavorites = async () => {
+      (async () => {
         const recipes = await getFavoriteRecipes(userId);
         setFavoriteRecipes(recipes.map((r) => ({ ...r, isFavorite: true })));
         const ingredients = await getFavoriteIngredients(userId);
         setFavoriteIngredients(
-          ingredients.map((i) => ({ ...i, isFavorite: true }))
+          ingredients.map((i) => ({ ...i, isFavorite: true })),
         );
-      };
-      fetchFavorites();
+      })();
       setIsLoading(false);
     }
   }, [userId]);

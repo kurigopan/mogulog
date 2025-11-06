@@ -25,35 +25,52 @@ export default function AgeFilteredContent({
     useState<CardContent[]>(initialCardContents);
 
   useEffect(() => {
-    if (
-      initialCardContents.length === 0 ||
-      currentActiveAgeStage !== cardContents[0]?.id.split("-")[0]
-    ) {
-      fetchFilteredData(currentActiveAgeStage);
-    }
-  }, [currentActiveAgeStage]);
+    let isMounted = true;
 
-  const fetchFilteredData = async (age: string) => {
-    setIsLoading(true);
-    try {
-      const [popularRecipes, seasonalIngredients, recommendedRecipes] =
-        await Promise.all([
-          getPopularRecipes(age),
-          getSeasonalIngredients(age),
-          getRecommendedRecipes(age),
-        ]);
-      const cardContents = getCardContents({
-        popularRecipes: popularRecipes,
-        seasonalIngredients: seasonalIngredients,
-        recommendedRecipes: recommendedRecipes,
-      });
-      setCardContents(cardContents);
-    } catch (error) {
-      console.error("Error fetching filtered data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    (async () => {
+      if (!currentActiveAgeStage) {
+        return;
+      }
+
+      if (
+        initialCardContents.length === 0 ||
+        currentActiveAgeStage !== cardContents[0]?.id.split("-")[0]
+      ) {
+        setIsLoading(true);
+        const age = currentActiveAgeStage;
+
+        try {
+          const [popularRecipes, seasonalIngredients, recommendedRecipes] =
+            await Promise.all([
+              getPopularRecipes(age),
+              getSeasonalIngredients(age),
+              getRecommendedRecipes(age),
+            ]);
+
+          if (isMounted) {
+            const newCardContents = getCardContents({
+              popularRecipes: popularRecipes,
+              seasonalIngredients: seasonalIngredients,
+              recommendedRecipes: recommendedRecipes,
+            });
+            setCardContents(newCardContents);
+          }
+        } catch (error) {
+          if (isMounted) {
+            console.error("Error fetching filtered data:", error);
+          }
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentActiveAgeStage]);
 
   return (
     <section>

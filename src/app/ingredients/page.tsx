@@ -170,9 +170,9 @@ export default function IngredientsList() {
   );
   const helpText2 = (
     <>
-      食べた：食べたことのある食材
+      食べた：食べて問題のない食材
       <br />
-      NG：アレルギーまたは苦手な食材
+      NG：食べてアレルギーまたは苦手な食材
     </>
   );
 

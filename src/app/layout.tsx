@@ -1,5 +1,5 @@
 import "@/app/globals.css";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import { AuthObserver } from "@/components/common/AuthObserver";

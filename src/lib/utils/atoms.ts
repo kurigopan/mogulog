@@ -5,7 +5,6 @@ import {
   FavoriteUpdate,
   ParentInfo,
   SearchState,
-  User,
 } from "@/types";
 
 export const loginDialogSourceAtom = atom<string | null>(null);
@@ -13,7 +12,6 @@ export const loginDialogSourceAtom = atom<string | null>(null);
 export const loadingAtom = atom<boolean>(true);
 
 export const allergensAtom = atom<Allergen[]>([]);
-export const userAtom = atom<User | null>(null);
 
 export const parentInfoAtom = atom<ParentInfo>({
   id: "",
@@ -50,4 +48,4 @@ export const searchStateAtom = atom<SearchState>({
 });
 
 //　月齢フィルターを維持する
-export const childAgeStageAtom = atom<string>("初期");
+export const childAgeStageAtom = atom<string | null>(null);

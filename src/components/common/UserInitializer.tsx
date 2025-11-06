@@ -30,7 +30,7 @@ export const UserInitializer = () => {
   const userId = useAtomValue(userIdAtom);
 
   useEffect(() => {
-    const initializeUserData = async () => {
+    (async () => {
       // userIdがundefined（初期状態）の場合は、AuthObserverによるセットを待つ
       if (typeof userId === "undefined") {
         return;
@@ -48,7 +48,7 @@ export const UserInitializer = () => {
           // 現在のセッション情報を取得
 
           const [profileData, childData, allergensResponse] = await Promise.all(
-            [getProfile(userId), getChild(userId), getAllergens()]
+            [getProfile(userId), getChild(userId), getAllergens()],
           );
 
           if (allergensResponse) {
@@ -124,9 +124,7 @@ export const UserInitializer = () => {
       } finally {
         setIsLoading(false);
       }
-    };
-
-    initializeUserData();
+    })();
   }, [
     userId,
     setIsLoading,

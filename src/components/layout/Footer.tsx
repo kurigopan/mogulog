@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { HomeIcon, FavoriteIcon, ListIcon, PersonIcon, AddIcon } from "@/icons";
 import { useAtomValue, useSetAtom } from "jotai";

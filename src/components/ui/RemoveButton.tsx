@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { DeleteIcon } from "@/icons";
 import { removeBrowsingHistory } from "@/lib/utils/localstorage";
 

@@ -12,7 +12,7 @@ export const AuthObserver = () => {
     // 認証状態の変化を監視
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       // セッションがあればユーザーIDをセット
       if (session) {
         const userId = session.user.id;

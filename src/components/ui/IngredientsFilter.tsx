@@ -193,7 +193,7 @@ export default function IngredientsFilter({
                 title={helpText}
                 placement="top"
                 arrow
-                componentsProps={{
+                slotProps={{
                   tooltip: {
                     sx: {
                       bgcolor: "rgba(0, 0, 0, 0.8)",

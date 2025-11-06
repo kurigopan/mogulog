@@ -145,24 +145,19 @@ export default function ProfilePage() {
   // ページロード時とアレルゲン項目がないときに実行
   useEffect(() => {
     inputRef.current?.focus();
-    const fetchAllergens = async () => {
-      try {
-        if (allergens.length === 0) {
-          const data = await getAllergens();
-          if (data) {
-            setAllergens(data);
-            const initialExclusions: Record<string, boolean> = {};
-            data.forEach((allergen) => {
-              initialExclusions[allergen.id] = false;
-            });
-            setAllergenExclusions(initialExclusions);
-          }
+    (async () => {
+      if (allergens.length === 0) {
+        const data = await getAllergens();
+        if (data) {
+          setAllergens(data);
+          const initialExclusions: Record<string, boolean> = {};
+          data.forEach((allergen) => {
+            initialExclusions[allergen.id] = false;
+          });
+          setAllergenExclusions(initialExclusions);
         }
-      } catch (error) {
-        console.error("アレルゲン取得中にエラー:", error);
       }
-    };
-    fetchAllergens().catch((e) => console.error(e));
+    })();
   });
 
   useEffect(() => {

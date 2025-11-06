@@ -187,15 +187,6 @@ export const ingredientDetailSchema = rpcIngredientDetailSchema.transform(
   }),
 );
 
-// ingredientsテーブルからのレスポンス全体（配列）のスキーマ
-// export const ingredientsResponseSchema = z.array(dbIngredientCardSchema);
-
-// スキーマからTypeScriptの型を推論
-// export type SupabaseSeason = z.infer<typeof seasonSchema>;
-// export type Ingredient = z.infer<typeof ingredientSchema>;
-// export type IngredientNutrition = z.infer<typeof ingredientNutritionSchema>;
-// export type IngredientStageInfo = z.infer<typeof ingredientStageInfoSchema>;
-
 // 1.データベースから直接取得するレシピデータのスキーマを定義
 export const dbRecipeCardSchema = z.object({
   id: z.number(),
@@ -282,7 +273,6 @@ export function formatRecipeForSupabase(
     tags: recipe.tags,
     is_private: recipe.isPrivate,
     memo: recipe.savedMemo,
-    // status: recipe.status,
     ingredients: recipe.ingredients.map((ing) =>
       JSON.parse(JSON.stringify(ing)),
     ),

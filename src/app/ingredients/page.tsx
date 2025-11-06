@@ -243,7 +243,7 @@ export default function IngredientsList() {
                         </IconButton>
                       </Tooltip>
                     </div>
-                    <div className="w-30 text-center flex items-center justify-center">
+                    <div className="w-28 text-center flex items-center justify-center">
                       <div className="flex gap-3">
                         <span>食べた</span>
                         <span>NG</span>
@@ -326,7 +326,7 @@ export default function IngredientsList() {
                           </div>
 
                           {/* 食べた・NGチェック */}
-                          <div className="w-28 flex items-center gap-4">
+                          <div className="w-26 flex items-center gap-4">
                             {/* 食べたボタン */}
                             <div className="text-center">
                               <button

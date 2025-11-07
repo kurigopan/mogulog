@@ -86,6 +86,7 @@ export default function ProfilePage() {
       return;
     }
     setParentFormErrors(null);
+    setIsLoading(false);
     setStep(2);
   };
 

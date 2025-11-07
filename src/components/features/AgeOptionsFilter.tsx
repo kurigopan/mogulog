@@ -23,6 +23,13 @@ export default function AgeOptionsFilter({
     { label: "12-18ヶ月", value: "完了期" },
   ];
 
+  const displayStage =
+    childAgeStage === "離乳食開始前"
+      ? "初期"
+      : childAgeStage === "離乳食終了"
+        ? "完了期"
+        : childAgeStage;
+
   const handleStageChange = (newStage: string) => {
     setChildAgeStage(newStage);
     setIsDropdownOpen(false);
@@ -47,7 +54,7 @@ export default function AgeOptionsFilter({
   }, []);
 
   const currentAgeLabel = ageOptions.find(
-    (option) => option.value === childAgeStage,
+    (option) => option.value === displayStage,
   )?.label;
 
   return (
@@ -69,7 +76,7 @@ export default function AgeOptionsFilter({
               key={option.value}
               onClick={() => handleStageChange(option.value)}
               className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
-                childAgeStage === option.value
+                displayStage === option.value
                   ? "bg-violet-100 text-violet-700 font-semibold"
                   : "text-stone-700 hover:bg-stone-100"
               }`}

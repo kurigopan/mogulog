@@ -136,9 +136,9 @@ export async function deleteIngredientStatus(
 }
 
 // 旬の食材 (月齢と季節を考慮)を５件取得
-export async function getSeasonalIngredients(childStageAge: string) {
+export async function getSeasonalIngredients(childAgeStage: string) {
   const { data, error } = await supabase.rpc("get_seasonal_ingredients", {
-    stage: childStageAge,
+    stage: childAgeStage,
     limit_count: 5,
   });
 

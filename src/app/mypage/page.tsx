@@ -167,17 +167,17 @@ export default function MyPage() {
   const handleToggleAllergen = (allergenId: number) => {
     if (!childInfo) return;
 
-    if (childInfo.allergens.includes(allergenId)) {
-      setChildInfo({
-        ...childInfo,
-        allergens: childInfo.allergens.filter(
+    if (displayChildInfo.allergens.includes(allergenId)) {
+      setDisplayChildInfo({
+        ...displayChildInfo,
+        allergens: displayChildInfo.allergens.filter(
           (id: number) => id !== allergenId,
         ),
       });
     } else {
-      setChildInfo({
-        ...childInfo,
-        allergens: [...childInfo.allergens, allergenId],
+      setDisplayChildInfo({
+        ...displayChildInfo,
+        allergens: [...displayChildInfo.allergens, allergenId],
       });
     }
   };

@@ -6,7 +6,7 @@ export async function getProfile(userId: string) {
     .from("profiles")
     .select("*")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Failed to fetch profile:", error);
@@ -19,7 +19,7 @@ export async function getChild(userId: string) {
     .from("children")
     .select("*")
     .eq("parent_id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Failed to fetch child:", error);
@@ -30,7 +30,7 @@ export async function getChild(userId: string) {
 
 export async function createProfile(
   formData: { name: string; avatar_url: string | null },
-  userId: string // supabase.auth.signUp 後の user.id
+  userId: string, // supabase.auth.signUp 後の user.id
 ) {
   const profileData: Profile = {
     id: userId,
@@ -55,7 +55,7 @@ export async function createProfile(
 
 export async function createChild(
   formData: { childName: string; childBirthday: string },
-  userId: string // supabase.auth.signUp 後の user.id
+  userId: string, // supabase.auth.signUp 後の user.id
 ) {
   const childData: Omit<Child, "id"> = {
     parent_id: userId,
@@ -81,7 +81,7 @@ export async function createChild(
 
 export async function updateProfile(
   userId: string,
-  updates: { name: string; avatar_url: string | null }
+  updates: { name: string; avatar_url: string | null },
 ) {
   const { data, error } = await supabase
     .from("profiles")
@@ -100,7 +100,7 @@ export async function updateProfile(
 
 export async function updateChild(
   childId: number,
-  updates: { name: string; birthday: string }
+  updates: { name: string; birthday: string },
 ) {
   const { data, error } = await supabase
     .from("children")

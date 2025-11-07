@@ -125,14 +125,7 @@ export const UserInitializer = () => {
         setIsLoading(false);
       }
     })();
-  }, [
-    userId,
-    setIsLoading,
-    setParentInfo,
-    setChildId,
-    setChildInfo,
-    setAllergens,
-  ]);
+  }, [userId]);
 
   return null;
 };

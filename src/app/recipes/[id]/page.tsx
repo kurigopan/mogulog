@@ -3,12 +3,19 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { EditIcon, ScheduleIcon, PeopleIcon, DeleteIcon } from "@/icons";
+import {
+  EditIcon,
+  ScheduleIcon,
+  PeopleIcon,
+  DeleteIcon,
+  ImageIcon,
+} from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import NotFoundPage from "@/components/common/NotFound";
 import ShareButton from "@/components/ui/ShareButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
+import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
 import { useAtomValue, useSetAtom } from "jotai";
 import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
 import { savedBrowsingHistory } from "@/lib/utils/localstorage";
@@ -31,6 +38,7 @@ export default function RecipeDetail({
   const userId = useAtomValue(userIdAtom);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // TODO : メモ機能
   // const [memo, setMemo] = useState("");
@@ -41,23 +49,14 @@ export default function RecipeDetail({
 
   const handleDelete = async () => {
     if (!recipe) return;
-
-    const confirmDelete = window.confirm(
-      "本当にこのレシピを削除しますか？この操作は元に戻せません。",
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const response = await deleteRecipe(id);
-
-      if (response.error) {
-        alert("レシピを削除しました。");
-        router.push("/");
-      }
-    } catch (error) {
+    setIsDialogOpen(false);
+    const { error } = await deleteRecipe(id);
+    if (error) {
       console.error("Error deleting recipe:", error);
       alert("レシピの削除中にエラーが発生しました。");
+      return;
     }
+    router.push("/");
   };
 
   useEffect(() => {
@@ -114,19 +113,22 @@ export default function RecipeDetail({
             {/* レシピ基本情報 */}
             <section className="bg-white rounded-3xl p-6 shadow-sm text-center mb-4">
               {/* 画像があれば表示する */}
-              <div className="w-[300px] h-[300px] overflow-hidden mx-auto mb-4">
-                {recipe.image && (
-                  <Image
-                    src={recipe.image}
-                    alt={`${recipe.name}の画像`}
-                    width={300}
-                    height={300}
-                    className="object-contain rounded-3xl"
-                    unoptimized // 画像がsvgの場合ブロックされてしまうため設定
-                    priority
-                  />
-                )}
-              </div>
+              {recipe.image ? (
+                <Image
+                  src={recipe.image}
+                  alt={`${recipe.name}の画像`}
+                  width={200}
+                  height={200}
+                  className="rounded-3xl mb-4 mx-auto"
+                  unoptimized // 画像がsvgの場合ブロックされてしまうため設定
+                  priority
+                />
+              ) : (
+                <ImageIcon
+                  className="text-stone-200"
+                  style={{ fontSize: 200 }}
+                />
+              )}
               <h2 className="text-2xl font-bold text-stone-700 mb-4">
                 {recipe.name}
               </h2>
@@ -175,12 +177,22 @@ export default function RecipeDetail({
                   </button>
 
                   <button
-                    onClick={handleDelete}
+                    onClick={() => setIsDialogOpen(true)}
                     className="py-2 px-3 rounded-2xl font-medium bg-stone-100 text-stone-600 hover:bg-violet-200 transition-colors"
                   >
                     <DeleteIcon />
                     <span className="ml-2">削除</span>
                   </button>
+                  {isDialogOpen && (
+                    <ConfirmationDialog
+                      isOpen={isDialogOpen}
+                      onClose={() => setIsDialogOpen(false)}
+                      onConfirm={handleDelete}
+                      title="レシピを削除しますか？"
+                      message="この操作は元に戻せません"
+                      confirmText="削除"
+                    />
+                  )}
                 </div>
               )}
             </section>

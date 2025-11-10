@@ -16,6 +16,7 @@ import {
 } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   allergensAtom,
@@ -49,13 +50,13 @@ export default function MyPage() {
   const [isEditingChild, setIsEditingChild] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [displayParentInfo, setDisplayParentInfo] = useState(parentInfo);
   const [displayChildInfo, setDisplayChildInfo] = useState(childInfo);
   const [parentFormErrors, setParentFormErrors] =
     useState<ZodFormattedError<ParentForm> | null>(null);
   const [childFormErrors, setChildFormErrors] =
     useState<ZodFormattedError<ChildUpdateForm> | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (
@@ -157,13 +158,6 @@ export default function MyPage() {
     setIsEditingChild(false);
   };
 
-  const handleLogout = async () => {
-    setShowLogoutConfirm(false);
-    await logout();
-    setUserId(null);
-    router.push("/");
-  };
-
   const handleToggleAllergen = (allergenId: number) => {
     if (!childInfo) return;
 
@@ -180,6 +174,13 @@ export default function MyPage() {
         allergens: [...displayChildInfo.allergens, allergenId],
       });
     }
+  };
+
+  const handleLogout = async () => {
+    setIsDialogOpen(false);
+    await logout();
+    setUserId(null);
+    router.push("/");
   };
 
   const menuItems = [
@@ -525,7 +526,7 @@ export default function MyPage() {
         {/* ログアウト */}
         <section>
           <button
-            onClick={() => setShowLogoutConfirm(true)}
+            onClick={() => setIsDialogOpen(true)}
             className="w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:bg-red-50 border border-transparent hover:border-red-100"
           >
             <div className="flex items-center justify-center">
@@ -538,34 +539,15 @@ export default function MyPage() {
         </section>
       </div>
       {/* ログアウト確認モーダル */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-300 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm">
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-bold text-stone-700 mb-2">
-                ログアウトしますか？
-              </h3>
-              <p className="text-sm text-stone-500">
-                また戻ってきてくださいね！
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 py-3 px-4 bg-stone-100 text-stone-600 rounded-2xl font-medium hover:bg-stone-200 transition-colors"
-              >
-                キャンセル
-              </button>
-              <Link
-                href="/"
-                onClick={handleLogout}
-                className="flex justify-center flex-1 py-3 px-4 bg-red-500 text-white rounded-2xl font-medium hover:bg-red-600 transition-colors"
-              >
-                ログアウト
-              </Link>
-            </div>
-          </div>
-        </div>
+      {isDialogOpen && (
+        <ConfirmationDialog
+          isOpen={true}
+          onClose={() => setIsDialogOpen(false)}
+          onConfirm={handleLogout}
+          title="ログアウトしますか？"
+          message="また戻ってきてくださいね！"
+          confirmText="ログアウト"
+        />
       )}
       <Footer />
     </>

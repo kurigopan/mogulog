@@ -50,7 +50,7 @@ export default function IngredientsFilter({
     { value: "初期", label: "初期" },
     { value: "中期", label: "中期" },
     { value: "後期", label: "後期" },
-    { value: "完了機", label: "完了期" },
+    { value: "完了期", label: "完了期" },
   ];
 
   const statusFilters = [

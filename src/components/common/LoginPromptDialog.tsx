@@ -1,16 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
 import { useAtom } from "jotai";
 import { loginDialogSourceAtom } from "@/lib/utils/atoms";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-} from "@mui/material";
 
 export default function LoginPromptDialog() {
   const [source, setSource] = useAtom(loginDialogSourceAtom);
@@ -25,25 +18,20 @@ export default function LoginPromptDialog() {
     }
   };
 
+  const handleConfirm = () => {
+    setSource(null);
+    router.push("/register/authform");
+  };
+
   return (
-    <Dialog open={source !== null} onClose={handleClose}>
-      <DialogTitle>ログインが必要です</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          この機能を使うにはログインしてください。
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>閉じる</Button>
-        <Button
-          onClick={() => {
-            setSource(null);
-            router.push("/register/authform");
-          }}
-        >
-          ログイン・新規登録へ
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <ConfirmationDialog
+      isOpen={source !== null}
+      onClose={handleClose}
+      onConfirm={handleConfirm}
+      title="ログインが必要です"
+      message="この機能を使うにはログインしてください"
+      cancelText="閉じる"
+      confirmText="ログイン"
+    />
   );
 }

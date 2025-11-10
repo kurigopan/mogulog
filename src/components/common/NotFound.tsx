@@ -1,39 +1,40 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ErrorOutlineIcon } from "@/icons";
-import router from "next/router";
 
 export default function NotFoundPage() {
+  const router = useRouter();
+
   const handleBack = () => {
     router.back();
   };
+
   return (
-    <div className="flex flex-col bg-white rounded-3xl shadow-sm text-center p-4 space-y-4 mt-20 mx-auto w-full max-w-lg">
-      <div className="text-6xl text-stone-300 font-bold">404</div>
-      <div className="w-20 h-20 mx-auto rounded-full bg-stone-100 flex items-center justify-center">
+    <div className="text-center py-12">
+      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center">
         <ErrorOutlineIcon className="text-violet-500 text-3xl" />
       </div>
-      <h2 className="text-2xl font-bold text-stone-700">
+      <h3 className="text-lg font-semibold text-stone-700 mb-4">
         ページが見つかりません
-      </h2>
-      <p className="text-stone-600 mb-4 leading-relaxed">
+      </h3>
+      <p className="text-stone-500 mb-4">
         お探しのページは存在しないか、
         <br />
-        削除されている可能性があります。
-        <br />
-        URLをご確認いただくか、再度お探しください。
+        削除されている可能性があります
       </p>
-      <div className="space-y-3 mx-auto">
+      <div className="flex flex-col gap-3 items-center">
         <button
           onClick={handleBack}
-          className="block w-full bg-violet-500 hover:bg-violet-600 text-white font-medium py-3 px-6 rounded-2xl transition-colors duration-200"
+          className="w-50 py-3 px-6 rounded-2xl font-medium bg-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
         >
           前のページに戻る
         </button>
         <Link
           href="/"
-          className="block w-full bg-stone-200 hover:text-stone-600 font-medium py-3 px-6 rounded-2xl transition-colors duration-200"
+          className="w-50 py-3 px-6 rounded-2xl font-medium bg-stone-200 hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
         >
           ホームに戻る
         </Link>

@@ -85,7 +85,7 @@ export default function Introduction() {
         {/* 次ボタン */}
         <button
           onClick={() => setCurrentScreen("loginPrompt")}
-          className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+          className="w-full py-4 rounded-2xl font-medium bg-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
         >
           <span>つぎへ</span>
           <ArrowForwardIcon className="ml-2" />
@@ -122,7 +122,7 @@ export default function Introduction() {
       {/* ボタン */}
       <div className="space-y-3">
         <Link href="/register/authform">
-          <button className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all mb-2">
+          <button className="w-full py-4 rounded-2xl font-medium bg-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all mb-2">
             ログイン・新規登録する
           </button>
         </Link>

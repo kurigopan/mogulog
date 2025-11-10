@@ -842,7 +842,7 @@ export default function RecipeForm({
           </button> */}
           <button
             type="submit"
-            className="flex items-center justify-center w-40 px-6 py-3 bg-violet-400 text-white rounded-2xl font-medium hover:bg-violet-600 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center w-50 px-6 py-3 bg-violet-400 text-white rounded-2xl font-medium hover:bg-violet-600 transition-colors disabled:opacity-50"
             disabled={isSaving}
           >
             {isSaving ? (

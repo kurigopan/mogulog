@@ -104,45 +104,47 @@ export default function IngredientDetail({
         {ingredient ? (
           <>
             {/* 食材概要 */}
-            <section>
-              <div className="bg-white rounded-3xl p-6 shadow-sm">
-                <div className="text-center mb-4">
-                  {/* 画像があれば表示する */}
-                  {ingredient.image && (
-                    <Image
-                      src={ingredient.image}
-                      alt={`${ingredient.name}の画像`}
-                      width={150}
-                      height={150}
-                      className="rounded-3xl mb-4 mx-auto"
-                      unoptimized // 画像がsvgの場合ブロックされてしまうため設定
-                      priority
-                    />
-                  )}
-                  <h2 className="text-2xl font-bold text-stone-700 mb-4">
-                    {ingredient.name}
-                  </h2>
-                  {ingredient.season.map((s) => {
-                    return (
-                      <div
-                        key={s}
-                        className="inline-flex items-center px-3 py-2 rounded-full bg-green-50 text-green-600 text-sm mr-2"
-                      >
-                        {s}
-                      </div>
-                    );
-                  })}
-                  <div className="inline-flex items-center px-3 py-2 rounded-full bg-amber-50 text-amber-600 text-sm">
-                    {ingredient.category}
-                  </div>
-                </div>
-                <p className="text-stone-600 text-center leading-relaxed">
-                  {ingredient.description}
-                </p>
+            <section className="bg-white rounded-3xl p-6 shadow-sm text-center mb-4">
+              {/* 画像があれば表示する */}
+              {ingredient.image && (
+                <Image
+                  src={ingredient.image}
+                  alt={`${ingredient.name}の画像`}
+                  width={150}
+                  height={150}
+                  className="rounded-3xl mb-4 mx-auto"
+                  unoptimized // 画像がsvgの場合ブロックされてしまうため設定
+                  priority
+                />
+              )}
+              <h2 className="text-2xl font-bold text-stone-700 mb-4">
+                {ingredient.name}
+              </h2>
 
-                {/* 食べたNGボタン */}
-                <IngredientStatusButtons ingredient={ingredient} />
+              {/* 季節・離乳食段階・カテゴリータグ */}
+              <div className="flex justify-center space-x-2 mb-4">
+                {ingredient.season.map((s) => {
+                  return (
+                    <div
+                      key={s}
+                      className="inline-flex items-center px-3 py-2 rounded-full bg-green-50 text-green-600 text-sm"
+                    >
+                      {s}
+                    </div>
+                  );
+                })}
+                <div className="inline-flex items-center px-3 py-2 rounded-full bg-amber-50 text-amber-600 text-sm">
+                  {ingredient.category}
+                </div>
               </div>
+
+              {/* レシピ説明 */}
+              <p className="text-stone-600 text-center leading-relaxed">
+                {ingredient.description}
+              </p>
+
+              {/* 食べたNGボタン */}
+              <IngredientStatusButtons ingredient={ingredient} />
             </section>
 
             {/* 離乳食段階別の食べ方 */}
@@ -250,10 +252,10 @@ export default function IngredientDetail({
                   </span>
                 </div>
                 <div className="flex justify-between w-full">
-                  <span className="font-medium text-stone-700 flex-shrink-0">
+                  <span className="font-medium text-stone-700 flex-shrink-0 mr-4">
                     主な栄養素
                   </span>
-                  <div className="flex flex-wrap gap-2 ml-2">
+                  <div className="flex flex-wrap justify-end gap-2">
                     {ingredient.nutrition.nutrients.map((nutrient, index) => (
                       <span
                         key={index}

@@ -76,7 +76,7 @@ export default function ForgetPassword() {
           </div>
           <button
             type="submit"
-            className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+            className="flex items-center justify-center w-full py-4 rounded-2xl font-medium bg-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             メールを送信する
           </button>

@@ -234,7 +234,7 @@ export default function ProfilePage() {
           </div>
           <button
             onClick={handleNext}
-            className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+            className="w-full py-4 rounded-2xl font-medium bg-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             つぎへ
           </button>
@@ -299,7 +299,7 @@ export default function ProfilePage() {
           </div>
           <button
             onClick={handleSaveProfile}
-            className="w-full py-4 rounded-2xl font-medium bg-gradient-to-r from-violet-400 to-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+            className="w-full py-4 rounded-2xl font-medium bg-violet-400 text-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             保存してはじめる
           </button>

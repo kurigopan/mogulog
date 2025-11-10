@@ -67,7 +67,7 @@ export default function Footer({ pageName }: HeaderProps) {
       {pageName === "home" && (
         <div className="fixed bottom-24 right-4">
           <Link href="/recipes/create" onClick={(e) => handleClick(e, true)}>
-            <button className="w-14 h-14 bg-gradient-to-r from-violet-400 to-violet-400 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 group">
+            <button className="w-14 h-14 bg-violet-400 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 group">
               <div className="text-white group-hover:rotate-90 transition-transform duration-200">
                 <AddIcon />
               </div>

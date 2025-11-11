@@ -30,7 +30,7 @@ export async function getChild(userId: string) {
 
 export async function createProfile(
   formData: { name: string; avatar_url: string | null },
-  userId: string, // supabase.auth.signUp 後の user.id
+  userId: string,
 ) {
   const profileData: Profile = {
     id: userId,
@@ -43,11 +43,12 @@ export async function createProfile(
   const { data, error } = await supabase
     .from("profiles")
     .insert(profileData)
-    .select();
+    .select()
+    .single();
 
   if (error) {
     console.error("プロフィールの登録に失敗しました:", error);
-    return { data: null, error };
+    throw error;
   }
 
   return data;
@@ -73,7 +74,7 @@ export async function createChild(
 
   if (error) {
     console.error("子どもの登録に失敗しました:", error);
-    return null;
+    throw error;
   }
 
   return data.id;

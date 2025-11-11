@@ -7,14 +7,23 @@ import { ZodFormattedError } from "zod";
 import { AccountBoxIcon } from "@/icons";
 import CenteredCard from "@/components/ui/CenteredCard";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
+import {
+  childIdAtom,
+  childInfoAtom,
+  loadingAtom,
+  parentInfoAtom,
+  userIdAtom,
+} from "@/lib/utils/atoms";
 import {
   createChild,
   createChildAllergens,
   createProfile,
   getAllergens,
+  getChildAllergens,
+  supabase,
   uploadAvatar,
 } from "@/lib/supabase";
+import { calculateAgeInMonths, getAgeStage } from "@/lib/utils";
 import { parentSchema, childCreateSchema } from "@/types";
 import type { Allergen, FormData, ParentForm, ChildCreateForm } from "@/types";
 
@@ -22,6 +31,10 @@ export default function ProfilePage() {
   const router = useRouter();
   const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
+  const setParentInfo = useSetAtom(parentInfoAtom);
+  const setChildId = useSetAtom(childIdAtom);
+  const setChildInfo = useSetAtom(childInfoAtom);
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     avatar_url: null as string | null,
@@ -115,18 +128,45 @@ export default function ProfilePage() {
     }
 
     try {
-      // プロフィールと子どもの情報を登録
-      await createProfile({ ...formData, avatar_url: newAvatarUrl }, userId!);
-      const childId = await createChild(formData, userId!);
+      // プロフィール情報を登録してset
+      const newProfile = await createProfile(
+        { ...formData, avatar_url: newAvatarUrl },
+        userId!,
+      );
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
+      setParentInfo({
+        id: newProfile.id,
+        name: newProfile.name,
+        avatar_url: newProfile.avatar_url,
+        email: session?.user?.email || "未設定",
+        joinDate: new Date(newProfile.created_at).toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "long",
+        }),
+      });
+
+      // 子どもの情報を登録してset
+      const childId = await createChild(formData, userId!);
+      setChildId(childId);
       // アレルゲン情報を登録
-      if (childId) {
-        await createChildAllergens(
-          { ...formData, allergens: selectedAllergenIds },
-          childId,
-          userId!,
-        );
-      }
+      await createChildAllergens(
+        { ...formData, allergens: selectedAllergenIds },
+        childId,
+        userId!,
+      );
+      const childAllergenData = await getChildAllergens(childId);
+
+      setChildInfo({
+        id: childId,
+        name: formData.childName,
+        birthday: formData.childBirthday,
+        age: calculateAgeInMonths(formData.childBirthday) + "ヶ月",
+        ageStage: getAgeStage(calculateAgeInMonths(formData.childBirthday)),
+        allergens: childAllergenData || [],
+      });
 
       // 成功したらホーム画面へ遷移
       router.push("/");

@@ -2,7 +2,9 @@ import { supabase } from "@/lib/supabase/client";
 import { ChildAllergens } from "@/types";
 
 // 子どものアレルゲンデータを取得する関数
-export async function getChildAllergens(childId: number) {
+export async function getChildAllergens(
+  childId: number,
+): Promise<number[] | null> {
   const { data, error } = await supabase
     .from("child_allergens")
     .select("allergen_id")
@@ -12,7 +14,7 @@ export async function getChildAllergens(childId: number) {
     console.error("Failed to fetch child allergens:", error);
     return null;
   }
-  return data.map((item) => item.allergen_id);
+  return data.map((item) => item.allergen_id); // allergen_idの配列
 }
 
 // アレルゲン登録データを全て取得する関数
@@ -61,8 +63,12 @@ export async function getRecipeAllergensById(recipeId: number) {
 export async function createChildAllergens(
   formData: { allergens: number[] },
   childId: number,
-  userId: string, // supabase.auth.signUp 後の user.id
+  userId: string,
 ) {
+  if (formData.allergens.length === 0) {
+    return [];
+  }
+
   const allergenData: Omit<ChildAllergens, "id">[] = formData.allergens.map(
     (allergenId) => ({
       child_id: childId,
@@ -72,17 +78,12 @@ export async function createChildAllergens(
     }),
   );
 
-  const { data, error } = await supabase
-    .from("child_allergens")
-    .insert(allergenData)
-    .select();
+  const { error } = await supabase.from("child_allergens").insert(allergenData);
 
   if (error) {
     console.error("アレルゲンの登録に失敗しました:", error);
-    return { data: null, error };
+    throw error;
   }
-
-  return data;
 }
 
 export async function createRecipeAllergens(

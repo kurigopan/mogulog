@@ -21,22 +21,20 @@ import { calculateAgeInMonths, getAgeStage } from "@/lib/utils";
 
 export const UserInitializer = () => {
   const setIsLoading = useSetAtom(loadingAtom);
+  const userId = useAtomValue(userIdAtom);
   const setParentInfo = useSetAtom(parentInfoAtom);
   const setChildId = useSetAtom(childIdAtom);
   const setChildInfo = useSetAtom(childInfoAtom);
   const setAllergens = useSetAtom(allergensAtom);
 
-  // AuthObserverによって更新されるuserIdを監視する
-  const userId = useAtomValue(userIdAtom);
-
   useEffect(() => {
-    (async () => {
-      // userIdがundefined（初期状態）の場合は、AuthObserverによるセットを待つ
-      if (typeof userId === "undefined") {
-        return;
-      }
+    // userIdがundefined（初期状態）の場合は、AuthObserverによるセットを待つ
+    if (typeof userId === "undefined") {
+      return;
+    }
 
-      setIsLoading(true);
+    setIsLoading(true);
+    (async () => {
       try {
         // 現在のセッション情報を取得
         const {
@@ -119,6 +117,8 @@ export const UserInitializer = () => {
         }
       } catch (error) {
         console.error("Failed to initialize user session:", error);
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
         // エラー時もJotaiの状態をリセット
         setChildId(null);
       } finally {

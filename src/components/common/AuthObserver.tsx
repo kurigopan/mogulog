@@ -13,14 +13,7 @@ export const AuthObserver = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      // セッションがあればユーザーIDをセット
-      if (session) {
-        const userId = session.user.id;
-        setUserId(userId);
-      } else {
-        // セッションがなければユーザーIDをnullにリセット
-        setUserId(null);
-      }
+      setUserId(session?.user?.id ?? null);
     });
 
     // クリーンアップ関数

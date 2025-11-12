@@ -20,7 +20,7 @@ export const parentInfoAtom = atom<ParentInfo>({
   email: "未設定",
   joinDate: "不明",
 });
-export const userIdAtom = atom<string | null>(null);
+export const userIdAtom = atom<string | null | undefined>(undefined);
 
 export const childInfoAtom = atom<ChildInfo>({
   id: 0,

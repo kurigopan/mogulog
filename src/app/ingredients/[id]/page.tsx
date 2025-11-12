@@ -43,9 +43,10 @@ export default function IngredientDetail({
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      if (userId && childId) {
-        const ingredientData = await getIngredientById(userId, childId, id);
-        if (ingredientData) {
+      try {
+        if (userId && childId) {
+          const ingredientData = await getIngredientById(userId, childId, id);
+          if (!ingredientData) return;
           setIngredient(ingredientData);
           const recipeData = await searchRecipesByIngredient(
             userId,
@@ -55,10 +56,9 @@ export default function IngredientDetail({
           if (recipeData) {
             setRelatedRecipes(recipeData);
           }
-        }
-      } else {
-        const ingredientData = await getIngredientById(null, null, id);
-        if (ingredientData) {
+        } else {
+          const ingredientData = await getIngredientById(null, null, id);
+          if (!ingredientData) return;
           setIngredient(ingredientData);
           const recipeData = await searchRecipesByIngredient(
             null,
@@ -69,9 +69,13 @@ export default function IngredientDetail({
             setRelatedRecipes(recipeData);
           }
         }
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
       }
     })();
-    setIsLoading(false);
   }, [userId, childId, id, childInfo?.ageStage]);
 
   // 閲覧履歴ローカルストレージに保存

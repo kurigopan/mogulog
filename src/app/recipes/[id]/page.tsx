@@ -62,23 +62,23 @@ export default function RecipeDetail({
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const allergensData = await getRecipeAllergens(id);
-      if (allergensData) {
+      try {
+        const allergensData = await getRecipeAllergens(id);
         setAllergens(allergensData);
-      }
-      if (userId) {
-        const recipeData = await getRecipeById(userId, id);
-        if (recipeData) {
+        if (userId) {
+          const recipeData = await getRecipeById(userId, id);
+          setRecipe(recipeData);
+        } else {
+          const recipeData = await getRecipeById(null, id);
           setRecipe(recipeData);
         }
-      } else {
-        const recipeData = await getRecipeById(null, id);
-        if (recipeData) {
-          setRecipe(recipeData);
-        }
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
       }
     })();
-    setIsLoading(false);
   }, [id, userId]);
 
   // 閲覧履歴ローカルストレージに保存

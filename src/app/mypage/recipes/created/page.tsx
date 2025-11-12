@@ -1,34 +1,46 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CreateIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
 import { useAtomValue, useSetAtom } from "jotai";
-import { loadingAtom, userIdAtom } from "@/lib/utils/atoms";
+import {
+  loadingAtom,
+  loginDialogSourceAtom,
+  userIdAtom,
+} from "@/lib/utils/atoms";
 import { getRecipesCreatedByUser } from "@/lib/supabase";
 import type { ListCardItem } from "@/types";
 
 export default function CreatedRecipes() {
-  const router = useRouter();
   const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
+  const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const [createdRecipes, setCreatedRecipes] = useState<ListCardItem[]>([]);
 
   useEffect(() => {
-    if (userId) {
-      setIsLoading(true);
-      (async () => {
+    if (userId === undefined) {
+      return;
+    }
+    if (userId === null) {
+      setLoginDialogSource("mypage");
+      return;
+    }
+
+    setIsLoading(true);
+    (async () => {
+      try {
         const recipes = await getRecipesCreatedByUser(userId);
         setCreatedRecipes(recipes);
-      })();
-      setIsLoading(false);
-    } else {
-      router.push("/");
-    }
+      } catch (err) {
+        // TODO: エラーダイアログ
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, [userId]);
 
   return (

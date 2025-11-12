@@ -93,10 +93,10 @@ export async function updateProfile(
 
   if (error) {
     console.error("プロフィールの更新に失敗しました:", error);
-    return { data: null, error };
+    throw error;
   }
 
-  return { data, error };
+  return data;
 }
 
 export async function updateChild(

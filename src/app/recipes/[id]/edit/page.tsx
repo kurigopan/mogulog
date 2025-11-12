@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RecipeForm from "@/components/features/RecipeForm";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
   loadingAtom,
   loginDialogSourceAtom,
@@ -20,28 +20,32 @@ export default function RecipeEditPage({
 }) {
   const unwrapParams = use(params);
   const recipeId = Number(unwrapParams.id);
-  const [isLoading, setIsLoading] = useAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
 
   useEffect(() => {
-    if (!isLoading && !userId) {
-      setLoginDialogSource("edit");
+    if (userId === undefined) {
+      return;
     }
-  }, [isLoading]);
+    if (userId === null) {
+      setLoginDialogSource("edit");
+      return;
+    }
 
-  useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const data = await getRecipeById(userId, recipeId);
-      if (!data) {
-        console.error("レシピの取得に失敗しました:");
-      } else {
+      try {
+        const data = await getRecipeById(userId, recipeId);
         setRecipeData(data);
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
       }
     })();
-    setIsLoading(false);
   }, [recipeId]);
 
   return (

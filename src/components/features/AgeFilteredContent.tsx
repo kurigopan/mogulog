@@ -10,7 +10,7 @@ import {
   getSeasonalIngredients,
 } from "@/lib/supabase";
 import { getCardContents } from "@/lib/utils";
-import { CardContent } from "@/types";
+import type { CardContent } from "@/types";
 
 type AgeFilteredContentProps = {
   initialCardContents: CardContent[];
@@ -59,6 +59,8 @@ export default function AgeFilteredContent({
           if (isMounted) {
             console.error("Error fetching filtered data:", error);
           }
+          // TODO: エラーダイアログ
+          alert("処理中にエラーが発生しました。");
         } finally {
           if (isMounted) {
             setIsLoading(false);

@@ -51,6 +51,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
       setEaten(originalEatenStatus);
       setNG(originalNgStatus);
       // TODO: ユーザーへのエラー通知
+      alert("処理中にエラーが発生しました。");
     }
   };
 
@@ -84,6 +85,7 @@ export const useIngredientStatusToggle = (ingredient: Ingredient) => {
       setEaten(originalEatenStatus);
       setNG(originalNgStatus);
       // TODO: ユーザーへのエラー通知
+      alert("処理中にエラーが発生しました。");
     }
   };
 

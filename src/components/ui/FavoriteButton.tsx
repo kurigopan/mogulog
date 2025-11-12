@@ -10,7 +10,7 @@ import {
   userIdAtom,
 } from "@/lib/utils/atoms";
 import { toggleFavoriteItem } from "@/lib/supabase";
-import { Type } from "@/types";
+import type { Type } from "@/types";
 
 type FavoriteButtonProps = {
   itemId: number;
@@ -43,7 +43,7 @@ export default function FavoriteButton({
         userId,
         itemId,
         itemType,
-        previousState
+        previousState,
       );
 
       if (!success) {
@@ -59,7 +59,7 @@ export default function FavoriteButton({
         alert(
           previousState
             ? "お気に入り解除に失敗しました。"
-            : "お気に入り登録に失敗しました。"
+            : "お気に入り登録に失敗しました。",
         );
       } else {
         setIsFavorited(newState);
@@ -71,8 +71,8 @@ export default function FavoriteButton({
         });
       }
     } catch (error) {
-      console.error("お気に入り操作中に予期せぬエラーが発生:", error);
       setIsFavorited(previousState);
+      // TODO: エラーダイアログ
       alert("処理中にエラーが発生しました。");
     } finally {
       setIsLoading(false);

@@ -90,6 +90,8 @@ export default function IngredientsList() {
           };
         }),
       );
+      // TODO: エラーダイアログ
+      alert("処理中にエラーが発生しました。");
     }
   };
 
@@ -135,6 +137,8 @@ export default function IngredientsList() {
           };
         }),
       );
+      // TODO: エラーダイアログ
+      alert("処理中にエラーが発生しました。");
     }
   };
   const filteredIngredients = ingredients.filter((ingredient) => {
@@ -179,17 +183,21 @@ export default function IngredientsList() {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      let ingredientsData;
-      if (userId && childId) {
-        ingredientsData = await getIngredientsWithStatus(userId, childId);
-      } else {
-        ingredientsData = await getIngredientsWithStatus();
-      }
-      if (ingredientsData) {
+      try {
+        let ingredientsData;
+        if (userId && childId) {
+          ingredientsData = await getIngredientsWithStatus(userId, childId);
+        } else {
+          ingredientsData = await getIngredientsWithStatus();
+        }
         setIngredients(ingredientsData);
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
       }
     })();
-    setIsLoading(false);
   }, [userId, childId]);
 
   return (

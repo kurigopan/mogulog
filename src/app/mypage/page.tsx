@@ -139,7 +139,8 @@ export default function MyPage() {
       }
       setAvatar(null);
     } catch (error) {
-      console.error("Failed to update parent profile:", error);
+      // TODO: エラーダイアログ
+      alert("処理中にエラーが発生しました。");
     } finally {
       setIsLoading(false);
       setIsEditingParent(false);
@@ -167,10 +168,7 @@ export default function MyPage() {
       setChildInfo(displayChildInfo);
     } catch (error) {
       if (error instanceof Error) {
-        console.error(
-          "子どもの情報更新中にエラーが発生しました:",
-          error.message,
-        );
+        // TODO: エラーダイアログ
         alert(error.message);
       }
     } finally {

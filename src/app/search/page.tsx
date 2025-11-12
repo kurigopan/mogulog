@@ -30,10 +30,8 @@ export default function SearchResults() {
   const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const childId = useAtomValue(childIdAtom);
-
   const [searchState, setSearchState] = useAtom(searchStateAtom);
   const { query: searchQuery, results, allergenExclusions } = searchState;
-
   const [allergens, setAllergens] = useState<Allergen[]>([]);
   const [showAllergens, setShowAllergens] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,28 +112,34 @@ export default function SearchResults() {
     setIsLoading(true);
 
     (async () => {
-      if (allergens.length === 0) {
-        const data = await getAllergens();
-        if (data) {
-          setAllergens(data);
+      try {
+        if (allergens.length === 0) {
+          const data = await getAllergens();
+          if (data) {
+            setAllergens(data);
 
-          if (
-            !searchState.allergenExclusions ||
-            Object.keys(searchState.allergenExclusions).length === 0
-          ) {
-            const initialExclusions: Record<string, boolean> = {};
-            data.forEach((a) => {
-              initialExclusions[a.id] = false;
-            });
-            setSearchState((prev) => ({
-              ...prev,
-              allergenExclusions: initialExclusions,
-            }));
+            if (
+              !searchState.allergenExclusions ||
+              Object.keys(searchState.allergenExclusions).length === 0
+            ) {
+              const initialExclusions: Record<string, boolean> = {};
+              data.forEach((a) => {
+                initialExclusions[a.id] = false;
+              });
+              setSearchState((prev) => ({
+                ...prev,
+                allergenExclusions: initialExclusions,
+              }));
+            }
           }
         }
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
       }
     })();
-    setIsLoading(false);
   });
 
   return (

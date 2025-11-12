@@ -6,7 +6,7 @@ import { FavoriteBorderIcon } from "@/icons";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ListCard from "@/components/ui/ListCard";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
   favoriteUpdateAtom,
   loadingAtom,
@@ -14,10 +14,10 @@ import {
   userIdAtom,
 } from "@/lib/utils/atoms";
 import { getFavoriteIngredients, getFavoriteRecipes } from "@/lib/supabase";
-import { ListCardItem } from "@/types";
+import type { ListCardItem } from "@/types";
 
 export default function Favorites() {
-  const [isLoading, setIsLoading] = useAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const userId = useAtomValue(userIdAtom);
   const setLoginDialogSource = useSetAtom(loginDialogSourceAtom);
   const favoriteUpdate = useAtomValue(favoriteUpdateAtom);
@@ -27,24 +27,32 @@ export default function Favorites() {
   >([]);
 
   useEffect(() => {
-    if (!isLoading && !userId) {
-      setLoginDialogSource("favorites");
+    if (userId === undefined) {
+      return;
     }
-  }, [isLoading]);
+    if (userId === null) {
+      setLoginDialogSource("favorites");
+      return;
+    }
 
-  useEffect(() => {
-    if (userId) {
-      setIsLoading(true);
-      (async () => {
-        const recipes = await getFavoriteRecipes(userId);
+    setIsLoading(true);
+    (async () => {
+      try {
+        const [recipes, ingredients] = await Promise.all([
+          getFavoriteRecipes(userId),
+          getFavoriteIngredients(userId),
+        ]);
         setFavoriteRecipes(recipes.map((r) => ({ ...r, isFavorite: true })));
-        const ingredients = await getFavoriteIngredients(userId);
         setFavoriteIngredients(
           ingredients.map((i) => ({ ...i, isFavorite: true })),
         );
-      })();
-      setIsLoading(false);
-    }
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, [userId]);
 
   useEffect(() => {

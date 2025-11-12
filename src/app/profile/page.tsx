@@ -170,14 +170,16 @@ export default function ProfilePage() {
 
       // 成功したらホーム画面へ遷移
       router.push("/");
-    } catch (err) {
+    } catch (error) {
       // いずれかのステップでエラーが発生した場合
-      console.error(err);
-      if (err instanceof Error) {
-        setErrors(err.message);
+      console.error(error);
+      if (error instanceof Error) {
+        setErrors(error.message);
       } else {
         setErrors("不明なエラーが発生しました。");
       }
+      // TODO: エラーダイアログ
+      alert("処理中にエラーが発生しました。");
     } finally {
       setIsLoading(false);
     }
@@ -186,17 +188,25 @@ export default function ProfilePage() {
   // ページロード時とアレルゲン項目がないときに実行
   useEffect(() => {
     inputRef.current?.focus();
+    setIsLoading(true);
     (async () => {
-      if (allergens.length === 0) {
-        const data = await getAllergens();
-        if (data) {
-          setAllergens(data);
-          const initialExclusions: Record<string, boolean> = {};
-          data.forEach((allergen) => {
-            initialExclusions[allergen.id] = false;
-          });
-          setAllergenExclusions(initialExclusions);
+      try {
+        if (allergens.length === 0) {
+          const data = await getAllergens();
+          if (data) {
+            setAllergens(data);
+            const initialExclusions: Record<string, boolean> = {};
+            data.forEach((allergen) => {
+              initialExclusions[allergen.id] = false;
+            });
+            setAllergenExclusions(initialExclusions);
+          }
         }
+      } catch (error) {
+        // TODO: エラーダイアログ
+        alert("処理中にエラーが発生しました。");
+      } finally {
+        setIsLoading(false);
       }
     })();
   });

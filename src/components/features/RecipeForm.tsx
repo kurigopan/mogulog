@@ -336,7 +336,8 @@ export default function RecipeForm({
 
       router.push(`/recipes/${recipeId}`);
     } catch (error) {
-      console.error("保存中にエラーが発生:", error);
+      // TODO: エラーダイアログ
+      alert("処理中にエラーが発生しました。");
     } finally {
       setIsSaving(false);
     }
@@ -376,7 +377,6 @@ export default function RecipeForm({
         savedMemo: rest.savedMemo || "",
         category: rest.category || "主食",
         type: rest.type || "recipe",
-        // status: rest.status || "draft",
       });
     }
   }, [initialData]);
@@ -386,48 +386,53 @@ export default function RecipeForm({
     inputRef.current?.focus();
     setIsLoading(true);
     (async () => {
-      if (allergens.length === 0) {
-        const data = await getAllergens();
-        if (data) {
-          setAllergens(data);
+      try {
+        if (allergens.length === 0) {
+          const data = await getAllergens();
+          if (data) {
+            setAllergens(data);
 
-          // マップを作成
-          const newMap = new Map<string, string>();
-          data.forEach((allergen) => {
-            // 同義語をキー、アレルゲン名を値として保存
-            if (allergen.variants) {
-              allergen.variants.forEach((variant: string) => {
-                newMap.set(variant, allergen.name);
-              });
-            }
-          });
-          allergenMap.current = newMap;
-
-          // レシピIDがすでに存在する場合、そのレシピに紐づくアレルゲンも取得
-          if (isEditMode && initialData?.id) {
-            const selectedAllergenIds = await getRecipeAllergensById(
-              initialData.id,
-            );
-            if (selectedAllergenIds) {
-              const initialAllergenState: Record<string, boolean> = {};
-              data.forEach((allergen) => {
-                initialAllergenState[allergen.id] =
-                  selectedAllergenIds.includes(allergen.id);
-              });
-              setAllergenInclusions(initialAllergenState);
-            }
-          } else {
-            // 新規作成モードの場合、全てのアレルゲンをfalseで初期化
-            const initialInclusions: Record<string, boolean> = {};
+            // マップを作成
+            const newMap = new Map<string, string>();
             data.forEach((allergen) => {
-              initialInclusions[allergen.id] = false;
+              // 同義語をキー、アレルゲン名を値として保存
+              if (allergen.variants) {
+                allergen.variants.forEach((variant: string) => {
+                  newMap.set(variant, allergen.name);
+                });
+              }
             });
-            setAllergenInclusions(initialInclusions);
+            allergenMap.current = newMap;
+
+            // レシピIDがすでに存在する場合、そのレシピに紐づくアレルゲンも取得
+            if (isEditMode && initialData?.id) {
+              const selectedAllergenIds = await getRecipeAllergensById(
+                initialData.id,
+              );
+              if (selectedAllergenIds) {
+                const initialAllergenState: Record<string, boolean> = {};
+                data.forEach((allergen) => {
+                  initialAllergenState[allergen.id] =
+                    selectedAllergenIds.includes(allergen.id);
+                });
+                setAllergenInclusions(initialAllergenState);
+              }
+            } else {
+              // 新規作成モードの場合、全てのアレルゲンをfalseで初期化
+              const initialInclusions: Record<string, boolean> = {};
+              data.forEach((allergen) => {
+                initialInclusions[allergen.id] = false;
+              });
+              setAllergenInclusions(initialInclusions);
+            }
           }
         }
+      } catch (err) {
+        // TODO: エラーダイアログ
+      } finally {
+        setIsLoading(false);
       }
     })();
-    setIsLoading(false);
   }, [allergens, isEditMode, initialData]);
 
   // 材料の変更をチェックしてサジェストを更新するuseEffect

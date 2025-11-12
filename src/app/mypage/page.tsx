@@ -39,7 +39,7 @@ import type { ParentForm, ChildUpdateForm } from "@/types";
 
 export default function MyPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useAtom(loadingAtom);
+  const setIsLoading = useSetAtom(loadingAtom);
   const [userId, setUserId] = useAtom(userIdAtom);
   const childId = useAtomValue(childIdAtom);
   const [parentInfo, setParentInfo] = useAtom(parentInfoAtom);
@@ -59,24 +59,32 @@ export default function MyPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (
-      !isLoading &&
-      (!userId || !childId || !parentInfo.id || !childInfo.id)
-    ) {
+    if (userId === undefined) {
+      return;
+    }
+    if (userId === null) {
       setLoginDialogSource("mypage");
     }
-  }, [isLoading]);
+  }, [userId, setLoginDialogSource]);
+
+  useEffect(() => {
+    setDisplayParentInfo(parentInfo);
+  }, [parentInfo]);
+
+  useEffect(() => {
+    setDisplayChildInfo(childInfo);
+  }, [childInfo]);
 
   // アバター画像の変更処理
   const onUpLoadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
 
     if (!files || files.length === 0) {
-      setParentInfo((prev) => ({ ...prev, avatar_url: null }));
+      setDisplayParentInfo((prev) => ({ ...prev, avatar_url: null }));
       setAvatar(null);
     } else {
       const imageUrl = URL.createObjectURL(files[0]);
-      setParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
+      setDisplayParentInfo((prev) => ({ ...prev, avatar_url: imageUrl }));
       setAvatar(files[0]);
     }
   };
@@ -88,13 +96,20 @@ export default function MyPage() {
 
   const handleParentEditToggle = () => {
     setIsEditingParent(!isEditingParent);
+    if (isEditingParent) {
+      setDisplayParentInfo(parentInfo); // Cancel edits, revert to global state
+    }
   };
 
   const handleChildEditToggle = () => {
     setIsEditingChild(!isEditingChild);
+    if (isEditingChild) {
+      setDisplayChildInfo(childInfo); // Cancel edits, revert to global state
+    }
   };
 
   const handleParentSave = async () => {
+    if (!userId) return;
     setIsLoading(true);
 
     const result = parentSchema.safeParse(displayParentInfo);
@@ -105,27 +120,34 @@ export default function MyPage() {
     }
     setParentFormErrors(null);
 
-    let newAvatarUrl = parentInfo.avatar_url;
+    try {
+      let newAvatarUrl = displayParentInfo.avatar_url;
 
-    if (avatar) {
-      newAvatarUrl = await uploadAvatar(avatar, userId!);
+      if (avatar) {
+        newAvatarUrl = await uploadAvatar(avatar, userId);
+      }
+      const data = await updateProfile(userId, {
+        name: displayParentInfo.name,
+        avatar_url: newAvatarUrl,
+      });
+      if (data) {
+        setParentInfo((prev) => ({
+          ...prev,
+          name: data.name,
+          avatar_url: newAvatarUrl,
+        }));
+      }
+      setAvatar(null);
+    } catch (error) {
+      console.error("Failed to update parent profile:", error);
+    } finally {
+      setIsLoading(false);
+      setIsEditingParent(false);
     }
-    const { data, error } = await updateProfile(userId!, {
-      name: displayParentInfo.name,
-      avatar_url: newAvatarUrl,
-    });
-    if (error) throw error;
-    setParentInfo((prev) => ({
-      ...prev,
-      name: data.name,
-      avatar_url: newAvatarUrl,
-    }));
-    setIsEditingParent(false);
-    setAvatar(null);
-    setIsLoading(false);
   };
 
   const handleChildSave = async () => {
+    if (!childId || !userId) return;
     setIsLoading(true);
 
     const result = childUpdateSchema.safeParse(displayChildInfo);
@@ -137,13 +159,12 @@ export default function MyPage() {
     setChildFormErrors(null);
 
     try {
-      await updateChild(childId!, {
+      await updateChild(childId, {
         name: displayChildInfo.name,
         birthday: displayChildInfo.birthday,
       });
-      await upsertChildAllergens(childId!, displayChildInfo.allergens, userId!);
+      await upsertChildAllergens(childId, displayChildInfo.allergens, userId);
       setChildInfo(displayChildInfo);
-      setIsEditingChild(false);
     } catch (error) {
       if (error instanceof Error) {
         console.error(
@@ -154,13 +175,11 @@ export default function MyPage() {
       }
     } finally {
       setIsLoading(false);
+      setIsEditingChild(false);
     }
-    setIsEditingChild(false);
   };
 
   const handleToggleAllergen = (allergenId: number) => {
-    if (!childInfo) return;
-
     if (displayChildInfo.allergens.includes(allergenId)) {
       setDisplayChildInfo({
         ...displayChildInfo,
@@ -210,6 +229,10 @@ export default function MyPage() {
     //   link: "/mypage/recipes/drafts",
     // },
   ];
+
+  if (userId === undefined || userId === null) {
+    return null;
+  }
 
   return (
     <>
